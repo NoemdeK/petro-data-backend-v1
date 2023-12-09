@@ -1,0 +1,6 @@
+apps:
+  - script: ./dist/main.js
+    name: petro-data
+    watch: false
+    instances: max
+    exec_mode: cluster
