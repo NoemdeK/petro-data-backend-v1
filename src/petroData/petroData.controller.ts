@@ -23,27 +23,24 @@ export class PetroDataController {
   // @Roles(Role.ADMIN, Role.MEMBER)
   @Post('/upload-xlsx')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadXlsxFileIntoDb(
+  async uploadXlsxCsvFilesIntoDb(
     @Req() req: any,
     @Res() res: Response,
-    @Body() createXlsxDto: CreateXlsxDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<Response> {
-    // function payload() /* : CreateXlsxDto */ {
-    //   return {
-    //     file,
-    //     //...createXlsxDto,
-    //   };
-    // }
     const configFileBuffer: Buffer = req.file.buffer;
-    const data = await this.petroDataService.uploadXlsxFileIntoDb(
+    const data = await this.petroDataService.uploadXlsxCsvFilesIntoDb(
       file,
       configFileBuffer,
     );
     return res
       .status(200)
       .json(
-        success('Successfully stored xlsx data into the database', 201, data),
+        success(
+          'Successfully stored xlsx/csv files into the database',
+          201,
+          data,
+        ),
       );
   }
 }

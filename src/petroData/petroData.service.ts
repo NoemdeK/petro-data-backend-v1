@@ -26,7 +26,10 @@ export class PetroDataService {
    * @returns {Promise<any>}
    */
 
-  async uploadXlsxFileIntoDb(file: any, configFileBuffer: any): Promise<any> {
+  async uploadXlsxCsvFilesIntoDb(
+    file: any,
+    configFileBuffer: any,
+  ): Promise<any> {
     try {
       if (!file) {
         AppResponse.error({
@@ -123,7 +126,7 @@ export class PetroDataService {
         });
       }
     } catch (error) {
-      error.location = `ExecutiveServices.${this.uploadXlsxFileIntoDb.name} method`;
+      error.location = `ExecutiveServices.${this.uploadXlsxCsvFilesIntoDb.name} method`;
       AppResponse.error(error);
     }
   }
