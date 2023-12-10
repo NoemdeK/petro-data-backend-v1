@@ -34,7 +34,7 @@ export class PetroDataController {
       configFileBuffer,
     );
     return res
-      .status(200)
+      .status(201)
       .json(
         success(
           'Successfully stored xlsx/csv files into the database',
