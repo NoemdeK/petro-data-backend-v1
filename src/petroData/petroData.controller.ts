@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   Req,
   Res,
   UploadedFile,
@@ -12,6 +14,7 @@ import { PetroDataService } from './petroData.service';
 import { Response } from 'express';
 import { CreateXlsxDto } from './dto/create-xlsx.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { PetroDataAnalysisDto } from './dto/petro-data-analysis.dto';
 
 const { success } = AppResponse;
 
@@ -19,9 +22,9 @@ const { success } = AppResponse;
 export class PetroDataController {
   constructor(private readonly petroDataService: PetroDataService) {}
 
-  // @UseGuards(JwtAuthGuard, WorkspaceGuard, RoleGuard)
-  // @Roles(Role.ADMIN, Role.MEMBER)
-  @Post('/upload-xlsx')
+  // @UseGuards(JwtAuthGuard, RoleGuard)
+  //@Roles(Role.ADMIN, Role.RWX)
+  @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadXlsxCsvFilesIntoDb(
     @Req() req: any,
@@ -42,5 +45,22 @@ export class PetroDataController {
           data,
         ),
       );
+  }
+
+  // @UseGuards(JwtAuthGuard, RoleGuard)
+  // @Roles(Role.ADMIN, Role.RWX, Role.RW, Role.R)
+  @Get('/analysis')
+  async petroDataAnalysis(
+    @Req() req: any,
+    @Res() res: Response,
+    @Body() petroDataAnalysisDto: PetroDataAnalysisDto,
+    @Query('period') period: string,
+  ): Promise<Response> {
+    petroDataAnalysisDto.period = period;
+    const data =
+      await this.petroDataService.petroDataAnalysis(petroDataAnalysisDto);
+    return res
+      .status(200)
+      .json(success('Successfully analyzed petro data', 200, data));
   }
 }
