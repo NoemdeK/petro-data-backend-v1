@@ -1,9 +1,19 @@
-import { Body, Controller, Post, Query, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { AppResponse } from 'src/common/app.response';
 import { CreateUserDto, LoginDto } from './dto/create-user.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { JwtAuthGuard } from 'src/guards/jwt/jwt.guard';
 
 const { success } = AppResponse;
 @Controller('auth')
@@ -57,5 +67,16 @@ export class AuthController {
     return res
       .status(200)
       .json(success('Successfully reset user password', 200, data));
+  }
+
+  @Get('/me')
+  @UseGuards(JwtAuthGuard)
+  async userProfile(@Req() req: any, @Res() res: Response): Promise<Response> {
+    const userId = req.user.userId;
+    const data = await this.authService.userProfile(userId);
+
+    return res
+      .status(200)
+      .json(success('Successfully retrieved user profile', 200, data));
   }
 }

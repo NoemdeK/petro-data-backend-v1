@@ -223,4 +223,30 @@ export class AuthService {
       AppResponse.error(error);
     }
   }
+
+  /**
+   * @Responsibility: dedicated service for retrieving logged in user details
+   *
+   * @param userId
+   * @returns {Promise<any>}
+   */
+
+  async userProfile(userId: string): Promise<any> {
+    try {
+      const user = await this.authRepository.findUser({ _id: userId });
+
+      const { password, ...otherUserDetails } = user;
+
+      if (!user) {
+        AppResponse.error({
+          message: 'User not found',
+          status: HttpStatus.BAD_REQUEST,
+        });
+      }
+      return otherUserDetails;
+    } catch (error) {
+      error.location = `AuthServices.${this.userProfile.name} method`;
+      AppResponse.error(error);
+    }
+  }
 }
