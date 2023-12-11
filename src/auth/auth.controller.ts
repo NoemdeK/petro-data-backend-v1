@@ -1,8 +1,9 @@
-import { Body, Controller, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Post, Query, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { AppResponse } from 'src/common/app.response';
 import { CreateUserDto, LoginDto } from './dto/create-user.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 const { success } = AppResponse;
 @Controller('auth')
@@ -30,5 +31,31 @@ export class AuthController {
     const data = await this.authService.login(loginDto);
 
     return res.status(200).json(success('Successfully logged in', 200, data));
+  }
+
+  @Post('/forgot-password')
+  async forgotPassword(
+    @Res() res: Response,
+    @Body('email') email: string,
+  ): Promise<Response> {
+    const data = await this.authService.forgotPassword(email);
+
+    return res
+      .status(200)
+      .json(success('Password reset token successfully sent', 200, data));
+  }
+
+  @Post('/reset-password')
+  async resetPassword(
+    @Res() res: Response,
+    @Query('token') token: string,
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<Response> {
+    resetPasswordDto.token = token;
+    const data = await this.authService.resetPassword(resetPasswordDto);
+
+    return res
+      .status(200)
+      .json(success('Successfully reset user password', 200, data));
   }
 }

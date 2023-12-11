@@ -5,12 +5,22 @@ import { hashSync, genSaltSync, compareSync } from 'bcrypt';
 import { Role } from 'src/common/interfaces/roles.interface';
 import { AuthRepository } from './auth.repository';
 import { JwtService } from '@nestjs/jwt';
+import { randomUUID } from 'crypto';
+import * as moment from 'moment';
+import { ConfigService } from '@nestjs/config';
+import { MailDispatcherDto } from 'src/email/dto/send-mail.dto';
+import { forgotPasswordTemplate } from 'src/email/templates/forgot-password.template';
+import { EmailService } from 'src/email/email.service';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { passwordResetTemplate } from 'src/email/templates/password-reset-template';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly authRepository: AuthRepository,
     private jwtService: JwtService,
+    private readonly configService: ConfigService,
+    private readonly emailService: EmailService,
   ) {}
 
   /**
@@ -22,14 +32,16 @@ export class AuthService {
 
   async signup(createUserDto: CreateUserDto): Promise<any> {
     try {
-      let { email, password } = createUserDto;
+      let { firstName, lastName, email, password } = createUserDto;
 
       /* Hash password before storing it */
       password = password ? hashSync(password, genSaltSync()) : null;
 
       function userData(): CreateUserDto {
         return {
-          email: email,
+          firstName,
+          lastName,
+          email,
           password,
           role: Role.RWX_USER,
         };
@@ -85,6 +97,129 @@ export class AuthService {
       return { auth: this.jwtService.sign(jwtPayloadForAuth()) };
     } catch (error) {
       error.location = `AuthServices.${this.login.name} method`;
+      AppResponse.error(error);
+    }
+  }
+
+  /**
+   * @Responsibility: dedicated service for forget password
+   *
+   * @param email
+   * @returns {Promise<any>}
+   */
+
+  async forgotPassword(email: string): Promise<any> {
+    try {
+      const user = await this.authRepository.findUser({ email });
+      if (!user) {
+        AppResponse.error({
+          message: 'User not found',
+          status: HttpStatus.NOT_FOUND,
+        });
+      }
+      const token = randomUUID().split('-').join('');
+
+      const findUserPwdToken = await this.authRepository.findResetPwdToken({
+        email,
+      });
+
+      if (!findUserPwdToken) {
+        await this.authRepository.createResetPwdToken({
+          email,
+          token,
+          expiresIn: moment().utc().add(1, 'hour').toDate(),
+        });
+      } else {
+        await this.authRepository.updateResetPwdToken(
+          { email },
+          { token, expiresIn: moment().utc().add(1, 'hour').toDate() },
+        );
+      }
+
+      const resetPasswordLink = `${this.configService.get<string>(
+        'FRONTEND_BASE_URL',
+      )}/auth/reset-password/${token}`;
+      const emailFrom = this.configService.get<string>('EMAIL_SENDER');
+
+      function emailDispatcherPayload(): MailDispatcherDto {
+        return {
+          to: `${user?.email}`,
+          from: emailFrom,
+          subject: 'Password Reset Token',
+          text: 'Password Reset Token',
+          html: forgotPasswordTemplate(user?.firstName, resetPasswordLink),
+        };
+      }
+      /* Send email to user */
+      await this.emailService.emailDispatcher(emailDispatcherPayload());
+    } catch (error) {
+      error.location = `AuthServices.${this.forgotPassword.name} method`;
+      AppResponse.error(error);
+    }
+  }
+
+  /**
+   * @Responsibility: dedicated service for reset password
+   *
+   * @param resetPasswordDto
+   * @returns {Promise<any>}
+   */
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<any> {
+    try {
+      let { token, password } = resetPasswordDto;
+
+      const getToken = await this.authRepository.findResetPwdToken({
+        token,
+      });
+      if (!getToken) {
+        AppResponse.error({
+          message: 'Invalid token',
+          status: HttpStatus.BAD_REQUEST,
+        });
+      }
+
+      const theUser = await this.authRepository.findUser({
+        email: getToken?.email,
+      });
+      if (!theUser) {
+        AppResponse.error({
+          message: 'User not found',
+          status: HttpStatus.NOT_FOUND,
+        });
+      }
+
+      /* Check if token has expired */
+      if (moment.utc().toDate() > getToken?.expiresIn) {
+        AppResponse.error({
+          message: 'Token has expired. Please request a new one',
+          status: HttpStatus.BAD_REQUEST,
+        });
+      }
+
+      /* Update password of user */
+      password = hashSync(password, genSaltSync());
+      await this.authRepository.updateUser(
+        { email: getToken?.email },
+        { password },
+      );
+
+      await this.authRepository.removeResetPwdToken({ _id: getToken?._id });
+
+      const emailFrom = this.configService.get<string>('EMAIL_SENDER');
+      function emailDispatcherPayload(): MailDispatcherDto {
+        return {
+          to: `${getToken?.email}`,
+          from: emailFrom,
+          subject: 'Password Successfuly Reset',
+          text: 'Password Successfuly Reset',
+          html: passwordResetTemplate(theUser?.firstName),
+        };
+      }
+      /* Send email to user */
+      await this.emailService.emailDispatcher(emailDispatcherPayload());
+    } catch (error) {
+      error.location = `AuthServices.${this.resetPassword.name} method`;
       AppResponse.error(error);
     }
   }

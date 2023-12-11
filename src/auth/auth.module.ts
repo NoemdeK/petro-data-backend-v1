@@ -6,6 +6,11 @@ import { AuthRepository } from './auth.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schema/user.schema';
+import {
+  PasswordReset,
+  PasswordResetSchema,
+} from 'src/schema/passwordReset.schema';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
   controllers: [AuthController],
@@ -18,7 +23,11 @@ import { User, UserSchema } from 'src/schema/user.schema';
       }),
       inject: [ConfigService],
     }),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: PasswordReset.name, schema: PasswordResetSchema },
+    ]),
+    EmailModule,
   ],
   providers: [AuthService, AuthRepository],
 })
