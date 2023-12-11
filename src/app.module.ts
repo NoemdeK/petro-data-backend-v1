@@ -6,6 +6,7 @@ import { PetroDataModule } from './petroData/petroData.module';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './execption/http-exception';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         uri: config.get<string>('DATABASE_URL'),
       }),
     }),
+    AuthModule,
     PetroDataModule,
   ],
   controllers: [AppController],
