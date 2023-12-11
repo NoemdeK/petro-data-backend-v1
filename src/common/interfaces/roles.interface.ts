@@ -1,5 +1,5 @@
 export enum Role {
-  RWX = 'rwx_user',
-  RW = 'rw_user',
-  R = 'r_user',
+  RWX_USER = 'rwx_user',
+  RW_USER = 'rw_user',
+  R_USER = 'r_user',
 }
