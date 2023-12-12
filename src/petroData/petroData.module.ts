@@ -1,16 +1,24 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PetroDataController } from './petroData.controller';
 import { PetroDataService } from './petroData.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PetroData, PetroDataSchema } from 'src/schema/petroData.schema';
 import { PetroDataRepository } from './petroData.repository';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: PetroData.name, schema: PetroDataSchema },
     ]),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [PetroDataController],
   providers: [PetroDataService, PetroDataRepository],

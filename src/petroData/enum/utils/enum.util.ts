@@ -8,6 +8,7 @@ export enum ProductType {
   PMS = 'PMS',
   DPK = 'DPK',
   LPG = 'LPG',
+  ICE = 'ICE',
 }
 
 export enum PeriodicInterval {
@@ -22,10 +23,10 @@ export enum PeriodicInterval {
 }
 
 export enum Regions {
-  SOUTH_EAST = 'South East',
-  SOUTH_WEST = 'South West',
-  SOUTH_SOUTH = 'South South',
-  NORTH_CENTRAL = 'North Central',
-  NORTH_EAST = 'North East',
-  NORTH_WEST = 'North West',
+  SOUTH_EAST = 'SOUTH EAST',
+  SOUTH_WEST = 'SOUTH WEST',
+  SOUTH_SOUTH = 'SOUTH SOUTH',
+  NORTH_CENTRAL = 'NORTH CENTRAL',
+  NORTH_EAST = 'NORTH EAST',
+  NORTH_WEST = 'NORTH WEST',
 }

@@ -11,6 +11,7 @@ import { Logger } from '@nestjs/common';
 import {
   PeriodicInterval,
   ProductType,
+  Regions,
   fileExtensionType,
 } from './enum/utils/enum.util';
 import * as exceljs from 'exceljs';
@@ -164,6 +165,7 @@ export class PetroDataService {
         ProductType.DPK,
         ProductType.LPG,
         ProductType.PMS,
+        ProductType.ICE,
       ];
 
       if (!validProducts.includes(product)) {
@@ -199,11 +201,17 @@ export class PetroDataService {
                       today,
                       index,
                     )
-                  : await this.petroDataRepository.getPeriodicPetroDataForLPG(
-                      formattedDate,
-                      today,
-                      index,
-                    );
+                  : product === ProductType.LPG
+                    ? await this.petroDataRepository.getPeriodicPetroDataForLPG(
+                        formattedDate,
+                        today,
+                        index,
+                      )
+                    : await this.petroDataRepository.getPeriodicPetroDataForICE(
+                        formattedDate,
+                        today,
+                        index,
+                      );
           }),
         );
         return analysis.flat();
@@ -408,8 +416,185 @@ export class PetroDataService {
           return analysis.flat();
         }
       }
+
+      /************************** ICE Product Type ***************************************/
+      if (product === ProductType.ICE) {
+        if (period === PeriodicInterval.ONE_WEEK) {
+          const oneWeekDate = moment().subtract(7, 'days').toDate();
+          return getAnalysis(oneWeekDate, ProductType.ICE);
+        }
+
+        if (period === PeriodicInterval.ONE_MONTH) {
+          const oneMonthDate = moment().subtract(1, 'months').toDate();
+          return getAnalysis(oneMonthDate, ProductType.ICE);
+        }
+
+        if (period === PeriodicInterval.THREE_MONTHS) {
+          const threeMonthsDate = moment().subtract(3, 'months').toDate();
+          return getAnalysis(threeMonthsDate, ProductType.ICE);
+        }
+
+        if (period === PeriodicInterval.SIX_MONTHS) {
+          const sixMonthsDate = moment().subtract(6, 'months').toDate();
+          return getAnalysis(sixMonthsDate, ProductType.ICE);
+        }
+
+        if (period === PeriodicInterval.YESTERDAY) {
+          const yesterdayDate = moment().subtract(1, 'months').toDate();
+          return getAnalysis(yesterdayDate, ProductType.ICE);
+        }
+
+        if (period === PeriodicInterval.ONE_YEAR) {
+          const oneYearDate = moment().subtract(1, 'years').toDate();
+          return getAnalysis(oneYearDate, ProductType.ICE);
+        }
+
+        if (period === PeriodicInterval.FIVE_YEARS) {
+          const fiveYearsDate = moment().subtract(5, 'years').toDate();
+          return getAnalysis(fiveYearsDate, ProductType.ICE);
+        }
+
+        if (period === PeriodicInterval.MAX) {
+          analysis = await Promise.all(
+            Array.from(regions, async (index: any) => {
+              return await this.petroDataRepository.getMaxPetroData(
+                index,
+                ProductType.ICE,
+              );
+            }),
+          );
+          return analysis.flat();
+        }
+      }
     } catch (error) {
       error.location = `PetroDataServices.${this.petroDataAnalysis.name} method`;
+      AppResponse.error(error);
+    }
+  }
+
+  /**
+   * @Responsibility: dedicated service for retrieving petro data analysis
+   *
+   * @param petroDataAnalysisDto
+   * @returns {Promise<any>}
+   */
+
+  async petroDataAnalysisPercentages(): Promise<any> {
+    try {
+      const priceData = await this.petroDataRepository.getAllPrices();
+
+      let AGOPercentageChange: number,
+        DPKPercentageChange: number,
+        LPGPercentageChange: number,
+        PMSPercentageChange: number,
+        ICEPercentageChange: number;
+      const theLength: number = priceData.length;
+      for (let i = 1; i < theLength; i++) {
+        const oldAGOPrice = priceData[i - 1].AGO;
+        const oldDPKPrice = priceData[i - 1].DPK;
+        const oldLPGPrice = priceData[i - 1].LPG;
+        const oldPMSPrice = priceData[i - 1].PMS;
+        const oldICEPrice = priceData[i - 1].ICE;
+
+        const newAGOPrice = priceData[i].AGO;
+        const newDPKPrice = priceData[i].DPK;
+        const newLPGPrice = priceData[i].LPG;
+        const newPMSPrice = priceData[i].PMS;
+        const newICEPrice = priceData[i].ICE;
+
+        if (newAGOPrice) {
+          AGOPercentageChange =
+            ((newAGOPrice - oldAGOPrice) / oldAGOPrice) * 100;
+        }
+
+        if (newDPKPrice) {
+          DPKPercentageChange =
+            ((newDPKPrice - oldDPKPrice) / oldDPKPrice) * 100;
+        }
+
+        if (newLPGPrice) {
+          LPGPercentageChange =
+            ((newLPGPrice - oldLPGPrice) / oldLPGPrice) * 100;
+        }
+
+        if (newPMSPrice) {
+          PMSPercentageChange =
+            ((newPMSPrice - oldPMSPrice) / oldPMSPrice) * 100;
+        }
+
+        if (newICEPrice) {
+          ICEPercentageChange =
+            ((newICEPrice - oldICEPrice) / oldICEPrice) * 100;
+        }
+      }
+
+      const mostRecentPrices = await this.petroDataRepository.getAllPrices(2);
+
+      function recentPriceChgFxn(current: number, initial: number) {
+        const result = current - initial;
+        return result > 0 ? `+${result.toFixed(2)}` : `${result.toFixed(2)}`;
+      }
+
+      return {
+        AGOData: {
+          overallPricePercentChange:
+            AGOPercentageChange > 0
+              ? `+${AGOPercentageChange.toFixed(2)}`
+              : `${AGOPercentageChange.toFixed(2)}`,
+          currentPrice: mostRecentPrices[1].AGO,
+          recentPricePercentChange: recentPriceChgFxn(
+            mostRecentPrices[1].AGO,
+            mostRecentPrices[0].AGO,
+          ),
+        },
+        DPKData: {
+          overallPricePercentChange:
+            DPKPercentageChange > 0
+              ? `+${DPKPercentageChange.toFixed(2)}`
+              : `${DPKPercentageChange.toFixed(2)}`,
+          currentPrice: mostRecentPrices[1].DPK,
+          recentPricePercentChange: recentPriceChgFxn(
+            mostRecentPrices[1].DPK,
+            mostRecentPrices[0].DPK,
+          ),
+        },
+        LPGData: {
+          overallPricePercentChange:
+            LPGPercentageChange > 0
+              ? `+${LPGPercentageChange.toFixed(2)}`
+              : `${LPGPercentageChange.toFixed(2)}`,
+          currentPrice: mostRecentPrices[1].LPG,
+          recentPricePercentChange: recentPriceChgFxn(
+            mostRecentPrices[1].LPG,
+            mostRecentPrices[0].LPG,
+          ),
+        },
+        PMSData: {
+          overallPricePercentChange:
+            PMSPercentageChange > 0
+              ? `+${PMSPercentageChange.toFixed(2)}`
+              : `${PMSPercentageChange.toFixed(2)}`,
+          currentPrice: mostRecentPrices[1].PMS,
+          recentPricePercentChange: recentPriceChgFxn(
+            mostRecentPrices[1].PMS,
+            mostRecentPrices[0].PMS,
+          ),
+        },
+        // ICEData: {
+        //   overallPricePercentChange:
+        //     ICEPercentageChange > 0
+        //       ? `+${ICEPercentageChange.toFixed(2)}` ?? '0.00'
+        //       : `${ICEPercentageChange.toFixed(2)}` ?? '0.00',
+        //   currentPrice: mostRecentPrices[1].ICE ?? '0.00',
+        //   recentPricePercentChange:
+        //     recentPriceChgFxn(
+        //       mostRecentPrices[1].ICE,
+        //       mostRecentPrices[0].ICE,
+        //     ) ?? '0.00',
+        // },
+      };
+    } catch (error) {
+      error.location = `PetroDataServices.${this.petroDataAnalysisPercentages.name} method`;
       AppResponse.error(error);
     }
   }
