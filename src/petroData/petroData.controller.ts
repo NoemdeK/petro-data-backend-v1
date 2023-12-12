@@ -15,7 +15,10 @@ import { PetroDataService } from './petroData.service';
 import { Response } from 'express';
 import { CreateXlsxDto } from './dto/create-xlsx.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { PetroDataAnalysisDto } from './dto/petro-data-analysis.dto';
+import {
+  PetroDataAnalysisDto,
+  PetroDataAnalysisProjectionDto,
+} from './dto/petro-data-analysis.dto';
 import { JwtAuthGuard } from 'src/guards/jwt/jwt.guard';
 import { RoleGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/guards/decorators/roles.decorator';
@@ -86,5 +89,27 @@ export class PetroDataController {
           data,
         ),
       );
+  }
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
+  @Get('/analysis/projections')
+  async petroDataAnalysisProjections(
+    @Req() req: any,
+    @Res() res: Response,
+    @Query('flag') flag: string,
+    @Query('page') page: string,
+  ): Promise<Response> {
+    function payload(): PetroDataAnalysisProjectionDto {
+      return {
+        page,
+        flag,
+      };
+    }
+    const data =
+      await this.petroDataService.petroDataAnalysisProjections(payload());
+    return res
+      .status(200)
+      .json(success('Successfully retrieved analysis projections', 200, data));
   }
 }

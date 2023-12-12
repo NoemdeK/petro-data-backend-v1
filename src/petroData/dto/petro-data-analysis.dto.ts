@@ -3,3 +3,8 @@ export class PetroDataAnalysisDto {
   regions: string[];
   period: string;
 }
+
+export class PetroDataAnalysisProjectionDto {
+  page: string;
+  flag: string;
+}

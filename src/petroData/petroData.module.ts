@@ -6,9 +6,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PetroData, PetroDataSchema } from 'src/schema/petroData.schema';
 import { PetroDataRepository } from './petroData.repository';
 import { JwtModule } from '@nestjs/jwt';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
+    HttpModule,
+    ConfigModule,
     MongooseModule.forFeature([
       { name: PetroData.name, schema: PetroDataSchema },
     ]),

@@ -15,14 +15,25 @@ import {
   fileExtensionType,
 } from './enum/utils/enum.util';
 import * as exceljs from 'exceljs';
-import { PetroDataAnalysisDto } from './dto/petro-data-analysis.dto';
+import {
+  PetroDataAnalysisDto,
+  PetroDataAnalysisProjectionDto,
+} from './dto/petro-data-analysis.dto';
 import * as moment from 'moment';
+import { catchError, lastValueFrom } from 'rxjs';
+import { ConfigService } from '@nestjs/config';
+import { AxiosResponse, AxiosError } from 'axios';
+import { HttpService } from '@nestjs/axios';
 
 const pipelineAsync = promisify(pipeline);
 
 @Injectable()
 export class PetroDataService {
-  constructor(private readonly petroDataRepository: PetroDataRepository) {}
+  constructor(
+    private readonly petroDataRepository: PetroDataRepository,
+    private readonly configService: ConfigService,
+    private readonly httpService: HttpService,
+  ) {}
 
   private readonly logger = new Logger(PetroDataService.name);
 
@@ -595,6 +606,76 @@ export class PetroDataService {
       };
     } catch (error) {
       error.location = `PetroDataServices.${this.petroDataAnalysisPercentages.name} method`;
+      AppResponse.error(error);
+    }
+  }
+
+  /**
+   * @Responsibility: dedicated service for retrieving petro data analysis projections
+   *
+   * @param petroDataAnalysisProjectionDto
+   * @returns {Promise<any>}
+   */
+
+  async petroDataAnalysisProjections(
+    petroDataAnalysisProjectionDto: PetroDataAnalysisProjectionDto,
+  ): Promise<any> {
+    try {
+      const { flag, page } = petroDataAnalysisProjectionDto;
+
+      if (!flag) {
+        AppResponse.error({
+          message: 'Please provide a flag',
+          status: HttpStatus.BAD_REQUEST,
+        });
+      }
+
+      let queryString;
+
+      const axiosCallFxn = async (queryString: string) => {
+        const { data } = await lastValueFrom(
+          this.httpService
+            .get(
+              `${this.configService.get<string>(
+                'G_NEWS_URL',
+              )}?q=${queryString}&lang=en&country=us&page=${page}&max=5&sortby=publishedAt&apikey=${this.configService.get<string>(
+                'G_NEWS_SECRET_KEY',
+              )}`,
+            )
+            .pipe(
+              catchError((error: AxiosError) => {
+                return AppResponse.error({
+                  message: error?.message,
+                  status: HttpStatus.BAD_REQUEST,
+                });
+              }),
+            ),
+        );
+        return data;
+      };
+
+      if (flag === ProductType.PMS) {
+        return axiosCallFxn('petrol');
+      }
+
+      if (flag === ProductType.ICE) {
+        return axiosCallFxn('ICE brent crude');
+      }
+
+      if (flag === ProductType.LPG) {
+        return axiosCallFxn('liquefied petroleum gas');
+      }
+
+      if (flag === ProductType.AGO) {
+        return axiosCallFxn('gas oil OR diesel');
+      }
+
+      if (flag === ProductType.DPK) {
+        queryString = 'kerosene';
+        return axiosCallFxn('kerosene');
+      }
+    } catch (error) {
+      error.location = `PetroDataServices.${this.petroDataAnalysisProjections.name} method`;
       AppResponse.error(error);
     }
   }
