@@ -234,4 +234,147 @@ export class PetroDataRepository {
       throw new Error(error?.messsage);
     }
   }
+
+  /**
+   * @Responsibility: Repo for aggregating date range
+   *
+   * @param batch
+   *
+   * @returns {any}
+   */
+
+  async aggregateDateRange(batch: number): Promise<PetroDataDocument | any> {
+    try {
+      return await this.petroDataModel.aggregate([
+        {
+          $sort: { Period: -1 }, // Sort by Period in descending order
+        },
+        {
+          /* Group specs must include an _id */
+          $group: {
+            _id: null,
+            minDate: { $last: '$Period' }, // Use $last to get the first document after sorting
+            maxDate: { $first: '$Period' }, // Use $first to get the last document after sorting
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            startDate: { $toDate: '$minDate' },
+            endDate: { $toDate: '$maxDate' },
+          },
+        },
+        {
+          $addFields: {
+            endDate: { $add: ['$endDate', 1 * 24 * 60 * 60 * 1000] }, // Add one day to include the endDate in the results
+          },
+        },
+        {
+          $project: {
+            startDate: 1,
+            endDate: 1,
+            weeks: {
+              $range: [
+                {
+                  $floor: {
+                    $divide: [
+                      { $subtract: ['$startDate', '$startDate'] },
+                      7 * 24 * 60 * 60 * 1000,
+                    ],
+                  },
+                },
+                {
+                  $floor: {
+                    $divide: [
+                      { $subtract: ['$endDate', '$startDate'] },
+                      7 * 24 * 60 * 60 * 1000,
+                    ],
+                  },
+                },
+                1,
+              ],
+            },
+          },
+        },
+        {
+          $unwind: '$weeks',
+        },
+        {
+          $skip: (batch - 1) * 5, // pagination of 5 per batch
+        },
+        {
+          $limit: 5,
+        },
+        {
+          $project: {
+            _id: 0,
+            weekStartDate: {
+              $subtract: [
+                '$endDate',
+                { $multiply: ['$weeks', 7 * 24 * 60 * 60 * 1000] },
+              ],
+            },
+            weekEndDate: {
+              $subtract: [
+                '$endDate',
+                {
+                  $multiply: [
+                    { $subtract: ['$weeks', 1] },
+                    7 * 24 * 60 * 60 * 1000,
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      ]);
+    } catch (error) {
+      throw new Error(error?.messsage);
+    }
+  }
+
+  /**
+   * @Responsibility: Repo for aggregating total count of weeks
+   *
+   * @param
+   *
+   * @returns {any}
+   */
+
+  async aggregateTotalWeeks(): Promise<PetroDataDocument | any> {
+    try {
+      return await this.petroDataModel.aggregate([
+        {
+          /* Group specs must include an _id */
+          $group: {
+            _id: null,
+            minDate: { $first: '$Period' }, // Use $last to get the first document after sorting
+            maxDate: { $last: '$Period' }, // Use $first to get the last document after sorting
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            startDate: { $toDate: '$minDate' },
+            endDate: { $toDate: '$maxDate' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            totalWeeks: {
+              $ceil: {
+                $divide: [
+                  { $subtract: ['$endDate', '$startDate'] },
+                  7 * 24 * 60 * 60 * 1000,
+                ],
+              },
+            },
+          },
+        },
+      ]);
+    } catch (error) {
+      throw new Error(error?.messsage);
+    }
+  }
 }

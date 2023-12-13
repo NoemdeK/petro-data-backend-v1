@@ -679,4 +679,38 @@ export class PetroDataService {
       AppResponse.error(error);
     }
   }
+
+  /**
+   * @Responsibility: dedicated service for retrieving raw petro data
+   *
+   * @param batch
+   * @returns {Promise<any>}
+   */
+
+  async retrieveRawPetroData(batch: number): Promise<any> {
+    try {
+      /* Returns the range of the dates */
+      const getDateRange =
+        await this.petroDataRepository.aggregateDateRange(batch);
+
+      const result = await Promise.all(
+        Array.from(getDateRange, (index: any) => {
+          return {
+            ...index,
+            category: 'Pricing',
+            period: 'Weekly',
+            year: index?.weekStartDate?.getFullYear(),
+            source: 'Nigerian Bureau Of Statistics ',
+          };
+        }),
+      );
+
+      const weeklyDatesCount =
+        await this.petroDataRepository.aggregateTotalWeeks();
+      return { count: weeklyDatesCount[0].totalWeeks, result };
+    } catch (error) {
+      error.location = `PetroDataServices.${this.retrieveRawPetroData.name} method`;
+      AppResponse.error(error);
+    }
+  }
 }

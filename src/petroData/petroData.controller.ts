@@ -112,4 +112,18 @@ export class PetroDataController {
       .status(200)
       .json(success('Successfully retrieved analysis projections', 200, data));
   }
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
+  @Get('/raw')
+  async retrieveRawPetroData(
+    @Req() req: any,
+    @Res() res: Response,
+    @Query('batch') batch: number,
+  ): Promise<Response> {
+    const data = await this.petroDataService.retrieveRawPetroData(batch);
+    return res
+      .status(200)
+      .json(success('Successfully retrieved raw petro data', 200, data));
+  }
 }
