@@ -18,6 +18,7 @@ import * as exceljs from 'exceljs';
 import {
   PetroDataAnalysisDto,
   PetroDataAnalysisProjectionDto,
+  RawDataActionsDto,
 } from './dto/petro-data-analysis.dto';
 import * as moment from 'moment';
 import { catchError, lastValueFrom } from 'rxjs';
@@ -710,6 +711,54 @@ export class PetroDataService {
       return { count: weeklyDatesCount[0].totalWeeks, result };
     } catch (error) {
       error.location = `PetroDataServices.${this.retrieveRawPetroData.name} method`;
+      AppResponse.error(error);
+    }
+  }
+
+  /**
+   * @Responsibility: dedicated service for retrieving raw petro data
+   *
+   * @param batch
+   * @returns {Promise<any>}
+   */
+
+  async rawDataActions(rawDataActionsDto: RawDataActionsDto): Promise<any> {
+    try {
+      const { flag, weekStartDate, weekEndDate } = rawDataActionsDto;
+
+      if (!flag) {
+        AppResponse.error({
+          message: 'Please provide a flag',
+          status: HttpStatus.BAD_REQUEST,
+        });
+      }
+
+      if (flag !== fileExtensionType.CSV && flag !== fileExtensionType.XLSX) {
+        AppResponse.error({
+          message: 'Invalid flag provided',
+          status: HttpStatus.BAD_REQUEST,
+        });
+      }
+
+      const getDataWithinRange = await this.petroDataRepository.getMaxPetroData(
+        weekStartDate,
+        weekEndDate,
+      );
+
+      console.log(weekStartDate, weekEndDate);
+
+      if (flag === fileExtensionType.CSV) {
+        //        const data = await this.petroDataService.findAll();
+        //   response.setHeader('Content-Type', 'text/csv');
+        //   response.setHeader('Content-Disposition', 'attachment; filename=petro-data.csv');
+        //   fastCsv
+        //     .write(data, { headers: true })
+        //     .pipe(response);
+        // }
+      }
+      return getDataWithinRange;
+    } catch (error) {
+      error.location = `PetroDataServices.${this.rawDataActions.name} method`;
       AppResponse.error(error);
     }
   }

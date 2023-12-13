@@ -30,6 +30,30 @@ export class PetroDataRepository {
   }
 
   /**
+   * @Responsibility: Repo for creating petro data
+   *
+   * @param data
+   *
+   * @returns {any}
+   */
+
+  async retrievePetroData(
+    weekStartDate: Date,
+    weekEndDate: Date,
+  ): Promise<PetroDataDocument | any> {
+    try {
+      return await this.petroDataModel.find({
+        Period: {
+          $gte: weekStartDate,
+          $lt: weekEndDate,
+        },
+      });
+    } catch (error) {
+      throw new Error(error?.messsage);
+    }
+  }
+
+  /**
    * @Responsibility: Repo for retrieving periodic petro data for AGO
    *
    * @param data
@@ -249,12 +273,13 @@ export class PetroDataRepository {
         {
           $sort: { Period: -1 }, // Sort by Period in descending order
         },
+
         {
           /* Group specs must include an _id */
           $group: {
             _id: null,
-            minDate: { $last: '$Period' }, // Use $last to get the first document after sorting
-            maxDate: { $first: '$Period' }, // Use $first to get the last document after sorting
+            minDate: { $last: '$Period' }, // Use $last to get the last document after sorting
+            maxDate: { $first: '$Period' }, // Use $first to get the first document after sorting
           },
         },
         {
@@ -348,8 +373,8 @@ export class PetroDataRepository {
           /* Group specs must include an _id */
           $group: {
             _id: null,
-            minDate: { $first: '$Period' }, // Use $last to get the first document after sorting
-            maxDate: { $last: '$Period' }, // Use $first to get the last document after sorting
+            minDate: { $first: '$Period' }, // Use $first to get the first document after sorting
+            maxDate: { $last: '$Period' }, // Use $last to get the last document after sorting
           },
         },
         {

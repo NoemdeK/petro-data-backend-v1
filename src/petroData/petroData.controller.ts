@@ -13,11 +13,11 @@ import {
 import { AppResponse } from 'src/common/app.response';
 import { PetroDataService } from './petroData.service';
 import { Response } from 'express';
-import { CreateXlsxDto } from './dto/create-xlsx.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   PetroDataAnalysisDto,
   PetroDataAnalysisProjectionDto,
+  RawDataActionsDto,
 } from './dto/petro-data-analysis.dto';
 import { JwtAuthGuard } from 'src/guards/jwt/jwt.guard';
 import { RoleGuard } from 'src/guards/roles.guard';
@@ -124,6 +124,33 @@ export class PetroDataController {
     const data = await this.petroDataService.retrieveRawPetroData(batch);
     return res
       .status(200)
-      .json(success('Successfully retrieved raw petro data', 200, data));
+      .json(
+        success('Successfully retrieved raw petro weekly dataset', 200, data),
+      );
+  }
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
+  @Post('/raw/actions')
+  async rawDataActions(
+    @Req() req: any,
+    @Res() res: Response,
+    @Query('weekStartDate') weekStartDate: string,
+    @Query('weekEndDate') weekEndDate: string,
+    @Query('flag') flag: string,
+  ): Promise<Response> {
+    function payload(): RawDataActionsDto {
+      return {
+        weekStartDate,
+        weekEndDate,
+        flag,
+      };
+    }
+    const data = await this.petroDataService.rawDataActions(payload());
+    return res
+      .status(200)
+      .json(
+        success('Successfully performed action on weekly dataset', 200, data),
+      );
   }
 }
