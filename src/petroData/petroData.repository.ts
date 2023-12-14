@@ -38,16 +38,19 @@ export class PetroDataRepository {
    */
 
   async retrievePetroData(
-    weekStartDate: Date,
-    weekEndDate: Date,
+    weekStartDate: string,
+    weekEndDate: string,
   ): Promise<PetroDataDocument | any> {
     try {
-      return await this.petroDataModel.find({
-        Period: {
-          $gte: weekStartDate,
-          $lt: weekEndDate,
-        },
-      });
+      return await this.petroDataModel
+        .find({
+          Period: {
+            $gte: weekStartDate,
+            $lt: weekEndDate,
+          },
+        })
+        .select('-_id State Day Year Month Period AGO PMS DPK LPG Region')
+        .lean();
     } catch (error) {
       throw new Error(error?.messsage);
     }

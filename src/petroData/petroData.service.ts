@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { CreateXlsxDto } from './dto/create-xlsx.dto';
 import { AppResponse } from 'src/common/app.response';
 import * as xlsx from 'xlsx';
 import * as fs from 'fs';
+import { createObjectCsvWriter } from 'csv-writer';
 import { Readable, Transform, pipeline } from 'stream';
 import { PetroDataRepository } from './petroData.repository';
 import { promisify } from 'util';
@@ -12,7 +12,7 @@ import {
   PeriodicInterval,
   ProductType,
   Regions,
-  fileExtensionType,
+  FileExtensionType,
 } from './enum/utils/enum.util';
 import * as exceljs from 'exceljs';
 import {
@@ -21,10 +21,12 @@ import {
   RawDataActionsDto,
 } from './dto/petro-data-analysis.dto';
 import * as moment from 'moment';
-import { catchError, lastValueFrom } from 'rxjs';
+import { catchError, fromEventPattern, lastValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 import { AxiosResponse, AxiosError } from 'axios';
 import { HttpService } from '@nestjs/axios';
+import { v4 as uuidv4 } from 'uuid';
+import { S3 } from 'aws-sdk';
 
 const pipelineAsync = promisify(pipeline);
 
@@ -62,8 +64,8 @@ export class PetroDataService {
       const fileExtType = file.originalname.split('.')[1];
 
       const allowedExtensions: string[] = [
-        fileExtensionType.CSV,
-        fileExtensionType.XLSX,
+        FileExtensionType.CSV,
+        FileExtensionType.XLSX,
       ];
       if (!allowedExtensions.includes(fileExtType)) {
         AppResponse.error({
@@ -81,7 +83,7 @@ export class PetroDataService {
       }
 
       /************************** CSV File Extension  ********************************/
-      if (fileExtType === fileExtensionType.CSV) {
+      if (fileExtType === FileExtensionType.CSV) {
         let readableStream = readFileStream();
 
         const jsonData = [];
@@ -96,11 +98,24 @@ export class PetroDataService {
             // Process and store data
             jsonData.forEach(async (data) => {
               try {
-                // Convert Period date to iso string format
-                if (data.Period) {
-                  data.Period = moment(data.Period, 'DD-MMM-YY').toISOString();
+                function csvUploadData() {
+                  return {
+                    State: data['State '] ?? data['State'],
+                    Day: data.Day ?? null,
+                    Year: data['Year '] ?? data['Year'],
+                    Month: data['Month '] ?? data['Month'],
+                    Period:
+                      moment(data.Period, 'DD-MMM-YY').toISOString() ?? null,
+                    AGO: data.AGO ?? null,
+                    PMS: data.PMS ?? null,
+                    DPK: data.DPK ?? null,
+                    LPG: data.LPG ?? null,
+                    ICE: data.ICE ?? null,
+                    Region: data.Region,
+                  };
                 }
-                await this.petroDataRepository.createPetroData(data);
+
+                await this.petroDataRepository.createPetroData(csvUploadData());
               } catch (error) {
                 this.logger.log('Error processing data:', error);
               }
@@ -111,7 +126,7 @@ export class PetroDataService {
       }
 
       /************************** XLSX File Extension  ********************************/
-      if (fileExtType === fileExtensionType.XLSX) {
+      if (fileExtType === FileExtensionType.XLSX) {
         // Read XLSX file using streams
         let readableStream = readFileStream();
 
@@ -718,7 +733,7 @@ export class PetroDataService {
   /**
    * @Responsibility: dedicated service for retrieving raw petro data
    *
-   * @param batch
+   * @param rawDataActionsDto
    * @returns {Promise<any>}
    */
 
@@ -733,33 +748,102 @@ export class PetroDataService {
         });
       }
 
-      if (flag !== fileExtensionType.CSV && flag !== fileExtensionType.XLSX) {
+      if (flag !== FileExtensionType.CSV && flag !== FileExtensionType.XLSX) {
         AppResponse.error({
           message: 'Invalid flag provided',
           status: HttpStatus.BAD_REQUEST,
         });
       }
 
-      const getDataWithinRange = await this.petroDataRepository.getMaxPetroData(
-        weekStartDate,
-        weekEndDate,
-      );
+      const getDataWithinRange =
+        await this.petroDataRepository.retrievePetroData(
+          weekStartDate,
+          weekEndDate,
+        );
 
-      console.log(weekStartDate, weekEndDate);
+      /************************ Export CSV files ****************************/
+      if (flag === FileExtensionType.CSV) {
+        const csvWriter = createObjectCsvWriter({
+          path: 'petro-data.csv',
+          header: [
+            { id: 'State', title: 'State' },
+            { id: 'Day', title: 'Day' },
+            { id: 'Year', title: 'Year' },
+            { id: 'Month', title: 'Month' },
+            { id: 'Period', title: 'Period' },
+            { id: 'AGO', title: 'AGO' },
+            { id: 'PMS', title: 'PMS' },
+            { id: 'DPK', title: 'DPK' },
+            { id: 'LPG', title: 'LPG' },
+            { id: 'Region', title: 'Region' },
+          ],
+        });
 
-      if (flag === fileExtensionType.CSV) {
-        //        const data = await this.petroDataService.findAll();
-        //   response.setHeader('Content-Type', 'text/csv');
-        //   response.setHeader('Content-Disposition', 'attachment; filename=petro-data.csv');
-        //   fastCsv
-        //     .write(data, { headers: true })
-        //     .pipe(response);
-        // }
+        await csvWriter.writeRecords(getDataWithinRange);
+
+        const getImageUrl = await this.uploadS3(getDataWithinRange, 'csv');
+        const { name, url } = getImageUrl.data;
+
+        fs.unlinkSync('petro-data.csv');
+
+        return { name, url };
       }
-      return getDataWithinRange;
+
+      /************************ Export CSV files ****************************/
+      if (flag === FileExtensionType.XLSX) {
+      }
     } catch (error) {
       error.location = `PetroDataServices.${this.rawDataActions.name} method`;
       AppResponse.error(error);
     }
+  }
+
+  private async uploadS3(file: any, flag: string) {
+    let savedImages: any = {};
+    const errors = [];
+    const fileName = `${uuidv4().replace(/-/g, '').toLocaleUpperCase()}`;
+
+    let fileType: string = flag === FileExtensionType.CSV ? 'csv' : 'xlsx';
+    // if (flags === FileExtensionType.CSV) {
+    //   const { originalname } = file;
+    //   const splitImg = originalname.split('.');
+    //   // Last element in the array
+    //   fileType = splitImg[splitImg.length - 1];
+    // } else {
+    //   fileType = 'csv';
+    // }
+
+    const params = {
+      Bucket: this.configService.get<string>('SPACES_BUCKET_NAME'),
+      Key: `${this.configService.get<string>(
+        'PETRO_DATA_FILE_DIR',
+      )}/${fileName}.${fileType}`,
+      Body:
+        flag === FileExtensionType.CSV
+          ? require('fs').createReadStream('petro-data.csv')
+          : flag === FileExtensionType.XLSX
+            ? require('fs').createReadStream('petro-data.xlsx')
+            : Buffer.from(file.buffer),
+      ACL: 'public-read',
+    };
+    const data = await this.getS3().upload(params).promise();
+    if (data) {
+      savedImages = { name: fileName, type: fileType, url: data.Location };
+    } else {
+      errors.push(file);
+    }
+
+    return {
+      data: savedImages,
+      errors: errors.length ? errors : null,
+    };
+  }
+
+  private getS3() {
+    return new S3({
+      accessKeyId: this.configService.get<string>('SPACES_ACCESS_KEY'),
+      secretAccessKey: this.configService.get<string>('SPACES_SECRET_KEY'),
+      endpoint: this.configService.get('SPACES_ENDPOINT'),
+    });
   }
 }

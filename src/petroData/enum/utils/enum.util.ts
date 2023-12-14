@@ -1,4 +1,4 @@
-export enum fileExtensionType {
+export enum FileExtensionType {
   CSV = 'csv',
   XLSX = 'xlsx',
 }
