@@ -15,4 +15,4 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           key: ${{ secrets.SSH_KEY }}
           username: ${{ secrets.SSH_USERNAME }}
-          script: 'cd ${{secrets.PETRO_DATA_DIR}} && git reset --hard origin/staging && git pull origin staging && npm install && npm run build && npm run start:prod'
+          script: 'cd ${{secrets.PETRO_DATA_DIR}} && git reset --hard origin/staging && git pull origin staging && npm install --no-cache && npm run build && npm run start:prod'
