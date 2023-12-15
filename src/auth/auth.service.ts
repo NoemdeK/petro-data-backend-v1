@@ -49,7 +49,6 @@ export class AuthService {
       await this.authRepository.createUser(userData());
       return;
     } catch (error) {
-      console.log(error);
       error.location = `AuthServices.${this.signup.name} method`;
       AppResponse.error(error);
     }
