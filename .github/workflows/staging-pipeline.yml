@@ -17,6 +17,11 @@ jobs:
           nvm install 16.20.2
           nvm use 16.20.2
 
+      - name: Git Contents
+        run: |
+        echo "Contents of ${{secrets.RECORDS_DIR}}:"
+        ls -la ${{secrets.RECORDS_DIR}}
+
       - name: Setup all dependencies and deploy to staging
         uses: appleboy/ssh-action@master
         with:
