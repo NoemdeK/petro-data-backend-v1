@@ -34,6 +34,15 @@ export class AuthService {
     try {
       let { firstName, lastName, email, password } = createUserDto;
 
+      let userExists = await this.authRepository.findUser({ email }, 'email');
+
+      if (!userExists?.email) {
+        AppResponse.error({
+          message: 'User not found',
+          status: HttpStatus.NOT_FOUND,
+        });
+      }
+
       /* Hash password before storing it */
       password = password ? hashSync(password, genSaltSync()) : null;
 

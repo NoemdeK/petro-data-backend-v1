@@ -27,7 +27,6 @@ export class AuthRepository {
     try {
       return await this.userModel.create(data);
     } catch (error) {
-      console.log(error);
       throw new Error(error?.messsage);
     }
   }
