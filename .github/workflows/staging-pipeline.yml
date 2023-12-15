@@ -3,16 +3,27 @@ name: petro-data
 on:
   push:
     branches: [staging]
-
 jobs:
   Petro-Data:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Load nvm and Node.js
+        run: |
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+      - name: Use Node.js version
+        run: nvm install 16.20.2 && nvm use 16.20.2
+
       - name: Setup all dependencies and deploy to staging
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           key: ${{ secrets.SSH_KEY }}
           username: ${{ secrets.SSH_USERNAME }}
-          script: 'cd ${{secrets.PETRO_DATA_DIR}} && git reset --hard origin/staging && git pull origin staging && npm install && npm run build && npm run start:prod'
+          script: 'cd ${{secrets.RECORDS_DIR}} && git reset --hard origin/staging && git pull origin staging && npm install && npm run build && npm run start:prod'
