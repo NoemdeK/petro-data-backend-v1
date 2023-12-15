@@ -8,6 +8,7 @@ export class CreateXlsxDto {
   readonly PMS: number;
   readonly DPK: number;
   readonly LPG: number;
+  readonly ICE: number;
   readonly Region: string;
   file?: any;
 }

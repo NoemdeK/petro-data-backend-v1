@@ -17,11 +17,11 @@ export class PetroData {
   @Prop({ type: Number, required: false })
   Year: number;
 
-  @Prop({ type: Number, required: false })
-  Month: number;
-
   @Prop({ type: String, required: false })
-  Period: string;
+  Month: string;
+
+  @Prop({ type: Date, required: false })
+  Period: Date;
 
   @Prop({ type: Number, required: false })
   AGO: number;

@@ -7,14 +7,22 @@ import {
   Req,
   Res,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AppResponse } from 'src/common/app.response';
 import { PetroDataService } from './petroData.service';
 import { Response } from 'express';
-import { CreateXlsxDto } from './dto/create-xlsx.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { PetroDataAnalysisDto } from './dto/petro-data-analysis.dto';
+import {
+  PetroDataAnalysisDto,
+  PetroDataAnalysisProjectionDto,
+  RawDataActionsDto,
+} from './dto/petro-data-analysis.dto';
+import { JwtAuthGuard } from 'src/guards/jwt/jwt.guard';
+import { RoleGuard } from 'src/guards/roles.guard';
+import { Roles } from 'src/guards/decorators/roles.decorator';
+import { Role } from 'src/common/interfaces/roles.interface';
 
 const { success } = AppResponse;
 
@@ -22,8 +30,8 @@ const { success } = AppResponse;
 export class PetroDataController {
   constructor(private readonly petroDataService: PetroDataService) {}
 
-  // @UseGuards(JwtAuthGuard, RoleGuard)
-  //@Roles(Role.ADMIN, Role.RWX)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_USER)
   @Post('/upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadXlsxCsvFilesIntoDb(
@@ -47,8 +55,8 @@ export class PetroDataController {
       );
   }
 
-  // @UseGuards(JwtAuthGuard, RoleGuard)
-  // @Roles(Role.ADMIN, Role.RWX, Role.RW, Role.R)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
   @Get('/analysis')
   async petroDataAnalysis(
     @Req() req: any,
@@ -62,5 +70,87 @@ export class PetroDataController {
     return res
       .status(200)
       .json(success('Successfully analyzed petro data', 200, data));
+  }
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
+  @Get('/analysis/price-percentage-change')
+  async petroDataAnalysisPercentages(
+    @Req() req: any,
+    @Res() res: Response,
+  ): Promise<Response> {
+    const data = await this.petroDataService.petroDataAnalysisPercentages();
+    return res
+      .status(200)
+      .json(
+        success(
+          'Successfully analyzed petro data price percentage(s) change',
+          200,
+          data,
+        ),
+      );
+  }
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
+  @Get('/analysis/projections')
+  async petroDataAnalysisProjections(
+    @Req() req: any,
+    @Res() res: Response,
+    @Query('flag') flag: string,
+    @Query('page') page: string,
+  ): Promise<Response> {
+    function payload(): PetroDataAnalysisProjectionDto {
+      return {
+        page,
+        flag,
+      };
+    }
+    const data =
+      await this.petroDataService.petroDataAnalysisProjections(payload());
+    return res
+      .status(200)
+      .json(success('Successfully retrieved analysis projections', 200, data));
+  }
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
+  @Get('/raw')
+  async retrieveRawPetroData(
+    @Req() req: any,
+    @Res() res: Response,
+    @Query('batch') batch: number,
+  ): Promise<Response> {
+    const data = await this.petroDataService.retrieveRawPetroData(batch);
+    return res
+      .status(200)
+      .json(
+        success('Successfully retrieved raw petro weekly dataset', 200, data),
+      );
+  }
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
+  @Post('/raw/actions')
+  async rawDataActions(
+    @Req() req: any,
+    @Res() res: Response,
+    @Query('weekStartDate') weekStartDate: string,
+    @Query('weekEndDate') weekEndDate: string,
+    @Query('flag') flag: string,
+  ): Promise<Response> {
+    function payload(): RawDataActionsDto {
+      return {
+        weekStartDate,
+        weekEndDate,
+        flag,
+      };
+    }
+    const data = await this.petroDataService.rawDataActions(payload());
+    return res
+      .status(200)
+      .json(
+        success('Successfully performed action on weekly dataset', 200, data),
+      );
   }
 }
