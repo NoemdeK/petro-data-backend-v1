@@ -8,7 +8,7 @@ jobs:
   Petro-Data:
     runs-on: ubuntu-latest
 
-     steps:
+    steps:
       - name: Setup all dependencies and deploy to staging
         uses: appleboy/ssh-action@master
         with:
