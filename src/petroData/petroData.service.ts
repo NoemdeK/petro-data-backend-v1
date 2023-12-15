@@ -716,7 +716,7 @@ export class PetroDataService {
             category: 'Pricing',
             period: 'Weekly',
             year: index?.weekStartDate?.getFullYear(),
-            source: 'Nigerian Bureau Of Statistics ',
+            source: 'Nigerian Bureau Of Statistics',
           };
         }),
       );
@@ -781,7 +781,13 @@ export class PetroDataService {
 
         await csvWriter.writeRecords(getDataWithinRange);
 
-        const getImageUrl = await this.uploadS3(getDataWithinRange, 'csv');
+        const csvBuffer = require('fs').createReadStream('petro-data.csv');
+
+        const getImageUrl = await this.uploadS3(
+          getDataWithinRange,
+          'csv',
+          csvBuffer,
+        );
         const { name, url } = getImageUrl.data;
 
         fs.unlinkSync('petro-data.csv');
@@ -789,8 +795,31 @@ export class PetroDataService {
         return { name, url };
       }
 
-      /************************ Export CSV files ****************************/
+      /************************ Export XLSX files ****************************/
       if (flag === FileExtensionType.XLSX) {
+        // Create a new workbook and add a worksheet
+        const workbook = xlsx.utils.book_new();
+
+        // Add a worksheet
+        const worksheet = xlsx.utils.json_to_sheet(getDataWithinRange);
+
+        // Add the worksheet to the workbook
+        xlsx.utils.book_append_sheet(workbook, worksheet, 'PetroData');
+
+        const xlsxBuffer = xlsx.write(workbook, {
+          bookType: 'xlsx',
+          type: 'buffer',
+        });
+
+        const getImageUrl = await this.uploadS3(
+          getDataWithinRange,
+          'xlsx',
+          xlsxBuffer,
+        );
+
+        const { name, url } = getImageUrl.data;
+
+        return { name, url };
       }
     } catch (error) {
       error.location = `PetroDataServices.${this.rawDataActions.name} method`;
@@ -798,7 +827,7 @@ export class PetroDataService {
     }
   }
 
-  private async uploadS3(file: any, flag: string) {
+  private async uploadS3(file: any, flag: string, buffer: any) {
     let savedImages: any = {};
     const errors = [];
     const fileName = `${uuidv4().replace(/-/g, '').toLocaleUpperCase()}`;
@@ -818,12 +847,7 @@ export class PetroDataService {
       Key: `${this.configService.get<string>(
         'PETRO_DATA_FILE_DIR',
       )}/${fileName}.${fileType}`,
-      Body:
-        flag === FileExtensionType.CSV
-          ? require('fs').createReadStream('petro-data.csv')
-          : flag === FileExtensionType.XLSX
-            ? require('fs').createReadStream('petro-data.xlsx')
-            : Buffer.from(file.buffer),
+      Body: buffer,
       ACL: 'public-read',
     };
     const data = await this.getS3().upload(params).promise();
