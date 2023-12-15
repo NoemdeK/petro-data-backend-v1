@@ -38,8 +38,8 @@ export class AuthService {
 
       if (!userExists?.email) {
         AppResponse.error({
-          message: 'User not found',
-          status: HttpStatus.NOT_FOUND,
+          message: 'Email already exists',
+          status: HttpStatus.CONFLICT,
         });
       }
 
