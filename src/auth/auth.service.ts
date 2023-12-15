@@ -36,7 +36,7 @@ export class AuthService {
 
       let userExists = await this.authRepository.findUser({ email }, 'email');
 
-      if (!userExists?.email) {
+      if (userExists?.email) {
         AppResponse.error({
           message: 'Email already exists',
           status: HttpStatus.CONFLICT,
