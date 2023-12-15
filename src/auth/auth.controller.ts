@@ -26,6 +26,7 @@ export class AuthController {
     @Res() res: Response,
     @Body() createUserDto: CreateUserDto,
   ): Promise<Response> {
+    console.log(createUserDto);
     const data = await this.authService.signup(createUserDto);
 
     return res
