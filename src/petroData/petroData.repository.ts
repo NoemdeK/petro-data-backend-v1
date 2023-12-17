@@ -30,17 +30,18 @@ export class PetroDataRepository {
   }
 
   /**
-   * @Responsibility: Repo for creating petro data
+   * @Responsibility: Repo for retrieving periodic petro data
    *
-   * @param data
+   * @param weekStartDate
+   * @param weekEndDate
    *
    * @returns {any}
    */
 
-  async retrievePetroData(
+  async retrievePeriodicPetroData(
     weekStartDate: string,
     weekEndDate: string,
-  ): Promise<PetroDataDocument | any> {
+  ): Promise<PetroDataDocument[]> {
     try {
       return await this.petroDataModel
         .find({
@@ -49,6 +50,24 @@ export class PetroDataRepository {
             $lt: weekEndDate,
           },
         })
+        .select('-_id State Day Year Month Period AGO PMS DPK LPG Region')
+        .lean();
+    } catch (error) {
+      throw new Error(error?.messsage);
+    }
+  }
+
+  /**
+   * @Responsibility: Repo for retrieving petro data
+   *
+   *
+   * @returns {any}
+   */
+
+  async retrieveAllPetroData(): Promise<PetroDataDocument[]> {
+    try {
+      return await this.petroDataModel
+        .find({})
         .select('-_id State Day Year Month Period AGO PMS DPK LPG Region')
         .lean();
     } catch (error) {
@@ -68,7 +87,7 @@ export class PetroDataRepository {
     formattedDate?: string,
     today?: string,
     regionIndex?: string,
-  ): Promise<PetroDataDocument | any> {
+  ): Promise<PetroDataDocument[]> {
     try {
       return await this.petroDataModel
         .find({
@@ -97,7 +116,7 @@ export class PetroDataRepository {
     formattedDate?: string,
     today?: string,
     regionIndex?: string,
-  ): Promise<PetroDataDocument | any> {
+  ): Promise<PetroDataDocument[]> {
     try {
       return await this.petroDataModel
         .find({
@@ -126,7 +145,7 @@ export class PetroDataRepository {
     formattedDate?: string,
     today?: string,
     regionIndex?: string,
-  ): Promise<PetroDataDocument | any> {
+  ): Promise<PetroDataDocument[]> {
     try {
       return await this.petroDataModel
         .find({
@@ -155,7 +174,7 @@ export class PetroDataRepository {
     formattedDate?: string,
     today?: string,
     regionIndex?: string,
-  ): Promise<PetroDataDocument | any> {
+  ): Promise<PetroDataDocument[]> {
     try {
       return await this.petroDataModel
         .find({
@@ -184,7 +203,7 @@ export class PetroDataRepository {
     formattedDate?: string,
     today?: string,
     regionIndex?: string,
-  ): Promise<PetroDataDocument | any> {
+  ): Promise<PetroDataDocument[]> {
     try {
       return await this.petroDataModel
         .find({
@@ -212,7 +231,7 @@ export class PetroDataRepository {
   async getMaxPetroData(
     regionIndex: string,
     product: string,
-  ): Promise<PetroDataDocument | any> {
+  ): Promise<PetroDataDocument[]> {
     try {
       return product === ProductType.AGO
         ? await this.petroDataModel
@@ -270,7 +289,7 @@ export class PetroDataRepository {
    * @returns {any}
    */
 
-  async aggregateDateRange(batch: number): Promise<PetroDataDocument | any> {
+  async aggregateDateRange(batch: number): Promise<PetroDataDocument[]> {
     try {
       return await this.petroDataModel.aggregate([
         {
@@ -369,7 +388,7 @@ export class PetroDataRepository {
    * @returns {any}
    */
 
-  async aggregateTotalWeeks(): Promise<PetroDataDocument | any> {
+  async aggregateTotalWeeks(): Promise<PetroDataDocument[] | any> {
     try {
       return await this.petroDataModel.aggregate([
         {

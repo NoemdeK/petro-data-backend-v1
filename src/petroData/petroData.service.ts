@@ -27,6 +27,8 @@ import { AxiosResponse, AxiosError } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import { v4 as uuidv4 } from 'uuid';
 import { S3 } from 'aws-sdk';
+import { parse } from 'csv-parse';
+import * as PDFDocument from 'pdfkit';
 
 const pipelineAsync = promisify(pipeline);
 
@@ -748,7 +750,11 @@ export class PetroDataService {
         });
       }
 
-      if (flag !== FileExtensionType.CSV && flag !== FileExtensionType.XLSX) {
+      if (
+        flag !== FileExtensionType.CSV &&
+        flag !== FileExtensionType.XLSX &&
+        flag !== FileExtensionType.PDF
+      ) {
         AppResponse.error({
           message: 'Invalid flag provided',
           status: HttpStatus.BAD_REQUEST,
@@ -756,7 +762,7 @@ export class PetroDataService {
       }
 
       const getDataWithinRange =
-        await this.petroDataRepository.retrievePetroData(
+        await this.petroDataRepository.retrievePeriodicPetroData(
           weekStartDate,
           weekEndDate,
         );
@@ -821,18 +827,123 @@ export class PetroDataService {
 
         return { name, url };
       }
+
+      /************************ Export XLSX files ****************************/
+      if (flag === FileExtensionType.PDF) {
+        const csvWriter = createObjectCsvWriter({
+          path: 'petro-data.csv',
+          header: [
+            { id: 'State', title: 'State' },
+            { id: 'Day', title: 'Day' },
+            { id: 'Year', title: 'Year' },
+            { id: 'Month', title: 'Month' },
+            { id: 'Period', title: 'Period' },
+            { id: 'AGO', title: 'AGO' },
+            { id: 'PMS', title: 'PMS' },
+            { id: 'DPK', title: 'DPK' },
+            { id: 'LPG', title: 'LPG' },
+            { id: 'Region', title: 'Region' },
+          ],
+        });
+
+        await csvWriter.writeRecords(getDataWithinRange);
+
+        const csvData = fs.readFileSync('petro-data.csv', 'utf8');
+        const records = await this.parseCsv(csvData);
+
+        const pdfDoc = new PDFDocument();
+        const pdfOutputPath = 'petro-data.pdf';
+
+        pdfDoc.pipe(fs.createWriteStream(pdfOutputPath));
+
+        this.generatePdfContent(pdfDoc, records);
+
+        pdfDoc.end();
+
+        const pdfBuffer = fs.readFileSync(pdfOutputPath);
+
+        const getImageUrl = await this.uploadS3(
+          getDataWithinRange,
+          'pdf',
+          pdfBuffer,
+        );
+
+        const { name, url } = getImageUrl.data;
+
+        // todo ****************
+        /* Delete the files */
+        // const filesToDelete = ['petro-data.csv', 'petro-data.pdf'];
+
+        // await Promise.all(
+        //   filesToDelete.map((file: any) => {
+        //     fs.unlink(file, (error) => {
+        //       this.logger.error(`Error deleting file: ${error}`);
+        //     });
+        //   }),
+        // );
+
+        return { name, url };
+      }
     } catch (error) {
       error.location = `PetroDataServices.${this.rawDataActions.name} method`;
       AppResponse.error(error);
     }
   }
 
+  /**
+   * @Responsibility: dedicated service for exporting all petor-data to csv
+   *
+   * @returns {Promise<any>}
+   */
+
+  async exportToDefaultCsv(): Promise<any> {
+    try {
+      const allData = await this.petroDataRepository.retrieveAllPetroData();
+
+      const csvWriter = createObjectCsvWriter({
+        path: 'petro-data.csv',
+        header: [
+          { id: 'State', title: 'State' },
+          { id: 'Day', title: 'Day' },
+          { id: 'Year', title: 'Year' },
+          { id: 'Month', title: 'Month' },
+          { id: 'Period', title: 'Period' },
+          { id: 'AGO', title: 'AGO' },
+          { id: 'PMS', title: 'PMS' },
+          { id: 'DPK', title: 'DPK' },
+          { id: 'LPG', title: 'LPG' },
+          { id: 'Region', title: 'Region' },
+        ],
+      });
+
+      await csvWriter.writeRecords(allData);
+
+      const csvBuffer = require('fs').createReadStream('petro-data.csv');
+
+      const getImageUrl = await this.uploadS3(allData, 'csv', csvBuffer);
+      const { name, url } = getImageUrl.data;
+
+      fs.unlinkSync('petro-data.csv');
+
+      return { name, url };
+    } catch (error) {
+      error.location = `PetroDataServices.${this.rawDataActions.name} method`;
+      AppResponse.error(error);
+    }
+  }
+
+  /* Private fxn to store files in digital ocean spaces */
   private async uploadS3(file: any, flag: string, buffer: any) {
     let savedImages: any = {};
     const errors = [];
     const fileName = `${uuidv4().replace(/-/g, '').toLocaleUpperCase()}`;
 
-    let fileType: string = flag === FileExtensionType.CSV ? 'csv' : 'xlsx';
+    let fileType: string =
+      flag === FileExtensionType.CSV
+        ? 'csv'
+        : flag === FileExtensionType.XLSX
+          ? 'xlsx'
+          : 'pdf';
     // if (flags === FileExtensionType.CSV) {
     //   const { originalname } = file;
     //   const splitImg = originalname.split('.');
@@ -868,6 +979,104 @@ export class PetroDataService {
       accessKeyId: this.configService.get<string>('SPACES_ACCESS_KEY'),
       secretAccessKey: this.configService.get<string>('SPACES_SECRET_KEY'),
       endpoint: this.configService.get('SPACES_ENDPOINT'),
+    });
+  }
+
+  /* Private fxn to parse csv data */
+  private parseCsv(csvData: string): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      const records: any[] = [];
+      parse(csvData, { columns: true }, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          data.forEach((record) => records.push(record));
+          resolve(records);
+        }
+      });
+    });
+  }
+
+  private generatePdfContent(pdfDoc: any, records: any[]): void {
+    // Customize the PDF layout and content based on your requirements
+    pdfDoc.fontSize(5); // Adjust the font size as needed
+
+    // Constants for column widths and table headers
+    const columnWidths = [55, 15, 20, 25, 150, 30, 25, 25, 25, 65];
+    const tableHeader = [
+      'State',
+      'Day',
+      'Year',
+      'Month',
+      'Period',
+      'AGO',
+      'PMS',
+      'DPK',
+      'LPG',
+      'Region',
+    ];
+
+    // Set the initial position for the table
+    let tableX = 50;
+    let tableY = 50;
+
+    // Add the table header
+    tableHeader.forEach((header, index) => {
+      pdfDoc.text(header, tableX, tableY, {
+        width: columnWidths[index],
+        align: 'left',
+      });
+      tableX += columnWidths[index] + 5; // Add some padding between columns
+    });
+
+    // Move to the next row
+    tableY += 10;
+
+    // Populate the table with data
+    records.forEach((record) => {
+      tableX = 50; // Reset X position for each row
+
+      tableHeader.forEach((header, index) => {
+        let cellContent = String(record[header]);
+
+        // Split text manually based on the available width of the column
+        const maxLineWidth = columnWidths[index];
+        let textLines = [];
+
+        while (cellContent.length > 0) {
+          let line = '';
+          let i = 0;
+          while (
+            pdfDoc.widthOfString(line) < maxLineWidth &&
+            i < cellContent.length
+          ) {
+            line += cellContent[i];
+            i++;
+          }
+          textLines.push(line.trim());
+          cellContent = cellContent.slice(i);
+        }
+
+        // Draw each line of the cell content
+        textLines.forEach((line, lineIndex) => {
+          pdfDoc.text(line, tableX, tableY + lineIndex * 5, {
+            width: columnWidths[index],
+            align: 'left',
+          });
+        });
+
+        tableX += columnWidths[index]; // Do not add padding between columns here to minimize space
+      });
+
+      // Move to the next row
+      tableY += Math.max(
+        ...tableHeader.map(
+          (header) =>
+            pdfDoc.heightOfString(String(record[header]), {
+              width: columnWidths[tableHeader.indexOf(header)],
+            }) + 5,
+        ),
+      );
     });
   }
 }
