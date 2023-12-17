@@ -153,4 +153,17 @@ export class PetroDataController {
         success('Successfully performed action on weekly dataset', 200, data),
       );
   }
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
+  @Post('/export')
+  async exportToDefaultCsv(
+    @Req() req: any,
+    @Res() res: Response,
+  ): Promise<Response> {
+    const data = await this.petroDataService.exportToDefaultCsv();
+    return res
+      .status(200)
+      .json(success('Successfully exported max data to csv', 200, data));
+  }
 }
