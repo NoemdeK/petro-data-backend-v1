@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { CreateXlsxDto } from './dto/create-xlsx.dto';
 import { ProductType } from './enum/utils/enum.util';
 import { PropDataInput } from 'src/common/utils/util.interface';
+import * as moment from 'moment';
 
 @Injectable()
 export class PetroDataRepository {
@@ -46,8 +47,8 @@ export class PetroDataRepository {
       return await this.petroDataModel
         .find({
           Period: {
-            $gte: weekStartDate,
-            $lt: weekEndDate,
+            $gte: moment(weekStartDate).toISOString(),
+            $lt: moment(weekEndDate).toISOString(),
           },
         })
         .select('-_id State Day Year Month Period AGO PMS DPK LPG Region')

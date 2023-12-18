@@ -57,7 +57,7 @@ export class PetroDataController {
 
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
-  @Get('/analysis')
+  @Post('/analysis')
   async petroDataAnalysis(
     @Req() req: any,
     @Res() res: Response,

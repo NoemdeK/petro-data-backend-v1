@@ -243,7 +243,12 @@ export class PetroDataService {
                       );
           }),
         );
-        return analysis.flat();
+        return analysis.flat().map((index: any) => {
+          return {
+            ...index,
+            Period: moment(index?.Period).format('YYYY-MM-DD'),
+          };
+        });
       };
 
       /************************** AGO Product Type ***************************************/
@@ -761,7 +766,7 @@ export class PetroDataService {
         });
       }
 
-      const getDataWithinRange =
+      let getDataWithinRange =
         await this.petroDataRepository.retrievePeriodicPetroData(
           weekStartDate,
           weekEndDate,
