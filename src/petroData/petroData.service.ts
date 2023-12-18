@@ -100,14 +100,18 @@ export class PetroDataService {
             // Process and store data
             jsonData.forEach(async (data) => {
               try {
+                const formattedPeriodDate = moment(
+                  data.Period,
+                  'D-MMM-YY',
+                ).format('YYYY-MM-DD');
+
                 function csvUploadData() {
                   return {
                     State: data['State '] ?? data['State'],
                     Day: data.Day ?? null,
                     Year: data['Year '] ?? data['Year'],
                     Month: data['Month '] ?? data['Month'],
-                    Period:
-                      moment(data.Period, 'DD-MMM-YY').toISOString() ?? null,
+                    Period: moment(formattedPeriodDate).format('YYYY-MM-DD'),
                     AGO: data.AGO ?? null,
                     PMS: data.PMS ?? null,
                     DPK: data.DPK ?? null,
@@ -206,6 +210,7 @@ export class PetroDataService {
 
       let analysis;
 
+      // todo
       const getAnalysis = async (date: Date, product: string) => {
         const formattedDate = moment(date).toISOString();
         const today = moment().toISOString();
@@ -243,12 +248,7 @@ export class PetroDataService {
                       );
           }),
         );
-        return analysis.flat().map((index: any) => {
-          return {
-            ...index,
-            Period: moment(index?.Period).format('YYYY-MM-DD'),
-          };
-        });
+        return analysis.flat();
       };
 
       /************************** AGO Product Type ***************************************/

@@ -20,8 +20,8 @@ export class PetroData {
   @Prop({ type: String, required: false })
   Month: string;
 
-  @Prop({ type: Date, required: false })
-  Period: Date;
+  @Prop({ type: String, required: false })
+  Period: string;
 
   @Prop({ type: Number, required: false })
   AGO: number;
