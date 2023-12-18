@@ -580,6 +580,7 @@ export class PetroDataService {
             mostRecentPrices[1].AGO,
             mostRecentPrices[0].AGO,
           ),
+          closedDate: mostRecentPrices[0].Period,
         },
         DPKData: {
           overallPricePercentChange:
@@ -591,6 +592,7 @@ export class PetroDataService {
             mostRecentPrices[1].DPK,
             mostRecentPrices[0].DPK,
           ),
+          closedDate: mostRecentPrices[0].Period,
         },
         LPGData: {
           overallPricePercentChange:
@@ -602,6 +604,7 @@ export class PetroDataService {
             mostRecentPrices[1].LPG,
             mostRecentPrices[0].LPG,
           ),
+          closedDate: mostRecentPrices[0].Period,
         },
         PMSData: {
           overallPricePercentChange:
@@ -613,6 +616,7 @@ export class PetroDataService {
             mostRecentPrices[1].PMS,
             mostRecentPrices[0].PMS,
           ),
+          closedDate: mostRecentPrices[0].Period,
         },
         // ICEData: {
         //   overallPricePercentChange:
