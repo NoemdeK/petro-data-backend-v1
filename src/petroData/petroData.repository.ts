@@ -272,7 +272,7 @@ export class PetroDataRepository {
       if (limit) {
         return await this.petroDataModel
           .find()
-          .sort({ createdAt: 1 })
+          .sort({ createdAt: -1 })
           .limit(limit)
           .lean();
       }
