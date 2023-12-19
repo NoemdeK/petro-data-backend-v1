@@ -515,122 +515,873 @@ export class PetroDataService {
 
   async petroDataAnalysisPercentages(): Promise<any> {
     try {
-      const priceData = await this.petroDataRepository.getAllPrices();
+      const SEPriceData = await this.petroDataRepository.getAllPrices({
+        Region: Regions.SOUTH_EAST,
+      });
 
-      let AGOPercentageChange: number,
-        DPKPercentageChange: number,
-        LPGPercentageChange: number,
-        PMSPercentageChange: number,
-        ICEPercentageChange: number;
-      const theLength: number = priceData.length;
-      for (let i = 1; i < theLength; i++) {
-        const oldAGOPrice = priceData[i - 1].AGO;
-        const oldDPKPrice = priceData[i - 1].DPK;
-        const oldLPGPrice = priceData[i - 1].LPG;
-        const oldPMSPrice = priceData[i - 1].PMS;
-        const oldICEPrice = priceData[i - 1].ICE;
+      const SWPriceData = await this.petroDataRepository.getAllPrices({
+        Region: Regions.SOUTH_WEST,
+      });
 
-        const newAGOPrice = priceData[i].AGO;
-        const newDPKPrice = priceData[i].DPK;
-        const newLPGPrice = priceData[i].LPG;
-        const newPMSPrice = priceData[i].PMS;
-        const newICEPrice = priceData[i].ICE;
+      const SSPriceData = await this.petroDataRepository.getAllPrices({
+        Region: Regions.SOUTH_SOUTH,
+      });
 
-        if (newAGOPrice) {
-          AGOPercentageChange =
-            ((newAGOPrice - oldAGOPrice) / oldAGOPrice) * 100;
+      const NEPriceData = await this.petroDataRepository.getAllPrices({
+        Region: Regions.NORTH_EAST,
+      });
+
+      const NWPriceData = await this.petroDataRepository.getAllPrices({
+        Region: Regions.NORTH_WEST,
+      });
+
+      const NCPriceData = await this.petroDataRepository.getAllPrices({
+        Region: Regions.NORTH_CENTRAL,
+      });
+
+      const avgProductPricePerRegion = async (
+        data: Array<object | any>, // todo
+        region: string,
+        productType: string,
+      ) => {
+        /********************** Get overall price of the product ********************************/
+        const overallProductPrice =
+          productType === ProductType.AGO
+            ? data.reduce(
+                (accumulator, currentValue) => accumulator + currentValue.AGO,
+                0,
+              )
+            : productType === ProductType.PMS
+              ? data.reduce(
+                  (accumulator, currentValue) => accumulator + currentValue.PMS,
+                  0,
+                )
+              : productType === ProductType.DPK
+                ? data.reduce(
+                    (accumulator, currentValue) =>
+                      accumulator + currentValue.DPK,
+                    0,
+                  )
+                : productType === ProductType.LPG
+                  ? data.reduce(
+                      (accumulator, currentValue) =>
+                        accumulator + currentValue.LPG,
+                      0,
+                    )
+                  : data.reduce(
+                      (accumulator, currentValue) =>
+                        accumulator + currentValue.ICE,
+                      0,
+                    );
+
+        /******************** calculate the overall count of the products in a region ****************/
+        const overallCountByRegion =
+          region === Regions.SOUTH_EAST
+            ? await this.petroDataRepository.countDocuments({
+                Region: Regions.SOUTH_EAST,
+              })
+            : region === Regions.SOUTH_WEST
+              ? await this.petroDataRepository.countDocuments({
+                  Region: Regions.SOUTH_WEST,
+                })
+              : region === Regions.SOUTH_SOUTH
+                ? await this.petroDataRepository.countDocuments({
+                    Region: Regions.SOUTH_SOUTH,
+                  })
+                : region === Regions.NORTH_EAST
+                  ? await this.petroDataRepository.countDocuments({
+                      Region: Regions.NORTH_EAST,
+                    })
+                  : region === Regions.NORTH_WEST
+                    ? await this.petroDataRepository.countDocuments({
+                        Region: Regions.NORTH_WEST,
+                      })
+                    : await this.petroDataRepository.countDocuments({
+                        Region: Regions.NORTH_CENTRAL,
+                      });
+
+        const avgProductPrice =
+          +overallProductPrice.toFixed(2) / +overallCountByRegion;
+
+        return avgProductPrice.toFixed(2);
+      };
+
+      /* Get product data by region */
+      const AGODataByRegion = {
+        SE: await avgProductPricePerRegion(
+          SEPriceData,
+          Regions.SOUTH_EAST,
+          ProductType.AGO,
+        ),
+        SW: await avgProductPricePerRegion(
+          SWPriceData,
+          Regions.SOUTH_WEST,
+          ProductType.AGO,
+        ),
+        SS: await avgProductPricePerRegion(
+          SSPriceData,
+          Regions.SOUTH_SOUTH,
+          ProductType.AGO,
+        ),
+        NE: await avgProductPricePerRegion(
+          NEPriceData,
+          Regions.NORTH_EAST,
+          ProductType.AGO,
+        ),
+        NW: await avgProductPricePerRegion(
+          NWPriceData,
+          Regions.NORTH_WEST,
+          ProductType.AGO,
+        ),
+        NC: await avgProductPricePerRegion(
+          NCPriceData,
+          Regions.NORTH_CENTRAL,
+          ProductType.AGO,
+        ),
+      };
+
+      const PMSDataByRegion = {
+        SE: await avgProductPricePerRegion(
+          SEPriceData,
+          Regions.SOUTH_EAST,
+          ProductType.PMS,
+        ),
+        SW: await avgProductPricePerRegion(
+          SWPriceData,
+          Regions.SOUTH_WEST,
+          ProductType.PMS,
+        ),
+        SS: await avgProductPricePerRegion(
+          SSPriceData,
+          Regions.SOUTH_SOUTH,
+          ProductType.PMS,
+        ),
+        NE: await avgProductPricePerRegion(
+          NEPriceData,
+          Regions.NORTH_EAST,
+          ProductType.PMS,
+        ),
+        NW: await avgProductPricePerRegion(
+          NWPriceData,
+          Regions.NORTH_WEST,
+          ProductType.PMS,
+        ),
+        NC: await avgProductPricePerRegion(
+          NCPriceData,
+          Regions.NORTH_CENTRAL,
+          ProductType.PMS,
+        ),
+      };
+
+      const DPKDataByRegion = {
+        SE: await avgProductPricePerRegion(
+          SEPriceData,
+          Regions.SOUTH_EAST,
+          ProductType.DPK,
+        ),
+        SW: await avgProductPricePerRegion(
+          SWPriceData,
+          Regions.SOUTH_WEST,
+          ProductType.DPK,
+        ),
+        SS: await avgProductPricePerRegion(
+          SSPriceData,
+          Regions.SOUTH_SOUTH,
+          ProductType.DPK,
+        ),
+        NE: await avgProductPricePerRegion(
+          NEPriceData,
+          Regions.NORTH_EAST,
+          ProductType.DPK,
+        ),
+        NW: await avgProductPricePerRegion(
+          NWPriceData,
+          Regions.NORTH_WEST,
+          ProductType.DPK,
+        ),
+        NC: await avgProductPricePerRegion(
+          NCPriceData,
+          Regions.NORTH_CENTRAL,
+          ProductType.DPK,
+        ),
+      };
+
+      const LPGDataByRegion = {
+        SE: await avgProductPricePerRegion(
+          SEPriceData,
+          Regions.SOUTH_EAST,
+          ProductType.LPG,
+        ),
+        SW: await avgProductPricePerRegion(
+          SWPriceData,
+          Regions.SOUTH_WEST,
+          ProductType.LPG,
+        ),
+        SS: await avgProductPricePerRegion(
+          SSPriceData,
+          Regions.SOUTH_SOUTH,
+          ProductType.LPG,
+        ),
+        NE: await avgProductPricePerRegion(
+          NEPriceData,
+          Regions.NORTH_EAST,
+          ProductType.LPG,
+        ),
+        NW: await avgProductPricePerRegion(
+          NWPriceData,
+          Regions.NORTH_WEST,
+          ProductType.LPG,
+        ),
+        NC: await avgProductPricePerRegion(
+          NCPriceData,
+          Regions.NORTH_CENTRAL,
+          ProductType.LPG,
+        ),
+      };
+
+      const ICEDataByRegion = {
+        SE: await avgProductPricePerRegion(
+          SEPriceData,
+          Regions.SOUTH_EAST,
+          ProductType.ICE,
+        ),
+        SW: await avgProductPricePerRegion(
+          SWPriceData,
+          Regions.SOUTH_WEST,
+          ProductType.ICE,
+        ),
+        SS: await avgProductPricePerRegion(
+          SSPriceData,
+          Regions.SOUTH_SOUTH,
+          ProductType.ICE,
+        ),
+        NE: await avgProductPricePerRegion(
+          NEPriceData,
+          Regions.NORTH_EAST,
+          ProductType.ICE,
+        ),
+        NW: await avgProductPricePerRegion(
+          NWPriceData,
+          Regions.NORTH_WEST,
+          ProductType.ICE,
+        ),
+        NC: await avgProductPricePerRegion(
+          NCPriceData,
+          Regions.NORTH_CENTRAL,
+          ProductType.ICE,
+        ),
+      };
+
+      const AGOCurrentPrice =
+        (+AGODataByRegion.SE +
+          +AGODataByRegion.SW +
+          +AGODataByRegion.SS +
+          +AGODataByRegion.NE +
+          +AGODataByRegion.NW +
+          +AGODataByRegion.NC) /
+        6;
+
+      const PMSCurrentPrice =
+        (+PMSDataByRegion.SE +
+          +PMSDataByRegion.SW +
+          +PMSDataByRegion.SS +
+          +PMSDataByRegion.NE +
+          +PMSDataByRegion.NW +
+          +PMSDataByRegion.NC) /
+        6;
+
+      const DPKCurrentPrice =
+        (+DPKDataByRegion.SE +
+          +DPKDataByRegion.SW +
+          +DPKDataByRegion.SS +
+          +DPKDataByRegion.NE +
+          +DPKDataByRegion.NW +
+          +DPKDataByRegion.NC) /
+        6;
+
+      const LPGCurrentPrice =
+        (+LPGDataByRegion.SE +
+          +LPGDataByRegion.SW +
+          +LPGDataByRegion.SS +
+          +LPGDataByRegion.NE +
+          +LPGDataByRegion.NW +
+          +LPGDataByRegion.NC) /
+        6;
+
+      const ICECurrentPrice =
+        (+ICEDataByRegion.SE +
+          +ICEDataByRegion.SW +
+          +ICEDataByRegion.SS +
+          +ICEDataByRegion.NE +
+          +ICEDataByRegion.NW +
+          +ICEDataByRegion.NC) /
+        6;
+
+      /* Calculate the difference in last two prices for all products in every region */
+
+      const SERecentPriceData = await this.petroDataRepository.getAllPrices(
+        {
+          Region: Regions.SOUTH_EAST,
+        },
+        2,
+      );
+
+      const SWRecentPriceData = await this.petroDataRepository.getAllPrices(
+        {
+          Region: Regions.SOUTH_WEST,
+        },
+        2,
+      );
+
+      const SSRecentPriceData = await this.petroDataRepository.getAllPrices(
+        {
+          Region: Regions.SOUTH_SOUTH,
+        },
+        2,
+      );
+
+      const NERecentPriceData = await this.petroDataRepository.getAllPrices(
+        {
+          Region: Regions.NORTH_EAST,
+        },
+        2,
+      );
+
+      const NWRecentPriceData = await this.petroDataRepository.getAllPrices(
+        {
+          Region: Regions.NORTH_WEST,
+        },
+        2,
+      );
+
+      const NCRecentPriceData = await this.petroDataRepository.getAllPrices(
+        {
+          Region: Regions.NORTH_CENTRAL,
+        },
+        2,
+      );
+
+      const recentAGOPriceChg =
+        SERecentPriceData[0].AGO -
+        SERecentPriceData[1].AGO +
+        (SWRecentPriceData[0].AGO - SWRecentPriceData[1].AGO) +
+        (SSRecentPriceData[0].AGO - SSRecentPriceData[1].AGO) +
+        (NERecentPriceData[0].AGO - NERecentPriceData[1].AGO) +
+        (NWRecentPriceData[0].AGO - NWRecentPriceData[1].AGO) +
+        (NCRecentPriceData[0].AGO - NCRecentPriceData[1].AGO);
+
+      const recentPMSPriceChg =
+        SERecentPriceData[0].PMS -
+        SERecentPriceData[1].PMS +
+        (SWRecentPriceData[0].PMS - SWRecentPriceData[1].PMS) +
+        (SSRecentPriceData[0].PMS - SSRecentPriceData[1].PMS) +
+        (NERecentPriceData[0].PMS - NERecentPriceData[1].PMS) +
+        (NWRecentPriceData[0].PMS - NWRecentPriceData[1].PMS) +
+        (NCRecentPriceData[0].PMS - NCRecentPriceData[1].PMS);
+
+      const recentDPKPriceChg =
+        SERecentPriceData[0].DPK -
+        SERecentPriceData[1].DPK +
+        (SWRecentPriceData[0].DPK - SWRecentPriceData[1].DPK) +
+        (SSRecentPriceData[0].DPK - SSRecentPriceData[1].DPK) +
+        (NERecentPriceData[0].DPK - NERecentPriceData[1].DPK) +
+        (NWRecentPriceData[0].DPK - NWRecentPriceData[1].DPK) +
+        (NCRecentPriceData[0].DPK - NCRecentPriceData[1].DPK);
+
+      const recentLPGPriceChg =
+        SERecentPriceData[0].LPG -
+        SERecentPriceData[1].LPG +
+        (SWRecentPriceData[0].LPG - SWRecentPriceData[1].LPG) +
+        (SSRecentPriceData[0].LPG - SSRecentPriceData[1].LPG) +
+        (NERecentPriceData[0].LPG - NERecentPriceData[1].LPG) +
+        (NWRecentPriceData[0].LPG - NWRecentPriceData[1].LPG) +
+        (NCRecentPriceData[0].LPG - NCRecentPriceData[1].LPG);
+
+      const recentICEPriceChg =
+        SERecentPriceData[0].ICE -
+        SERecentPriceData[1].ICE +
+        (SWRecentPriceData[0].ICE - SWRecentPriceData[1].ICE) +
+        (SSRecentPriceData[0].ICE - SSRecentPriceData[1].ICE) +
+        (NERecentPriceData[0].ICE - NERecentPriceData[1].ICE) +
+        (NWRecentPriceData[0].ICE - NWRecentPriceData[1].ICE) +
+        (NCRecentPriceData[0].ICE - NCRecentPriceData[1].ICE);
+
+      const recentAGOPricePercentChange = +recentAGOPriceChg / 6;
+      const recentPMSPricePercentChange = +recentPMSPriceChg / 6;
+      const recentDPKPricePercentChange = +recentDPKPriceChg / 6;
+      const recentLPGPricePercentChange = +recentLPGPriceChg / 6;
+      const recentICEPricePercentChange = +recentICEPriceChg / 6;
+
+      function overallPercentageChgFxn(productType: string) {
+        let priceChgSE: number,
+          priceChgSW: number,
+          priceChgSS: number,
+          priceChgNE: number,
+          priceChgNW: number,
+          priceChgNC: number;
+
+        /********************** South East Products  ***************************/
+        for (let i = 1; i < SEPriceData.length; i++) {
+          /* Old price for products in South East */
+          const oldPriceSE =
+            productType === ProductType.AGO
+              ? SEPriceData[i - 1].AGO
+              : productType === ProductType.PMS
+                ? SEPriceData[i - 1].PMS
+                : productType === ProductType.DPK
+                  ? SEPriceData[i - 1].DPK
+                  : productType === ProductType.LPG
+                    ? SEPriceData[i - 1].LPG
+                    : SEPriceData[i - 1].ICE;
+
+          /* New price for products in South East */
+          const newPriceSE =
+            productType === ProductType.AGO
+              ? SEPriceData[i].AGO
+              : productType === ProductType.PMS
+                ? SEPriceData[i].PMS
+                : productType === ProductType.DPK
+                  ? SEPriceData[i].DPK
+                  : productType === ProductType.LPG
+                    ? SEPriceData[i].LPG
+                    : SEPriceData[i].ICE;
+
+          if (newPriceSE) {
+            priceChgSE = ((newPriceSE - oldPriceSE) / oldPriceSE) * 100;
+          }
         }
 
-        if (newDPKPrice) {
-          DPKPercentageChange =
-            ((newDPKPrice - oldDPKPrice) / oldDPKPrice) * 100;
+        /********************** South West Products  ***************************/
+        for (let i = 1; i < SWPriceData.length; i++) {
+          /* Old price for products in South West */
+          const oldPriceSW =
+            productType === ProductType.AGO
+              ? SWPriceData[i - 1].AGO
+              : productType === ProductType.PMS
+                ? SWPriceData[i - 1].PMS
+                : productType === ProductType.DPK
+                  ? SWPriceData[i - 1].DPK
+                  : productType === ProductType.LPG
+                    ? SWPriceData[i - 1].LPG
+                    : SWPriceData[i - 1].ICE;
+
+          /* New price for products in South West */
+          const newPriceSW =
+            productType === ProductType.AGO
+              ? SWPriceData[i].AGO
+              : productType === ProductType.PMS
+                ? SWPriceData[i].PMS
+                : productType === ProductType.DPK
+                  ? SWPriceData[i].DPK
+                  : productType === ProductType.LPG
+                    ? SWPriceData[i].LPG
+                    : SWPriceData[i].ICE;
+
+          if (newPriceSW) {
+            priceChgSW = ((newPriceSW - oldPriceSW) / oldPriceSW) * 100;
+          }
         }
 
-        if (newLPGPrice) {
-          LPGPercentageChange =
-            ((newLPGPrice - oldLPGPrice) / oldLPGPrice) * 100;
+        /********************** South South Products  ***************************/
+        for (let i = 1; i < SSPriceData.length; i++) {
+          /* Old price for products in South South */
+          const oldPriceSS =
+            productType === ProductType.AGO
+              ? SSPriceData[i - 1].AGO
+              : productType === ProductType.PMS
+                ? SSPriceData[i - 1].PMS
+                : productType === ProductType.DPK
+                  ? SSPriceData[i - 1].DPK
+                  : productType === ProductType.LPG
+                    ? SSPriceData[i - 1].LPG
+                    : SSPriceData[i - 1].ICE;
+
+          /* New price for products in South South */
+          const newPriceSS =
+            productType === ProductType.AGO
+              ? SSPriceData[i].AGO
+              : productType === ProductType.PMS
+                ? SSPriceData[i].PMS
+                : productType === ProductType.DPK
+                  ? SSPriceData[i].DPK
+                  : productType === ProductType.LPG
+                    ? SSPriceData[i].LPG
+                    : SSPriceData[i].ICE;
+
+          if (newPriceSS) {
+            priceChgSS = ((newPriceSS - oldPriceSS) / oldPriceSS) * 100;
+          }
         }
 
-        if (newPMSPrice) {
-          PMSPercentageChange =
-            ((newPMSPrice - oldPMSPrice) / oldPMSPrice) * 100;
+        /********************** North East Products  ***************************/
+        for (let i = 1; i < NEPriceData.length; i++) {
+          /* Old price for products in North East */
+          const oldPriceNE =
+            productType === ProductType.AGO
+              ? NEPriceData[i - 1].AGO
+              : productType === ProductType.PMS
+                ? NEPriceData[i - 1].PMS
+                : productType === ProductType.DPK
+                  ? NEPriceData[i - 1].DPK
+                  : productType === ProductType.LPG
+                    ? NEPriceData[i - 1].LPG
+                    : NEPriceData[i - 1].ICE;
+
+          /* New price for products in North East */
+          const newPriceNE =
+            productType === ProductType.AGO
+              ? NEPriceData[i].AGO
+              : productType === ProductType.PMS
+                ? NEPriceData[i].PMS
+                : productType === ProductType.DPK
+                  ? NEPriceData[i].DPK
+                  : productType === ProductType.LPG
+                    ? NEPriceData[i].LPG
+                    : NEPriceData[i].ICE;
+
+          if (newPriceNE) {
+            priceChgNE = ((newPriceNE - oldPriceNE) / oldPriceNE) * 100;
+          }
         }
 
-        if (newICEPrice) {
-          ICEPercentageChange =
-            ((newICEPrice - oldICEPrice) / oldICEPrice) * 100;
+        /********************** North West Products  ***************************/
+        for (let i = 1; i < NWPriceData.length; i++) {
+          /* Old price for products in North West */
+          const oldPriceNW =
+            productType === ProductType.AGO
+              ? NWPriceData[i - 1].AGO
+              : productType === ProductType.PMS
+                ? NWPriceData[i - 1].PMS
+                : productType === ProductType.DPK
+                  ? NWPriceData[i - 1].DPK
+                  : productType === ProductType.LPG
+                    ? NWPriceData[i - 1].LPG
+                    : NWPriceData[i - 1].ICE;
+
+          /* New price for products in North West */
+          const newPriceNW =
+            productType === ProductType.AGO
+              ? NWPriceData[i].AGO
+              : productType === ProductType.PMS
+                ? NWPriceData[i].PMS
+                : productType === ProductType.DPK
+                  ? NWPriceData[i].DPK
+                  : productType === ProductType.LPG
+                    ? NWPriceData[i].LPG
+                    : NWPriceData[i].ICE;
+
+          if (newPriceNW) {
+            priceChgNW = ((newPriceNW - oldPriceNW) / oldPriceNW) * 100;
+          }
         }
+
+        /********************** North Central Products  ***************************/
+        for (let i = 1; i < NCPriceData.length; i++) {
+          /* Old price for products in North Central */
+          const oldPriceNC =
+            productType === ProductType.AGO
+              ? NCPriceData[i - 1].AGO
+              : productType === ProductType.PMS
+                ? NCPriceData[i - 1].PMS
+                : productType === ProductType.DPK
+                  ? NCPriceData[i - 1].DPK
+                  : productType === ProductType.LPG
+                    ? NCPriceData[i - 1].LPG
+                    : NCPriceData[i - 1].ICE;
+
+          /* New price for products in North Central */
+          const newPriceNC =
+            productType === ProductType.AGO
+              ? NCPriceData[i].AGO
+              : productType === ProductType.PMS
+                ? NCPriceData[i].PMS
+                : productType === ProductType.DPK
+                  ? NCPriceData[i].DPK
+                  : productType === ProductType.LPG
+                    ? NCPriceData[i].LPG
+                    : NCPriceData[i].ICE;
+
+          if (newPriceNC) {
+            priceChgNC = ((newPriceNC - oldPriceNC) / oldPriceNC) * 100;
+          }
+        }
+
+        const result =
+          (+priceChgSE +
+            +priceChgSW +
+            +priceChgSS +
+            +priceChgNE +
+            +priceChgNW +
+            +priceChgNC) /
+          6;
+
+        return result.toFixed(2);
       }
 
-      const mostRecentPrices = await this.petroDataRepository.getAllPrices(2);
-
-      function recentPriceChgFxn(current: number, initial: number) {
-        const result = current - initial;
-        return result > 0 ? `+${result.toFixed(2)}` : `${result.toFixed(2)}`;
-      }
+      const overallPercentageChgAGO = +overallPercentageChgFxn(ProductType.AGO);
+      const overallPercentageChgPMS = +overallPercentageChgFxn(ProductType.PMS);
+      const overallPercentageChgDPK = +overallPercentageChgFxn(ProductType.DPK);
+      const overallPercentageChgLPG = +overallPercentageChgFxn(ProductType.LPG);
+      const overallPercentageChgICE = +overallPercentageChgFxn(ProductType.ICE);
 
       return {
         AGOData: {
           overallPricePercentChange:
-            AGOPercentageChange > 0
-              ? `+${AGOPercentageChange.toFixed(2)}`
-              : `${AGOPercentageChange.toFixed(2)}`,
-          currentPrice: mostRecentPrices[1].AGO,
-          recentPricePercentChange: recentPriceChgFxn(
-            mostRecentPrices[1].AGO,
-            mostRecentPrices[0].AGO,
-          ),
-          closedDate: mostRecentPrices[0].Period,
-        },
-        DPKData: {
-          overallPricePercentChange:
-            DPKPercentageChange > 0
-              ? `+${DPKPercentageChange.toFixed(2)}`
-              : `${DPKPercentageChange.toFixed(2)}`,
-          currentPrice: mostRecentPrices[1].DPK,
-          recentPricePercentChange: recentPriceChgFxn(
-            mostRecentPrices[1].DPK,
-            mostRecentPrices[0].DPK,
-          ),
-          closedDate: mostRecentPrices[0].Period,
-        },
-        LPGData: {
-          overallPricePercentChange:
-            LPGPercentageChange > 0
-              ? `+${LPGPercentageChange.toFixed(2)}`
-              : `${LPGPercentageChange.toFixed(2)}`,
-          currentPrice: mostRecentPrices[1].LPG,
-          recentPricePercentChange: recentPriceChgFxn(
-            mostRecentPrices[1].LPG,
-            mostRecentPrices[0].LPG,
-          ),
-          closedDate: mostRecentPrices[0].Period,
+            overallPercentageChgAGO > 0
+              ? `+${overallPercentageChgAGO}`
+              : `${overallPercentageChgAGO}`,
+          currentPrice: AGOCurrentPrice.toFixed(2) ?? '0.00',
+          recentPricePercentChange:
+            recentAGOPricePercentChange > 0
+              ? `+${recentAGOPricePercentChange.toFixed(2)}`
+              : `${recentAGOPricePercentChange.toFixed(2)}`,
         },
         PMSData: {
           overallPricePercentChange:
-            PMSPercentageChange > 0
-              ? `+${PMSPercentageChange.toFixed(2)}`
-              : `${PMSPercentageChange.toFixed(2)}`,
-          currentPrice: mostRecentPrices[1].PMS,
-          recentPricePercentChange: recentPriceChgFxn(
-            mostRecentPrices[1].PMS,
-            mostRecentPrices[0].PMS,
-          ),
-          closedDate: mostRecentPrices[0].Period,
+            overallPercentageChgPMS > 0
+              ? `+${overallPercentageChgPMS}`
+              : `${overallPercentageChgPMS}`,
+          currentPrice: PMSCurrentPrice.toFixed(2) ?? '0.00',
+          recentPricePercentChange:
+            recentPMSPricePercentChange > 0
+              ? `+${recentPMSPricePercentChange.toFixed(2)}`
+              : `${recentPMSPricePercentChange.toFixed(2)}`,
         },
-        // ICEData: {
-        //   overallPricePercentChange:
-        //     ICEPercentageChange > 0
-        //       ? `+${ICEPercentageChange.toFixed(2)}` ?? '0.00'
-        //       : `${ICEPercentageChange.toFixed(2)}` ?? '0.00',
-        //   currentPrice: mostRecentPrices[1].ICE ?? '0.00',
-        //   recentPricePercentChange:
-        //     recentPriceChgFxn(
-        //       mostRecentPrices[1].ICE,
-        //       mostRecentPrices[0].ICE,
-        //     ) ?? '0.00',
-        // },
+
+        DPKData: {
+          overallPricePercentChange:
+            overallPercentageChgDPK > 0
+              ? `+${overallPercentageChgDPK}`
+              : `${overallPercentageChgDPK}`,
+          currentPrice: DPKCurrentPrice.toFixed(2) ?? '0.00',
+          recentPricePercentChange:
+            recentDPKPricePercentChange > 0
+              ? `+${recentDPKPricePercentChange.toFixed(2)}`
+              : `${recentDPKPricePercentChange.toFixed(2)}`,
+        },
+
+        LPGData: {
+          overallPricePercentChange:
+            overallPercentageChgLPG > 0
+              ? `+${overallPercentageChgLPG}`
+              : `${overallPercentageChgLPG}`,
+          currentPrice: LPGCurrentPrice.toFixed(2) ?? '0.00',
+          recentPricePercentChange:
+            recentLPGPricePercentChange > 0
+              ? `+${recentLPGPricePercentChange.toFixed(2)}`
+              : `${recentLPGPricePercentChange.toFixed(2)}`,
+        },
+
+        ICEData: {
+          overallPricePercentChange:
+            overallPercentageChgICE > 0
+              ? `+${overallPercentageChgICE}`
+              : `${overallPercentageChgICE}`,
+          currentPrice: ICECurrentPrice.toFixed(2) ?? '0.00',
+          recentPricePercentChange:
+            recentICEPricePercentChange > 0
+              ? `+${recentICEPricePercentChange.toFixed(2)}`
+              : `${recentICEPricePercentChange.toFixed(2)}`,
+        },
       };
+      // /************************************* South East ************************************/
+      // const overallAGOPriceSE = SEPriceData.reduce(
+      //   (accumulator, currentValue) => accumulator + currentValue.AGO
+      //   0,
+      // );
+
+      // const SECount = await this.petroDataRepository.countDocuments({
+      //   Region: Regions.SOUTH_EAST,
+      // });
+
+      // const avgAGOPriceSE = +overallAGOPriceSE.toFixed(2) / +SECount;
+
+      // /************************************* South West ************************************/
+      // const overallAGOPriceSW = SWPriceData.reduce(
+      //   (accumulator, currentValue) => accumulator + currentValue.AGO,
+      //   0,
+      // );
+
+      // const SWCount = await this.petroDataRepository.countDocuments({
+      //   Region: Regions.SOUTH_WEST,
+      // });
+
+      // const avgAGOPriceSW = +overallAGOPriceSW.toFixed(2) / +SWCount;
+
+      // /************************************* South South ************************************/
+      // const overallAGOPriceSS = SSPriceData.reduce(
+      //   (accumulator, currentValue) => accumulator + currentValue.AGO,
+      //   0,
+      // );
+
+      // const SSCount = await this.petroDataRepository.countDocuments({
+      //   Region: Regions.SOUTH_SOUTH,
+      // });
+
+      // const avgAGOPriceSS = +overallAGOPriceSS.toFixed(2) / +SSCount;
+
+      // /************************************* North East ************************************/
+      // const overallAGOPriceNE = NEPriceData.reduce(
+      //   (accumulator, currentValue) => accumulator + currentValue.AGO,
+      //   0,
+      // );
+
+      // const NECount = await this.petroDataRepository.countDocuments({
+      //   Region: Regions.NORTH_EAST,
+      // });
+
+      // const avgAGOPriceNE = +overallAGOPriceNE.toFixed(2) / +NECount;
+
+      // /************************************* North west ************************************/
+      // const overallAGOPriceNW = NWPriceData.reduce(
+      //   (accumulator, currentValue) => accumulator + currentValue.AGO,
+      //   0,
+      // );
+
+      // const NWCount = await this.petroDataRepository.countDocuments({
+      //   Region: Regions.NORTH_WEST,
+      // });
+
+      // const avgAGOPriceNW = +overallAGOPriceNW.toFixed(2) / +NWCount;
+
+      // /************************************* North Central **********************************/
+      // const overallAGOPriceNC = NCPriceData.reduce(
+      //   (accumulator, currentValue) => accumulator + currentValue.AGO,
+      //   0,
+      // );
+
+      // const NCCount = await this.petroDataRepository.countDocuments({
+      //   Region: Regions.NORTH_CENTRAL,
+      // });
+
+      // const avgAGOPriceNC = +overallAGOPriceNC.toFixed(2) / +NCCount;
+
+      // return {
+      //   SE: +avgAGOPriceSE.toFixed(2),
+      //   SW: +avgAGOPriceSW.toFixed(2),
+      //   SS: +avgAGOPriceSS.toFixed(2),
+      //   NE: +avgAGOPriceNE.toFixed(2),
+      //   NW: +avgAGOPriceNW.toFixed(2),
+      //   NC: +avgAGOPriceNC.toFixed(2),
+      // };
+
+      // let AGOPercentageChange: number,
+      //   DPKPercentageChange: number,
+      //   LPGPercentageChange: number,
+      //   PMSPercentageChange: number,
+      //   ICEPercentageChange: number;
+      // const theLength: number = priceData.length;
+      // for (let i = 1; i < theLength; i++) {
+      //   const oldAGOPrice = priceData[i - 1].AGO;
+      //   const oldDPKPrice = priceData[i - 1].DPK;
+      //   const oldLPGPrice = priceData[i - 1].LPG;
+      //   const oldPMSPrice = priceData[i - 1].PMS;
+      //   const oldICEPrice = priceData[i - 1].ICE;
+
+      //   const newAGOPrice = priceData[i].AGO;
+      //   const newDPKPrice = priceData[i].DPK;
+      //   const newLPGPrice = priceData[i].LPG;
+      //   const newPMSPrice = priceData[i].PMS;
+      //   const newICEPrice = priceData[i].ICE;
+
+      //   if (newAGOPrice) {
+      //     AGOPercentageChange =
+      //       ((newAGOPrice - oldAGOPrice) / oldAGOPrice) * 100;
+      //   }
+
+      //   if (newDPKPrice) {
+      //     DPKPercentageChange =
+      //       ((newDPKPrice - oldDPKPrice) / oldDPKPrice) * 100;
+      //   }
+
+      //   if (newLPGPrice) {
+      //     LPGPercentageChange =
+      //       ((newLPGPrice - oldLPGPrice) / oldLPGPrice) * 100;
+      //   }
+
+      //   if (newPMSPrice) {
+      //     PMSPercentageChange =
+      //       ((newPMSPrice - oldPMSPrice) / oldPMSPrice) * 100;
+      //   }
+
+      //   if (newICEPrice) {
+      //     ICEPercentageChange =
+      //       ((newICEPrice - oldICEPrice) / oldICEPrice) * 100;
+      //   }
+      // }
+
+      // const mostRecentPrices = await this.petroDataRepository.getAllPrices(
+      //   {},
+      //   2,
+      // );
+
+      // function recentPriceChgFxn(current: number, initial: number) {
+      //   const result = current - initial;
+      //   return result > 0 ? `+${result.toFixed(2)}` : `${result.toFixed(2)}`;
+      // }
+
+      // return {
+      //   AGOData: {
+      //     overallPricePercentChange:
+      //       AGOPercentageChange > 0
+      //         ? `+${AGOPercentageChange.toFixed(2)}`
+      //         : `${AGOPercentageChange.toFixed(2)}`,
+      //     currentPrice: mostRecentPrices[1].AGO,
+      //     recentPricePercentChange: recentPriceChgFxn(
+      //       mostRecentPrices[1].AGO,
+      //       mostRecentPrices[0].AGO,
+      //     ),
+      //     closedDate: mostRecentPrices[0].Period,
+      //   },
+      //   DPKData: {
+      //     overallPricePercentChange:
+      //       DPKPercentageChange > 0
+      //         ? `+${DPKPercentageChange.toFixed(2)}`
+      //         : `${DPKPercentageChange.toFixed(2)}`,
+      //     currentPrice: mostRecentPrices[1].DPK,
+      //     recentPricePercentChange: recentPriceChgFxn(
+      //       mostRecentPrices[1].DPK,
+      //       mostRecentPrices[0].DPK,
+      //     ),
+      //     closedDate: mostRecentPrices[0].Period,
+      //   },
+      //   LPGData: {
+      //     overallPricePercentChange:
+      //       LPGPercentageChange > 0
+      //         ? `+${LPGPercentageChange.toFixed(2)}`
+      //         : `${LPGPercentageChange.toFixed(2)}`,
+      //     currentPrice: mostRecentPrices[1].LPG,
+      //     recentPricePercentChange: recentPriceChgFxn(
+      //       mostRecentPrices[1].LPG,
+      //       mostRecentPrices[0].LPG,
+      //     ),
+      //     closedDate: mostRecentPrices[0].Period,
+      //   },
+      //   PMSData: {
+      //     overallPricePercentChange:
+      //       PMSPercentageChange > 0
+      //         ? `+${PMSPercentageChange.toFixed(2)}`
+      //         : `${PMSPercentageChange.toFixed(2)}`,
+      //     currentPrice: mostRecentPrices[1].PMS,
+      //     recentPricePercentChange: recentPriceChgFxn(
+      //       mostRecentPrices[1].PMS,
+      //       mostRecentPrices[0].PMS,
+      //     ),
+      //     closedDate: mostRecentPrices[0].Period,
+      //   },
+      //   // ICEData: {
+      //   //   overallPricePercentChange:
+      //   //     ICEPercentageChange > 0
+      //   //       ? `+${ICEPercentageChange.toFixed(2)}` ?? '0.00'
+      //   //       : `${ICEPercentageChange.toFixed(2)}` ?? '0.00',
+      //   //   currentPrice: mostRecentPrices[1].ICE ?? '0.00',
+      //   //   recentPricePercentChange:
+      //   //     recentPriceChgFxn(
+      //   //       mostRecentPrices[1].ICE,
+      //   //       mostRecentPrices[0].ICE,
+      //   //     ) ?? '0.00',
+      //   // },
+      // };
     } catch (error) {
       error.location = `PetroDataServices.${this.petroDataAnalysisPercentages.name} method`;
       AppResponse.error(error);

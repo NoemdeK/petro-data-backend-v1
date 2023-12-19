@@ -267,19 +267,36 @@ export class PetroDataRepository {
    * @returns {any}
    */
 
-  async getAllPrices(limit?: number): Promise<PetroDataDocument | any> {
+  async getAllPrices(
+    where?: PropDataInput,
+    limit?: number,
+  ): Promise<PetroDataDocument | any> {
     try {
       if (limit) {
         return await this.petroDataModel
-          .find()
+          .find(where)
           .sort({ createdAt: -1 })
           .limit(limit)
           .lean();
       }
-      return await this.petroDataModel.find().sort({ createdAt: 1 }).lean();
+      return await this.petroDataModel
+        .find(where)
+        .sort({ createdAt: 1 })
+        .lean();
     } catch (error) {
       throw new Error(error?.messsage);
     }
+  }
+
+  /**
+   * @Responsibility: Repo for counting all petro data documents
+   *
+   * @param where
+   * @returns {Promise<Number>}
+   */
+
+  async countDocuments(where: PropDataInput): Promise<Number> {
+    return await this.petroDataModel.countDocuments(where);
   }
 
   /**
