@@ -226,8 +226,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -248,8 +250,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -270,8 +274,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -292,8 +298,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -314,8 +322,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -336,8 +346,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -358,8 +370,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -381,8 +395,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysis.flat(),
           };
         }
@@ -406,8 +422,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -428,8 +446,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -450,8 +470,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -472,8 +494,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -494,8 +518,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -516,8 +542,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -538,8 +566,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -561,8 +591,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysis.flat(),
           };
         }
@@ -586,8 +618,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -608,8 +642,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -630,8 +666,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -652,8 +690,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -674,8 +714,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -696,8 +738,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -717,8 +761,10 @@ export class PetroDataService {
               ProductType.DPK,
             );
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -740,8 +786,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysis.flat(),
           };
         }
@@ -765,8 +813,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -787,8 +837,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -809,8 +861,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -831,8 +885,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -853,8 +909,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -875,8 +933,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -897,8 +957,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -920,8 +982,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysis.flat(),
           };
         }
@@ -945,8 +1009,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -967,8 +1033,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -989,8 +1057,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -1011,8 +1081,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -1033,8 +1105,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -1055,8 +1129,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
@@ -1076,8 +1152,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall < 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysisData,
           };
         }
