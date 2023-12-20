@@ -7,6 +7,7 @@ import { PetroData, PetroDataSchema } from 'src/schema/petroData.schema';
 import { PetroDataRepository } from './petroData.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { HttpModule } from '@nestjs/axios';
+import { PetroDataUtility } from './petroData.utility';
 
 @Module({
   imports: [
@@ -24,6 +25,6 @@ import { HttpModule } from '@nestjs/axios';
     }),
   ],
   controllers: [PetroDataController],
-  providers: [PetroDataService, PetroDataRepository],
+  providers: [PetroDataService, PetroDataRepository, PetroDataUtility],
 })
 export class PetroDataModule {}
