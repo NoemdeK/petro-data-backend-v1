@@ -244,15 +244,22 @@ export class PetroDataRepository {
               .find({ Region: regionIndex })
               .select('_id Period PMS Region')
               .lean()
-          : product === ProductType.PMS
+          : product === ProductType.DPK
             ? await this.petroDataModel
                 .find({ Region: regionIndex })
                 .select('_id Period DPK Region')
                 .lean()
-            : await this.petroDataModel
-                .find({ Region: regionIndex })
-                .select('_id Period LPG Region')
-                .lean();
+            : product === ProductType.LPG
+              ? await this.petroDataModel
+                  .find({ Region: regionIndex })
+                  .select('_id Period LPG Region')
+                  .lean()
+              : product === ProductType.ICE
+                ? await this.petroDataModel
+                    .find({ Region: regionIndex })
+                    .select('_id Period ICE Region')
+                    .lean()
+                : [];
       // .limit(10);
     } catch (error) {
       throw new Error(error?.messsage);

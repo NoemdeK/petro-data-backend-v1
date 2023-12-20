@@ -1099,8 +1099,10 @@ export class PetroDataService {
             );
 
           return {
-            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
-            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            overallPriceChange:
+              overall > 0 ? `+${overall}` : overall > 0 ? `${overall}` : '0.00',
+            recentPriceChange:
+              recent > 0 ? `+${recent}` : recent < 0 ? `${recent}` : '0.00',
             analysis: analysis.flat(),
           };
         }
@@ -1734,59 +1736,79 @@ export class PetroDataService {
           overallPricePercentChange:
             overallPercentageChgAGO > 0
               ? `+${overallPercentageChgAGO}`
-              : `${overallPercentageChgAGO}`,
-          currentPrice: AGOCurrentPrice.toFixed(2) ?? '0.00',
+              : overallPercentageChgAGO < 0
+                ? `${overallPercentageChgAGO}`
+                : '0.00',
+          currentPrice: AGOCurrentPrice ? AGOCurrentPrice.toFixed(2) : '0.00',
           recentPricePercentChange:
             recentAGOPricePercentChange > 0
               ? `+${recentAGOPricePercentChange.toFixed(2)}`
-              : `${recentAGOPricePercentChange.toFixed(2)}`,
+              : recentAGOPricePercentChange < 0
+                ? `${recentAGOPricePercentChange.toFixed(2)}`
+                : '0.00',
         },
         PMSData: {
           overallPricePercentChange:
             overallPercentageChgPMS > 0
               ? `+${overallPercentageChgPMS}`
-              : `${overallPercentageChgPMS}`,
-          currentPrice: PMSCurrentPrice.toFixed(2) ?? '0.00',
+              : overallPercentageChgPMS < 0
+                ? `${overallPercentageChgPMS}`
+                : '0.00',
+          currentPrice: PMSCurrentPrice ? PMSCurrentPrice.toFixed(2) : '0.00',
           recentPricePercentChange:
             recentPMSPricePercentChange > 0
               ? `+${recentPMSPricePercentChange.toFixed(2)}`
-              : `${recentPMSPricePercentChange.toFixed(2)}`,
+              : recentPMSPricePercentChange < 0
+                ? `${recentPMSPricePercentChange.toFixed(2)}`
+                : '0.00',
         },
 
         DPKData: {
           overallPricePercentChange:
             overallPercentageChgDPK > 0
               ? `+${overallPercentageChgDPK}`
-              : `${overallPercentageChgDPK}`,
-          currentPrice: DPKCurrentPrice.toFixed(2) ?? '0.00',
+              : overallPercentageChgDPK < 0
+                ? `${overallPercentageChgDPK}`
+                : '0.00',
+          currentPrice: DPKCurrentPrice ? DPKCurrentPrice.toFixed(2) : '0.00',
           recentPricePercentChange:
             recentDPKPricePercentChange > 0
               ? `+${recentDPKPricePercentChange.toFixed(2)}`
-              : `${recentDPKPricePercentChange.toFixed(2)}`,
+              : recentDPKPricePercentChange < 0
+                ? `${recentDPKPricePercentChange.toFixed(2)}`
+                : '0.00',
         },
 
         LPGData: {
           overallPricePercentChange:
             overallPercentageChgLPG > 0
               ? `+${overallPercentageChgLPG}`
-              : `${overallPercentageChgLPG}`,
-          currentPrice: LPGCurrentPrice.toFixed(2) ?? '0.00',
+              : overallPercentageChgLPG < 0
+                ? `${overallPercentageChgLPG}`
+                : '0.00',
+          currentPrice: LPGCurrentPrice ? LPGCurrentPrice.toFixed(2) : '0.00',
           recentPricePercentChange:
             recentLPGPricePercentChange > 0
               ? `+${recentLPGPricePercentChange.toFixed(2)}`
-              : `${recentLPGPricePercentChange.toFixed(2)}`,
+              : recentLPGPricePercentChange < 0
+                ? `${recentLPGPricePercentChange.toFixed(2)}`
+                : '0.00',
         },
 
         // ICEData: {
         //   overallPricePercentChange:
         //     overallPercentageChgICE > 0
         //       ? `+${overallPercentageChgICE}`
-        //       : `${overallPercentageChgICE}`,
-        //   currentPrice: ICECurrentPrice.toFixed(2) ?? '0.00',
+        //       : overallPercentageChgICE < 0
+        //         ? `${overallPercentageChgICE}`
+        //         : '0.00',
+        //   currentPrice: ICECurrentPrice ? ICECurrentPrice.toFixed(2) : '0.00',
         //   recentPricePercentChange:
         //     recentICEPricePercentChange > 0
         //       ? `+${recentICEPricePercentChange.toFixed(2)}`
-        //       : `${recentICEPricePercentChange.toFixed(2)}`,
+        //       : recentICEPricePercentChange > 0
+        //         ? `${recentICEPricePercentChange.toFixed(2)}`
+        //         : '0.00',
         // },
       };
       // /************************************* South East ************************************/
