@@ -99,6 +99,7 @@ export class PetroDataRepository {
           Region: regionIndex,
         })
         .select('_id Period AGO Region')
+        .sort({ createdAt: -1 })
         .lean();
     } catch (error) {
       throw new Error(error?.messsage);
@@ -128,6 +129,7 @@ export class PetroDataRepository {
           Region: regionIndex,
         })
         .select('_id Period PMS Region')
+        .sort({ createdAt: -1 })
         .lean();
     } catch (error) {
       throw new Error(error?.messsage);
@@ -157,6 +159,7 @@ export class PetroDataRepository {
           Region: regionIndex,
         })
         .select('_id Period DPK Region')
+        .sort({ createdAt: -1 })
         .lean();
     } catch (error) {
       throw new Error(error?.messsage);
@@ -186,6 +189,7 @@ export class PetroDataRepository {
           Region: regionIndex,
         })
         .select('_id Period LPG Region')
+        .sort({ createdAt: -1 })
         .lean();
     } catch (error) {
       throw new Error(error?.messsage);
@@ -215,6 +219,7 @@ export class PetroDataRepository {
           Region: regionIndex,
         })
         .select('_id Period ICE Region')
+        .sort({ createdAt: -1 })
         .lean();
     } catch (error) {
       throw new Error(error?.messsage);

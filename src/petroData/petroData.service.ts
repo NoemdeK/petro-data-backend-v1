@@ -29,8 +29,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { S3 } from 'aws-sdk';
 import { parse } from 'csv-parse';
 import * as PDFDocument from 'pdfkit';
-
-const pipelineAsync = promisify(pipeline);
+import { PetroDataUtility } from './petroData.utility';
 
 @Injectable()
 export class PetroDataService {
@@ -38,6 +37,7 @@ export class PetroDataService {
     private readonly petroDataRepository: PetroDataRepository,
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
+    private readonly petroDataUtility: PetroDataUtility,
   ) {}
 
   private readonly logger = new Logger(PetroDataService.name);
@@ -208,88 +208,164 @@ export class PetroDataService {
         });
       }
 
-      let analysis;
-
-      // todo
-      const getAnalysis = async (date: Date, product: string) => {
-        const formattedDate = moment(date).toISOString();
-        const today = moment().toISOString();
-
-        analysis = await Promise.all(
-          Array.from(regions, async (index: any) => {
-            return product === ProductType.AGO
-              ? await this.petroDataRepository.getPeriodicPetroDataForAGO(
-                  formattedDate,
-                  today,
-                  index,
-                )
-              : product === ProductType.PMS
-                ? await this.petroDataRepository.getPeriodicPetroDataForPMS(
-                    formattedDate,
-                    today,
-                    index,
-                  )
-                : product === ProductType.DPK
-                  ? await this.petroDataRepository.getPeriodicPetroDataForDPK(
-                      formattedDate,
-                      today,
-                      index,
-                    )
-                  : product === ProductType.LPG
-                    ? await this.petroDataRepository.getPeriodicPetroDataForLPG(
-                        formattedDate,
-                        today,
-                        index,
-                      )
-                    : await this.petroDataRepository.getPeriodicPetroDataForICE(
-                        formattedDate,
-                        today,
-                        index,
-                      );
-          }),
-        );
-        return analysis.flat();
-      };
-
       /************************** AGO Product Type ***************************************/
       if (product === ProductType.AGO) {
         if (period === PeriodicInterval.ONE_WEEK) {
           const oneWeekDate = moment().subtract(7, 'days').toDate();
-          return getAnalysis(oneWeekDate, ProductType.AGO);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneWeekDate,
+            ProductType.AGO,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.AGO,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.ONE_MONTH) {
           const oneMonthDate = moment().subtract(1, 'months').toDate();
-          return getAnalysis(oneMonthDate, ProductType.AGO);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneMonthDate,
+            ProductType.AGO,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.AGO,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.THREE_MONTHS) {
           const threeMonthsDate = moment().subtract(3, 'months').toDate();
-          return getAnalysis(threeMonthsDate, ProductType.AGO);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            threeMonthsDate,
+            ProductType.AGO,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.AGO,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.SIX_MONTHS) {
           const sixMonthsDate = moment().subtract(6, 'months').toDate();
-          return getAnalysis(sixMonthsDate, ProductType.AGO);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            sixMonthsDate,
+            ProductType.AGO,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.AGO,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.YESTERDAY) {
           const yesterdayDate = moment().subtract(1, 'months').toDate();
-          return getAnalysis(yesterdayDate, ProductType.AGO);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            yesterdayDate,
+            ProductType.AGO,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.AGO,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.ONE_YEAR) {
           const oneYearDate = moment().subtract(1, 'years').toDate();
-          return getAnalysis(oneYearDate, ProductType.AGO);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneYearDate,
+            ProductType.AGO,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.AGO,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.FIVE_YEARS) {
           const fiveYearsDate = moment().subtract(5, 'years').toDate();
-          return getAnalysis(fiveYearsDate, ProductType.AGO);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            fiveYearsDate,
+            ProductType.AGO,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.AGO,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.MAX) {
-          analysis = await Promise.all(
+          const analysis = await Promise.all(
             Array.from(regions, async (index: any) => {
               return await this.petroDataRepository.getMaxPetroData(
                 index,
@@ -297,7 +373,18 @@ export class PetroDataService {
               );
             }),
           );
-          return analysis.flat();
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysis.flat(),
+              ProductType.AGO,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysis.flat(),
+          };
         }
       }
 
@@ -305,41 +392,160 @@ export class PetroDataService {
       if (product === ProductType.PMS) {
         if (period === PeriodicInterval.ONE_WEEK) {
           const oneWeekDate = moment().subtract(7, 'days').toDate();
-          return getAnalysis(oneWeekDate, ProductType.PMS);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneWeekDate,
+            ProductType.PMS,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.PMS,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.ONE_MONTH) {
           const oneMonthDate = moment().subtract(1, 'months').toDate();
-          return getAnalysis(oneMonthDate, ProductType.PMS);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneMonthDate,
+            ProductType.PMS,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.PMS,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.THREE_MONTHS) {
           const threeMonthsDate = moment().subtract(3, 'months').toDate();
-          return getAnalysis(threeMonthsDate, ProductType.PMS);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            threeMonthsDate,
+            ProductType.PMS,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.PMS,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.SIX_MONTHS) {
           const sixMonthsDate = moment().subtract(6, 'months').toDate();
-          return getAnalysis(sixMonthsDate, ProductType.PMS);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            sixMonthsDate,
+            ProductType.PMS,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.PMS,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.YESTERDAY) {
           const yesterdayDate = moment().subtract(1, 'months').toDate();
-          return getAnalysis(yesterdayDate, ProductType.PMS);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            yesterdayDate,
+            ProductType.PMS,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.PMS,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.ONE_YEAR) {
           const oneYearDate = moment().subtract(1, 'years').toDate();
-          return getAnalysis(oneYearDate, ProductType.PMS);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneYearDate,
+            ProductType.PMS,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.PMS,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.FIVE_YEARS) {
           const fiveYearsDate = moment().subtract(5, 'years').toDate();
-          return getAnalysis(fiveYearsDate, ProductType.PMS);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            fiveYearsDate,
+            ProductType.PMS,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.PMS,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.MAX) {
-          analysis = await Promise.all(
+          const analysis = await Promise.all(
             Array.from(regions, async (index: any) => {
               return await this.petroDataRepository.getMaxPetroData(
                 index,
@@ -347,7 +553,18 @@ export class PetroDataService {
               );
             }),
           );
-          return analysis.flat();
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysis.flat(),
+              ProductType.PMS,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysis.flat(),
+          };
         }
       }
 
@@ -355,41 +572,159 @@ export class PetroDataService {
       if (product === ProductType.DPK) {
         if (period === PeriodicInterval.ONE_WEEK) {
           const oneWeekDate = moment().subtract(7, 'days').toDate();
-          return getAnalysis(oneWeekDate, ProductType.DPK);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneWeekDate,
+            ProductType.DPK,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.DPK,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.ONE_MONTH) {
           const oneMonthDate = moment().subtract(1, 'months').toDate();
-          return getAnalysis(oneMonthDate, ProductType.DPK);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneMonthDate,
+            ProductType.DPK,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.DPK,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.THREE_MONTHS) {
           const threeMonthsDate = moment().subtract(3, 'months').toDate();
-          return getAnalysis(threeMonthsDate, ProductType.DPK);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            threeMonthsDate,
+            ProductType.DPK,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.DPK,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.SIX_MONTHS) {
           const sixMonthsDate = moment().subtract(6, 'months').toDate();
-          return getAnalysis(sixMonthsDate, ProductType.DPK);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            sixMonthsDate,
+            ProductType.DPK,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.DPK,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.YESTERDAY) {
           const yesterdayDate = moment().subtract(1, 'months').toDate();
-          return getAnalysis(yesterdayDate, ProductType.DPK);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            yesterdayDate,
+            ProductType.DPK,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.DPK,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.ONE_YEAR) {
           const oneYearDate = moment().subtract(1, 'years').toDate();
-          return getAnalysis(oneYearDate, ProductType.DPK);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneYearDate,
+            ProductType.DPK,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.DPK,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.FIVE_YEARS) {
           const fiveYearsDate = moment().subtract(5, 'years').toDate();
-          return getAnalysis(fiveYearsDate, ProductType.DPK);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            fiveYearsDate,
+            ProductType.DPK,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.DPK,
+            );
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.MAX) {
-          analysis = await Promise.all(
+          const analysis = await Promise.all(
             Array.from(regions, async (index: any) => {
               return await this.petroDataRepository.getMaxPetroData(
                 index,
@@ -397,7 +732,18 @@ export class PetroDataService {
               );
             }),
           );
-          return analysis.flat();
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysis.flat(),
+              ProductType.DPK,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysis.flat(),
+          };
         }
       }
 
@@ -405,41 +751,160 @@ export class PetroDataService {
       if (product === ProductType.LPG) {
         if (period === PeriodicInterval.ONE_WEEK) {
           const oneWeekDate = moment().subtract(7, 'days').toDate();
-          return getAnalysis(oneWeekDate, ProductType.LPG);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneWeekDate,
+            ProductType.LPG,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.LPG,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.ONE_MONTH) {
           const oneMonthDate = moment().subtract(1, 'months').toDate();
-          return getAnalysis(oneMonthDate, ProductType.LPG);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneMonthDate,
+            ProductType.LPG,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.LPG,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.THREE_MONTHS) {
           const threeMonthsDate = moment().subtract(3, 'months').toDate();
-          return getAnalysis(threeMonthsDate, ProductType.LPG);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            threeMonthsDate,
+            ProductType.LPG,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.LPG,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.SIX_MONTHS) {
           const sixMonthsDate = moment().subtract(6, 'months').toDate();
-          return getAnalysis(sixMonthsDate, ProductType.LPG);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            sixMonthsDate,
+            ProductType.LPG,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.LPG,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.YESTERDAY) {
           const yesterdayDate = moment().subtract(1, 'months').toDate();
-          return getAnalysis(yesterdayDate, ProductType.LPG);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            yesterdayDate,
+            ProductType.LPG,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.LPG,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.ONE_YEAR) {
           const oneYearDate = moment().subtract(1, 'years').toDate();
-          return getAnalysis(oneYearDate, ProductType.LPG);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneYearDate,
+            ProductType.LPG,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.LPG,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.FIVE_YEARS) {
           const fiveYearsDate = moment().subtract(5, 'years').toDate();
-          return getAnalysis(fiveYearsDate, ProductType.LPG);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            fiveYearsDate,
+            ProductType.LPG,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.LPG,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.MAX) {
-          analysis = await Promise.all(
+          const analysis = await Promise.all(
             Array.from(regions, async (index: any) => {
               return await this.petroDataRepository.getMaxPetroData(
                 index,
@@ -447,7 +912,18 @@ export class PetroDataService {
               );
             }),
           );
-          return analysis.flat();
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysis.flat(),
+              ProductType.LPG,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysis.flat(),
+          };
         }
       }
 
@@ -455,41 +931,159 @@ export class PetroDataService {
       if (product === ProductType.ICE) {
         if (period === PeriodicInterval.ONE_WEEK) {
           const oneWeekDate = moment().subtract(7, 'days').toDate();
-          return getAnalysis(oneWeekDate, ProductType.ICE);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneWeekDate,
+            ProductType.ICE,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.ICE,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.ONE_MONTH) {
           const oneMonthDate = moment().subtract(1, 'months').toDate();
-          return getAnalysis(oneMonthDate, ProductType.ICE);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneMonthDate,
+            ProductType.ICE,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.ICE,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.THREE_MONTHS) {
           const threeMonthsDate = moment().subtract(3, 'months').toDate();
-          return getAnalysis(threeMonthsDate, ProductType.ICE);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            threeMonthsDate,
+            ProductType.ICE,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.ICE,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.SIX_MONTHS) {
           const sixMonthsDate = moment().subtract(6, 'months').toDate();
-          return getAnalysis(sixMonthsDate, ProductType.ICE);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            sixMonthsDate,
+            ProductType.ICE,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.ICE,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.YESTERDAY) {
           const yesterdayDate = moment().subtract(1, 'months').toDate();
-          return getAnalysis(yesterdayDate, ProductType.ICE);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            yesterdayDate,
+            ProductType.ICE,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.ICE,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.ONE_YEAR) {
           const oneYearDate = moment().subtract(1, 'years').toDate();
-          return getAnalysis(oneYearDate, ProductType.ICE);
+
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            oneYearDate,
+            ProductType.ICE,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.ICE,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.FIVE_YEARS) {
           const fiveYearsDate = moment().subtract(5, 'years').toDate();
-          return getAnalysis(fiveYearsDate, ProductType.ICE);
+          const analysisData = await this.petroDataUtility.getAnalysis(
+            regions,
+            fiveYearsDate,
+            ProductType.ICE,
+          );
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysisData,
+              ProductType.ICE,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.MAX) {
-          analysis = await Promise.all(
+          const analysis = await Promise.all(
             Array.from(regions, async (index: any) => {
               return await this.petroDataRepository.getMaxPetroData(
                 index,
@@ -497,7 +1091,18 @@ export class PetroDataService {
               );
             }),
           );
-          return analysis.flat();
+
+          const { overall, recent } =
+            this.petroDataUtility.overallAndRecentPercentPriceCghFxn(
+              analysis.flat(),
+              ProductType.ICE,
+            );
+
+          return {
+            overallPriceChange: overall > 0 ? `+${overall}` : `${overall}`,
+            recentPriceChange: recent > 0 ? `+${recent}` : `${recent}`,
+            analysis: analysis.flat(),
+          };
         }
       }
     } catch (error) {
@@ -540,7 +1145,7 @@ export class PetroDataService {
       });
 
       const avgProductPricePerRegion = async (
-        data: Array<object | any>, // todo
+        data: Array<object> | any,
         region: string,
         productType: string,
       ) => {
@@ -862,49 +1467,49 @@ export class PetroDataService {
       );
 
       const recentAGOPriceChg =
-        SERecentPriceData[0].AGO -
-        SERecentPriceData[1].AGO +
-        (SWRecentPriceData[0].AGO - SWRecentPriceData[1].AGO) +
-        (SSRecentPriceData[0].AGO - SSRecentPriceData[1].AGO) +
-        (NERecentPriceData[0].AGO - NERecentPriceData[1].AGO) +
-        (NWRecentPriceData[0].AGO - NWRecentPriceData[1].AGO) +
-        (NCRecentPriceData[0].AGO - NCRecentPriceData[1].AGO);
+        (SERecentPriceData[0].AGO ?? 0) -
+        (SERecentPriceData[1].AGO ?? 0) +
+        ((SWRecentPriceData[0].AGO ?? 0) - (SWRecentPriceData[1].AGO ?? 0)) +
+        ((SSRecentPriceData[0].AGO ?? 0) - (SSRecentPriceData[1].AGO ?? 0)) +
+        ((NERecentPriceData[0].AGO ?? 0) - (NERecentPriceData[1].AGO ?? 0)) +
+        ((NWRecentPriceData[0].AGO ?? 0) - (NWRecentPriceData[1].AGO ?? 0)) +
+        ((NCRecentPriceData[0].AGO ?? 0) - (NCRecentPriceData[1].AGO ?? 0));
 
       const recentPMSPriceChg =
-        SERecentPriceData[0].PMS -
-        SERecentPriceData[1].PMS +
-        (SWRecentPriceData[0].PMS - SWRecentPriceData[1].PMS) +
-        (SSRecentPriceData[0].PMS - SSRecentPriceData[1].PMS) +
-        (NERecentPriceData[0].PMS - NERecentPriceData[1].PMS) +
-        (NWRecentPriceData[0].PMS - NWRecentPriceData[1].PMS) +
-        (NCRecentPriceData[0].PMS - NCRecentPriceData[1].PMS);
+        (SERecentPriceData[0].PMS ?? 0) -
+        (SERecentPriceData[1].PMS ?? 0) +
+        ((SWRecentPriceData[0].PMS ?? 0) - (SWRecentPriceData[1].PMS ?? 0)) +
+        ((SSRecentPriceData[0].PMS ?? 0) - (SSRecentPriceData[1].PMS ?? 0)) +
+        ((NERecentPriceData[0].PMS ?? 0) - (NERecentPriceData[1].PMS ?? 0)) +
+        ((NWRecentPriceData[0].PMS ?? 0) - (NWRecentPriceData[1].PMS ?? 0)) +
+        ((NCRecentPriceData[0].PMS ?? 0) - (NCRecentPriceData[1].PMS ?? 0));
 
       const recentDPKPriceChg =
-        SERecentPriceData[0].DPK -
-        SERecentPriceData[1].DPK +
-        (SWRecentPriceData[0].DPK - SWRecentPriceData[1].DPK) +
-        (SSRecentPriceData[0].DPK - SSRecentPriceData[1].DPK) +
-        (NERecentPriceData[0].DPK - NERecentPriceData[1].DPK) +
-        (NWRecentPriceData[0].DPK - NWRecentPriceData[1].DPK) +
-        (NCRecentPriceData[0].DPK - NCRecentPriceData[1].DPK);
+        (SERecentPriceData[0].DPK ?? 0) -
+        (SERecentPriceData[1].DPK ?? 0) +
+        ((SWRecentPriceData[0].DPK ?? 0) - (SWRecentPriceData[1].DPK ?? 0)) +
+        ((SSRecentPriceData[0].DPK ?? 0) - (SSRecentPriceData[1].DPK ?? 0)) +
+        ((NERecentPriceData[0].DPK ?? 0) - (NERecentPriceData[1].DPK ?? 0)) +
+        ((NWRecentPriceData[0].DPK ?? 0) - (NWRecentPriceData[1].DPK ?? 0)) +
+        ((NCRecentPriceData[0].DPK ?? 0) - (NCRecentPriceData[1].DPK ?? 0));
 
       const recentLPGPriceChg =
-        SERecentPriceData[0].LPG -
-        SERecentPriceData[1].LPG +
-        (SWRecentPriceData[0].LPG - SWRecentPriceData[1].LPG) +
-        (SSRecentPriceData[0].LPG - SSRecentPriceData[1].LPG) +
-        (NERecentPriceData[0].LPG - NERecentPriceData[1].LPG) +
-        (NWRecentPriceData[0].LPG - NWRecentPriceData[1].LPG) +
-        (NCRecentPriceData[0].LPG - NCRecentPriceData[1].LPG);
+        (SERecentPriceData[0].LPG ?? 0) -
+        (SERecentPriceData[1].LPG ?? 0) +
+        ((SWRecentPriceData[0].LPG ?? 0) - (SWRecentPriceData[1].LPG ?? 0)) +
+        ((SSRecentPriceData[0].LPG ?? 0) - (SSRecentPriceData[1].LPG ?? 0)) +
+        ((NERecentPriceData[0].LPG ?? 0) - (NERecentPriceData[1].LPG ?? 0)) +
+        ((NWRecentPriceData[0].LPG ?? 0) - (NWRecentPriceData[1].LPG ?? 0)) +
+        ((NCRecentPriceData[0].LPG ?? 0) - (NCRecentPriceData[1].LPG ?? 0));
 
       const recentICEPriceChg =
-        SERecentPriceData[0].ICE -
-        SERecentPriceData[1].ICE +
-        (SWRecentPriceData[0].ICE - SWRecentPriceData[1].ICE) +
-        (SSRecentPriceData[0].ICE - SSRecentPriceData[1].ICE) +
-        (NERecentPriceData[0].ICE - NERecentPriceData[1].ICE) +
-        (NWRecentPriceData[0].ICE - NWRecentPriceData[1].ICE) +
-        (NCRecentPriceData[0].ICE - NCRecentPriceData[1].ICE);
+        (SERecentPriceData[0].ICE ?? 0) -
+        (SERecentPriceData[1].ICE ?? 0) +
+        ((SWRecentPriceData[0].ICE ?? 0) - (SWRecentPriceData[1].ICE ?? 0)) +
+        ((SSRecentPriceData[0].ICE ?? 0) - (SSRecentPriceData[1].ICE ?? 0)) +
+        ((NERecentPriceData[0].ICE ?? 0) - (NERecentPriceData[1].ICE ?? 0)) +
+        ((NWRecentPriceData[0].ICE ?? 0) - (NWRecentPriceData[1].ICE ?? 0)) +
+        ((NCRecentPriceData[0].ICE ?? 0) - (NCRecentPriceData[1].PMS ?? 0));
 
       const recentAGOPricePercentChange = +recentAGOPriceChg / 6;
       const recentPMSPricePercentChange = +recentPMSPriceChg / 6;
@@ -1384,6 +1989,30 @@ export class PetroDataService {
       // };
     } catch (error) {
       error.location = `PetroDataServices.${this.petroDataAnalysisPercentages.name} method`;
+      AppResponse.error(error);
+    }
+  }
+
+  /**
+   * @Responsibility: dedicated service for retrieving petro data periodic price percentage change for five years
+   *
+   * @returns {Promise<any>}
+   */
+
+  async periodicPricePercentageChangeFiveYears(): Promise<any> {
+    try {
+      const fiveYearsDate = moment().subtract(5, 'years').toDate();
+      const formattedDate = moment(fiveYearsDate).toISOString();
+      const today = moment().toISOString();
+
+      const periodicData =
+        await this.petroDataRepository.retrievePeriodicPetroData(
+          formattedDate,
+          today,
+        );
+      return periodicData;
+    } catch (error) {
+      error.location = `PetroDataServices.${this.periodicPricePercentageChangeFiveYears.name} method`;
       AppResponse.error(error);
     }
   }
