@@ -93,6 +93,27 @@ export class PetroDataController {
 
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
+  @Get('/analysis/periodic/percentage-change/five-years')
+  async periodicPricePercentageChangeFiveYears(
+    @Req() req: any,
+    @Res() res: Response,
+    @Query('period') period: string,
+  ): Promise<Response> {
+    const data =
+      await this.petroDataService.periodicPricePercentageChangeFiveYears();
+    return res
+      .status(200)
+      .json(
+        success(
+          'Successfully analyzed petro data periodic price percentage(s) change for five years',
+          200,
+          data,
+        ),
+      );
+  }
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
   @Get('/analysis/projections')
   async petroDataAnalysisProjections(
     @Req() req: any,

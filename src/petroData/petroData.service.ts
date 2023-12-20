@@ -210,7 +210,6 @@ export class PetroDataService {
 
       let analysis;
 
-      // todo
       const getAnalysis = async (date: Date, product: string) => {
         const formattedDate = moment(date).toISOString();
         const today = moment().toISOString();
@@ -255,37 +254,182 @@ export class PetroDataService {
       if (product === ProductType.AGO) {
         if (period === PeriodicInterval.ONE_WEEK) {
           const oneWeekDate = moment().subtract(7, 'days').toDate();
-          return getAnalysis(oneWeekDate, ProductType.AGO);
+          return await getAnalysis(oneWeekDate, ProductType.AGO);
         }
 
         if (period === PeriodicInterval.ONE_MONTH) {
           const oneMonthDate = moment().subtract(1, 'months').toDate();
-          return getAnalysis(oneMonthDate, ProductType.AGO);
+          return await getAnalysis(oneMonthDate, ProductType.AGO);
         }
 
         if (period === PeriodicInterval.THREE_MONTHS) {
           const threeMonthsDate = moment().subtract(3, 'months').toDate();
-          return getAnalysis(threeMonthsDate, ProductType.AGO);
+          return await getAnalysis(threeMonthsDate, ProductType.AGO);
         }
 
         if (period === PeriodicInterval.SIX_MONTHS) {
           const sixMonthsDate = moment().subtract(6, 'months').toDate();
-          return getAnalysis(sixMonthsDate, ProductType.AGO);
+          return await getAnalysis(sixMonthsDate, ProductType.AGO);
         }
 
         if (period === PeriodicInterval.YESTERDAY) {
           const yesterdayDate = moment().subtract(1, 'months').toDate();
-          return getAnalysis(yesterdayDate, ProductType.AGO);
+          return await getAnalysis(yesterdayDate, ProductType.AGO);
         }
 
         if (period === PeriodicInterval.ONE_YEAR) {
           const oneYearDate = moment().subtract(1, 'years').toDate();
-          return getAnalysis(oneYearDate, ProductType.AGO);
+          return await getAnalysis(oneYearDate, ProductType.AGO);
         }
 
         if (period === PeriodicInterval.FIVE_YEARS) {
           const fiveYearsDate = moment().subtract(5, 'years').toDate();
-          return getAnalysis(fiveYearsDate, ProductType.AGO);
+          const analysisData = await getAnalysis(
+            fiveYearsDate,
+            ProductType.AGO,
+          );
+
+          /* Get South East data */
+          const SEData = analysisData.filter(
+            (a: any) => a?.Region == Regions.SOUTH_EAST,
+          );
+
+          /* Get South West data */
+          const SWData = analysisData.filter(
+            (a: any) => a?.Region == Regions.SOUTH_WEST,
+          );
+
+          /* Get South South data */
+          const SSData = analysisData.filter(
+            (a: any) => a?.Region == Regions.SOUTH_SOUTH,
+          );
+
+          /* Get North East data */
+          const NEData = analysisData.filter(
+            (a: any) => a?.Region == Regions.NORTH_EAST,
+          );
+
+          /* Get North West data */
+          const NWData = analysisData.filter(
+            (a: any) => a?.Region == Regions.NORTH_WEST,
+          );
+
+          /* Get North Central data */
+          const NCData = analysisData.filter(
+            (a: any) => a?.Region == Regions.NORTH_CENTRAL,
+          );
+
+          /* Calculation Results */
+          let SEResult: number;
+          if (SEData.length) {
+            for (let i = 1; i < SEData.length; i++) {
+              const oldPrice = SEData[i - 1].AGO ?? 0;
+              const newPrice = SEData[i].AGO ?? 0;
+
+              if (newPrice) {
+                SEResult = ((oldPrice - newPrice) / oldPrice) * 100;
+              }
+            }
+          } else {
+            SEResult = 0;
+          }
+
+          let SWResult: number;
+          if (SWData.length) {
+            for (let i = 1; i < SWData.length; i++) {
+              const oldPrice = SWData[i - 1].AGO;
+              const newPrice = SWData[i].AGO;
+
+              if (newPrice) {
+                SWResult = ((oldPrice - newPrice) / oldPrice) * 100;
+              }
+            }
+          } else {
+            SWResult = 0;
+          }
+
+          let SSResult: number;
+          if (SSData.length) {
+            for (let i = 1; i < SSData.length; i++) {
+              const oldPrice = SSData[i - 1].AGO;
+              const newPrice = SSData[i].AGO;
+
+              if (newPrice) {
+                SSResult = ((oldPrice - newPrice) / oldPrice) * 100;
+              }
+            }
+          } else {
+            SSResult = 0;
+          }
+
+          let NEResult: number;
+          if (NEData.length) {
+            for (let i = 1; i < NEData.length; i++) {
+              const oldPrice = NEData[i - 1].AGO;
+              const newPrice = NEData[i].AGO;
+
+              if (newPrice) {
+                NEResult = ((oldPrice - newPrice) / oldPrice) * 100;
+              }
+            }
+          } else {
+            NEResult = 0;
+          }
+
+          let NWResult: number;
+          if (NWData.length) {
+            for (let i = 1; i < NWData.length; i++) {
+              const oldPrice = NWData[i - 1].AGO;
+              const newPrice = NWData[i].AGO;
+
+              if (newPrice) {
+                NWResult = ((oldPrice - newPrice) / oldPrice) * 100;
+              }
+            }
+          } else {
+            NWResult = 0;
+          }
+
+          let NCResult: number;
+          if (NCData.length) {
+            for (let i = 1; i < NCData.length; i++) {
+              const oldPrice = NCData[i - 1].AGO;
+              const newPrice = NCData[i].AGO;
+
+              if (newPrice) {
+                NCResult = ((oldPrice - newPrice) / oldPrice) * 100;
+              }
+            }
+          } else {
+            NCResult = 0;
+          }
+
+          /* Result for periodic percentage price change */
+          const overallPeriodicPriceChgPercent =
+            (+SEResult +
+              +SWResult +
+              +SWResult +
+              +SSResult +
+              +NEResult +
+              +NWResult +
+              +NCResult) /
+            6;
+
+          /* Periodic change in price */
+          const recentPeriodicPriceChgPercent =
+            (SEData[0]?.AGO ?? 0) -
+            (SEData[1]?.AGO ?? 0) +
+            ((SWData[0]?.AGO ?? 0) - (SWData[1]?.AGO ?? 0)) +
+            ((SSData[0]?.AGO ?? 0) - (SSData[1]?.AGO ?? 0)) +
+            ((NEData[0]?.AGO ?? 0) - (NEData[1]?.AGO ?? 0)) +
+            ((NWData[0]?.AGO ?? 0) - (NWData[1]?.AGO ?? 0)) +
+            ((NCData[0]?.AGO ?? 0) - (NCData[1]?.AGO ?? 0));
+
+          return {
+            overallPriceChange: overallPeriodicPriceChgPercent.toFixed(2),
+            recentPriceChange: recentPeriodicPriceChgPercent.toFixed(2),
+            analysis: analysisData,
+          };
         }
 
         if (period === PeriodicInterval.MAX) {
@@ -540,7 +684,7 @@ export class PetroDataService {
       });
 
       const avgProductPricePerRegion = async (
-        data: Array<object | any>, // todo
+        data: Array<object> | any,
         region: string,
         productType: string,
       ) => {
@@ -862,13 +1006,13 @@ export class PetroDataService {
       );
 
       const recentAGOPriceChg =
-        SERecentPriceData[0].AGO -
-        SERecentPriceData[1].AGO +
-        (SWRecentPriceData[0].AGO - SWRecentPriceData[1].AGO) +
-        (SSRecentPriceData[0].AGO - SSRecentPriceData[1].AGO) +
-        (NERecentPriceData[0].AGO - NERecentPriceData[1].AGO) +
-        (NWRecentPriceData[0].AGO - NWRecentPriceData[1].AGO) +
-        (NCRecentPriceData[0].AGO - NCRecentPriceData[1].AGO);
+        (SERecentPriceData[0].AGO ?? 0) -
+        (SERecentPriceData[1].AGO ?? 0) +
+        ((SWRecentPriceData[0].AGO ?? 0) - (SWRecentPriceData[1].AGO ?? 0)) +
+        ((SSRecentPriceData[0].AGO ?? 0) - (SSRecentPriceData[1].AGO ?? 0)) +
+        ((NERecentPriceData[0].AGO ?? 0) - (NERecentPriceData[1].AGO ?? 0)) +
+        ((NWRecentPriceData[0].AGO ?? 0) - (NWRecentPriceData[1].AGO ?? 0)) +
+        ((NCRecentPriceData[0].AGO ?? 0) - (NCRecentPriceData[1].AGO ?? 0));
 
       const recentPMSPriceChg =
         SERecentPriceData[0].PMS -
@@ -1384,6 +1528,30 @@ export class PetroDataService {
       // };
     } catch (error) {
       error.location = `PetroDataServices.${this.petroDataAnalysisPercentages.name} method`;
+      AppResponse.error(error);
+    }
+  }
+
+  /**
+   * @Responsibility: dedicated service for retrieving petro data periodic price percentage change for five years
+   *
+   * @returns {Promise<any>}
+   */
+
+  async periodicPricePercentageChangeFiveYears(): Promise<any> {
+    try {
+      const fiveYearsDate = moment().subtract(5, 'years').toDate();
+      const formattedDate = moment(fiveYearsDate).toISOString();
+      const today = moment().toISOString();
+
+      const periodicData =
+        await this.petroDataRepository.retrievePeriodicPetroData(
+          formattedDate,
+          today,
+        );
+      return periodicData;
+    } catch (error) {
+      error.location = `PetroDataServices.${this.periodicPricePercentageChangeFiveYears.name} method`;
       AppResponse.error(error);
     }
   }
