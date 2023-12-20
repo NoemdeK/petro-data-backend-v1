@@ -1172,17 +1172,17 @@ export class PetroDataService {
               : `${recentLPGPricePercentChange.toFixed(2)}`,
         },
 
-        ICEData: {
-          overallPricePercentChange:
-            overallPercentageChgICE > 0
-              ? `+${overallPercentageChgICE}`
-              : `${overallPercentageChgICE}`,
-          currentPrice: ICECurrentPrice.toFixed(2) ?? '0.00',
-          recentPricePercentChange:
-            recentICEPricePercentChange > 0
-              ? `+${recentICEPricePercentChange.toFixed(2)}`
-              : `${recentICEPricePercentChange.toFixed(2)}`,
-        },
+        // ICEData: {
+        //   overallPricePercentChange:
+        //     overallPercentageChgICE > 0
+        //       ? `+${overallPercentageChgICE}`
+        //       : `${overallPercentageChgICE}`,
+        //   currentPrice: ICECurrentPrice.toFixed(2) ?? '0.00',
+        //   recentPricePercentChange:
+        //     recentICEPricePercentChange > 0
+        //       ? `+${recentICEPricePercentChange.toFixed(2)}`
+        //       : `${recentICEPricePercentChange.toFixed(2)}`,
+        // },
       };
       // /************************************* South East ************************************/
       // const overallAGOPriceSE = SEPriceData.reduce(
