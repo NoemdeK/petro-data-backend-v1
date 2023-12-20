@@ -341,46 +341,77 @@ export class PetroDataUtility {
       6;
 
     /********************** Recent Price Change Calculation **********************/
+    /* Today's price - Yesterday's price / 6 */
     const recentPeriodicPriceChgPercent =
       productType === ProductType.AGO
-        ? (SEData[0]?.AGO ?? 0) -
-          (SEData[1]?.AGO ?? 0) +
-          ((SWData[0]?.AGO ?? 0) - (SWData[1]?.AGO ?? 0)) +
-          ((SSData[0]?.AGO ?? 0) - (SSData[1]?.AGO ?? 0)) +
-          ((NEData[0]?.AGO ?? 0) - (NEData[1]?.AGO ?? 0)) +
-          ((NWData[0]?.AGO ?? 0) - (NWData[1]?.AGO ?? 0)) +
-          ((NCData[0]?.AGO ?? 0) - (NCData[1]?.AGO ?? 0))
+        ? ((SEData.slice(-2)[0]?.AGO ?? 0) -
+            (SEData.slice(-2)[1]?.AGO ?? 0) +
+            ((SWData.slice(-2)[0]?.AGO ?? 0) -
+              (SWData.slice(-2)[1]?.AGO ?? 0)) +
+            ((SSData.slice(-2)[0]?.AGO ?? 0) -
+              (SSData.slice(-2)[1]?.AGO ?? 0)) +
+            ((NEData.slice(-2)[0]?.AGO ?? 0) -
+              (NEData.slice(-2)[1]?.AGO ?? 0)) +
+            ((NWData.slice(-2)[0]?.AGO ?? 0) -
+              (NWData.slice(-2)[1]?.AGO ?? 0)) +
+            ((NCData.slice(-2)[0]?.AGO ?? 0) -
+              (NCData.slice(-2)[1]?.AGO ?? 0))) /
+          6
         : productType === ProductType.PMS
-          ? (SEData[0]?.PMS ?? 0) -
-            (SEData[1]?.PMS ?? 0) +
-            ((SWData[0]?.PMS ?? 0) - (SWData[1]?.PMS ?? 0)) +
-            ((SSData[0]?.PMS ?? 0) - (SSData[1]?.PMS ?? 0)) +
-            ((NEData[0]?.PMS ?? 0) - (NEData[1]?.PMS ?? 0)) +
-            ((NWData[0]?.PMS ?? 0) - (NWData[1]?.PMS ?? 0)) +
-            ((NCData[0]?.PMS ?? 0) - (NCData[1]?.PMS ?? 0))
+          ? ((SEData.slice(-2)[0]?.PMS ?? 0) -
+              (SEData.slice(-2)[1]?.PMS ?? 0) +
+              ((SWData.slice(-2)[0]?.PMS ?? 0) -
+                (SWData.slice(-2)[1]?.PMS ?? 0)) +
+              ((SSData.slice(-2)[0]?.PMS ?? 0) -
+                (SSData.slice(-2)[1]?.PMS ?? 0)) +
+              ((NEData.slice(-2)[0]?.PMS ?? 0) -
+                (NEData.slice(-2)[1]?.PMS ?? 0)) +
+              ((NWData.slice(-2)[0]?.PMS ?? 0) -
+                (NWData.slice(-2)[1]?.PMS ?? 0)) +
+              ((NCData.slice(-2)[0]?.PMS ?? 0) -
+                (NCData.slice(-2)[1]?.PMS ?? 0))) /
+            6
           : productType === ProductType.DPK
-            ? (SEData[0]?.DPK ?? 0) -
-              (SEData[1]?.DPK ?? 0) +
-              ((SWData[0]?.DPK ?? 0) - (SWData[1]?.DPK ?? 0)) +
-              ((SSData[0]?.DPK ?? 0) - (SSData[1]?.DPK ?? 0)) +
-              ((NEData[0]?.DPK ?? 0) - (NEData[1]?.DPK ?? 0)) +
-              ((NWData[0]?.DPK ?? 0) - (NWData[1]?.DPK ?? 0)) +
-              ((NCData[0]?.DPK ?? 0) - (NCData[1]?.DPK ?? 0))
+            ? ((SEData.slice(-2)[0]?.DPK ?? 0) -
+                (SEData.slice(-2)[1]?.DPK ?? 0) +
+                ((SWData.slice(-2)[0]?.DPK ?? 0) -
+                  (SWData.slice(-2)[1]?.DPK ?? 0)) +
+                ((SSData.slice(-2)[0]?.DPK ?? 0) -
+                  (SSData.slice(-2)[1]?.DPK ?? 0)) +
+                ((NEData.slice(-2)[0]?.DPK ?? 0) -
+                  (NEData.slice(-2)[1]?.DPK ?? 0)) +
+                ((NWData.slice(-2)[0]?.DPK ?? 0) -
+                  (NWData.slice(-2)[1]?.DPK ?? 0)) +
+                ((NCData.slice(-2)[0]?.DPK ?? 0) -
+                  (NCData.slice(-2)[1]?.DPK ?? 0))) /
+              6
             : productType === ProductType.LPG
-              ? (SEData[0]?.LPG ?? 0) -
-                (SEData[1]?.LPG ?? 0) +
-                ((SWData[0]?.LPG ?? 0) - (SWData[1]?.LPG ?? 0)) +
-                ((SSData[0]?.LPG ?? 0) - (SSData[1]?.LPG ?? 0)) +
-                ((NEData[0]?.LPG ?? 0) - (NEData[1]?.LPG ?? 0)) +
-                ((NWData[0]?.LPG ?? 0) - (NWData[1]?.LPG ?? 0)) +
-                ((NCData[0]?.LPG ?? 0) - (NCData[1]?.LPG ?? 0))
-              : (SEData[0]?.ICE ?? 0) -
-                (SEData[1]?.ICE ?? 0) +
-                ((SWData[0]?.ICE ?? 0) - (SWData[1]?.ICE ?? 0)) +
-                ((SSData[0]?.ICE ?? 0) - (SSData[1]?.ICE ?? 0)) +
-                ((NEData[0]?.ICE ?? 0) - (NEData[1]?.ICE ?? 0)) +
-                ((NWData[0]?.ICE ?? 0) - (NWData[1]?.ICE ?? 0)) +
-                ((NCData[0]?.ICE ?? 0) - (NCData[1]?.ICE ?? 0));
+              ? ((SEData.slice(-2)[0]?.LPG ?? 0) -
+                  (SEData.slice(-2)[1]?.LPG ?? 0) +
+                  ((SWData.slice(-2)[0]?.LPG ?? 0) -
+                    (SWData.slice(-2)[1]?.LPG ?? 0)) +
+                  ((SSData.slice(-2)[0]?.LPG ?? 0) -
+                    (SSData.slice(-2)[1]?.LPG ?? 0)) +
+                  ((NEData.slice(-2)[0]?.LPG ?? 0) -
+                    (NEData.slice(-2)[1]?.LPG ?? 0)) +
+                  ((NWData.slice(-2)[0]?.LPG ?? 0) -
+                    (NWData.slice(-2)[1]?.LPG ?? 0)) +
+                  ((NCData.slice(-2)[0]?.LPG ?? 0) -
+                    (NCData.slice(-2)[1]?.LPG ?? 0))) /
+                6
+              : ((SEData.slice(-2)[0]?.ICE ?? 0) -
+                  (SEData.slice(-2)[1]?.ICE ?? 0) +
+                  ((SWData.slice(-2)[0]?.ICE ?? 0) -
+                    (SWData.slice(-2)[1]?.ICE ?? 0)) +
+                  ((SSData.slice(-2)[0]?.ICE ?? 0) -
+                    (SSData.slice(-2)[1]?.ICE ?? 0)) +
+                  ((NEData.slice(-2)[0]?.ICE ?? 0) -
+                    (NEData.slice(-2)[1]?.ICE ?? 0)) +
+                  ((NWData.slice(-2)[0]?.ICE ?? 0) -
+                    (NWData.slice(-2)[1]?.ICE ?? 0)) +
+                  ((NCData.slice(-2)[0]?.ICE ?? 0) -
+                    (NCData.slice(-2)[1]?.ICE ?? 0))) /
+                6;
 
     return {
       overall: +overallPeriodicPriceChgPercent.toFixed(2),
