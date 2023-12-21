@@ -13,6 +13,7 @@ import { forgotPasswordTemplate } from 'src/email/templates/forgot-password.temp
 import { EmailService } from 'src/email/email.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { passwordResetTemplate } from 'src/email/templates/password-reset-template';
+import { UserProfileSettingsDto } from 'src/petroData/dto/settings.dto';
 
 @Injectable()
 export class AuthService {
@@ -243,7 +244,6 @@ export class AuthService {
   async userProfile(userId: string): Promise<any> {
     try {
       const user = await this.authRepository.findUser({ _id: userId });
-
       const { password, ...otherUserDetails } = user;
 
       if (!user) {
@@ -253,6 +253,44 @@ export class AuthService {
         });
       }
       return otherUserDetails;
+    } catch (error) {
+      error.location = `AuthServices.${this.userProfile.name} method`;
+      AppResponse.error(error);
+    }
+  }
+
+  /**
+   * @Responsibility: dedicated service for updating user profile
+   *
+   * @param userProfileSettingsDto
+   * @returns {Promise<any>}
+   */
+
+  async userProfileSettings(
+    userProfileSettingsDto: UserProfileSettingsDto,
+  ): Promise<any> {
+    try {
+      const { userId, firstName, lastName, avatar } = userProfileSettingsDto;
+
+      const user = await this.authRepository.findUser({ _id: userId });
+
+      if (!user) {
+        AppResponse.error({
+          message: 'User not found',
+          status: HttpStatus.NOT_FOUND,
+        });
+      }
+
+      function updateData() {
+        return {
+          firstName,
+          lastName,
+          avatar,
+        };
+      }
+
+      await this.authRepository.updateUser({ _id: user?._id }, updateData());
+      return;
     } catch (error) {
       error.location = `AuthServices.${this.userProfile.name} method`;
       AppResponse.error(error);

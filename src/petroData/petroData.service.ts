@@ -1288,7 +1288,7 @@ export class PetroDataService {
         const avgProductPrice =
           +overallProductPrice.toFixed(2) / +overallCountByRegion;
 
-        return avgProductPrice.toFixed(2);
+        return +avgProductPrice.toFixed(2);
       };
 
       /* Get product data by region */
@@ -1889,204 +1889,6 @@ export class PetroDataService {
         //         : '0.00',
         // },
       };
-      // /************************************* South East ************************************/
-      // const overallAGOPriceSE = SEPriceData.reduce(
-      //   (accumulator, currentValue) => accumulator + currentValue.AGO
-      //   0,
-      // );
-
-      // const SECount = await this.petroDataRepository.countDocuments({
-      //   Region: Regions.SOUTH_EAST,
-      // });
-
-      // const avgAGOPriceSE = +overallAGOPriceSE.toFixed(2) / +SECount;
-
-      // /************************************* South West ************************************/
-      // const overallAGOPriceSW = SWPriceData.reduce(
-      //   (accumulator, currentValue) => accumulator + currentValue.AGO,
-      //   0,
-      // );
-
-      // const SWCount = await this.petroDataRepository.countDocuments({
-      //   Region: Regions.SOUTH_WEST,
-      // });
-
-      // const avgAGOPriceSW = +overallAGOPriceSW.toFixed(2) / +SWCount;
-
-      // /************************************* South South ************************************/
-      // const overallAGOPriceSS = SSPriceData.reduce(
-      //   (accumulator, currentValue) => accumulator + currentValue.AGO,
-      //   0,
-      // );
-
-      // const SSCount = await this.petroDataRepository.countDocuments({
-      //   Region: Regions.SOUTH_SOUTH,
-      // });
-
-      // const avgAGOPriceSS = +overallAGOPriceSS.toFixed(2) / +SSCount;
-
-      // /************************************* North East ************************************/
-      // const overallAGOPriceNE = NEPriceData.reduce(
-      //   (accumulator, currentValue) => accumulator + currentValue.AGO,
-      //   0,
-      // );
-
-      // const NECount = await this.petroDataRepository.countDocuments({
-      //   Region: Regions.NORTH_EAST,
-      // });
-
-      // const avgAGOPriceNE = +overallAGOPriceNE.toFixed(2) / +NECount;
-
-      // /************************************* North west ************************************/
-      // const overallAGOPriceNW = NWPriceData.reduce(
-      //   (accumulator, currentValue) => accumulator + currentValue.AGO,
-      //   0,
-      // );
-
-      // const NWCount = await this.petroDataRepository.countDocuments({
-      //   Region: Regions.NORTH_WEST,
-      // });
-
-      // const avgAGOPriceNW = +overallAGOPriceNW.toFixed(2) / +NWCount;
-
-      // /************************************* North Central **********************************/
-      // const overallAGOPriceNC = NCPriceData.reduce(
-      //   (accumulator, currentValue) => accumulator + currentValue.AGO,
-      //   0,
-      // );
-
-      // const NCCount = await this.petroDataRepository.countDocuments({
-      //   Region: Regions.NORTH_CENTRAL,
-      // });
-
-      // const avgAGOPriceNC = +overallAGOPriceNC.toFixed(2) / +NCCount;
-
-      // return {
-      //   SE: +avgAGOPriceSE.toFixed(2),
-      //   SW: +avgAGOPriceSW.toFixed(2),
-      //   SS: +avgAGOPriceSS.toFixed(2),
-      //   NE: +avgAGOPriceNE.toFixed(2),
-      //   NW: +avgAGOPriceNW.toFixed(2),
-      //   NC: +avgAGOPriceNC.toFixed(2),
-      // };
-
-      // let AGOPercentageChange: number,
-      //   DPKPercentageChange: number,
-      //   LPGPercentageChange: number,
-      //   PMSPercentageChange: number,
-      //   ICEPercentageChange: number;
-      // const theLength: number = priceData.length;
-      // for (let i = 1; i < theLength; i++) {
-      //   const oldAGOPrice = priceData[i - 1].AGO;
-      //   const oldDPKPrice = priceData[i - 1].DPK;
-      //   const oldLPGPrice = priceData[i - 1].LPG;
-      //   const oldPMSPrice = priceData[i - 1].PMS;
-      //   const oldICEPrice = priceData[i - 1].ICE;
-
-      //   const newAGOPrice = priceData[i].AGO;
-      //   const newDPKPrice = priceData[i].DPK;
-      //   const newLPGPrice = priceData[i].LPG;
-      //   const newPMSPrice = priceData[i].PMS;
-      //   const newICEPrice = priceData[i].ICE;
-
-      //   if (newAGOPrice) {
-      //     AGOPercentageChange =
-      //       ((newAGOPrice - oldAGOPrice) / oldAGOPrice) * 100;
-      //   }
-
-      //   if (newDPKPrice) {
-      //     DPKPercentageChange =
-      //       ((newDPKPrice - oldDPKPrice) / oldDPKPrice) * 100;
-      //   }
-
-      //   if (newLPGPrice) {
-      //     LPGPercentageChange =
-      //       ((newLPGPrice - oldLPGPrice) / oldLPGPrice) * 100;
-      //   }
-
-      //   if (newPMSPrice) {
-      //     PMSPercentageChange =
-      //       ((newPMSPrice - oldPMSPrice) / oldPMSPrice) * 100;
-      //   }
-
-      //   if (newICEPrice) {
-      //     ICEPercentageChange =
-      //       ((newICEPrice - oldICEPrice) / oldICEPrice) * 100;
-      //   }
-      // }
-
-      // const mostRecentPrices = await this.petroDataRepository.getAllPrices(
-      //   {},
-      //   2,
-      // );
-
-      // function recentPriceChgFxn(current: number, initial: number) {
-      //   const result = current - initial;
-      //   return result > 0 ? `+${result.toFixed(2)}` : `${result.toFixed(2)}`;
-      // }
-
-      // return {
-      //   AGOData: {
-      //     overallPricePercentChange:
-      //       AGOPercentageChange > 0
-      //         ? `+${AGOPercentageChange.toFixed(2)}`
-      //         : `${AGOPercentageChange.toFixed(2)}`,
-      //     currentPrice: mostRecentPrices[1].AGO,
-      //     recentPricePercentChange: recentPriceChgFxn(
-      //       mostRecentPrices[1].AGO,
-      //       mostRecentPrices[0].AGO,
-      //     ),
-      //     closedDate: mostRecentPrices[0].Period,
-      //   },
-      //   DPKData: {
-      //     overallPricePercentChange:
-      //       DPKPercentageChange > 0
-      //         ? `+${DPKPercentageChange.toFixed(2)}`
-      //         : `${DPKPercentageChange.toFixed(2)}`,
-      //     currentPrice: mostRecentPrices[1].DPK,
-      //     recentPricePercentChange: recentPriceChgFxn(
-      //       mostRecentPrices[1].DPK,
-      //       mostRecentPrices[0].DPK,
-      //     ),
-      //     closedDate: mostRecentPrices[0].Period,
-      //   },
-      //   LPGData: {
-      //     overallPricePercentChange:
-      //       LPGPercentageChange > 0
-      //         ? `+${LPGPercentageChange.toFixed(2)}`
-      //         : `${LPGPercentageChange.toFixed(2)}`,
-      //     currentPrice: mostRecentPrices[1].LPG,
-      //     recentPricePercentChange: recentPriceChgFxn(
-      //       mostRecentPrices[1].LPG,
-      //       mostRecentPrices[0].LPG,
-      //     ),
-      //     closedDate: mostRecentPrices[0].Period,
-      //   },
-      //   PMSData: {
-      //     overallPricePercentChange:
-      //       PMSPercentageChange > 0
-      //         ? `+${PMSPercentageChange.toFixed(2)}`
-      //         : `${PMSPercentageChange.toFixed(2)}`,
-      //     currentPrice: mostRecentPrices[1].PMS,
-      //     recentPricePercentChange: recentPriceChgFxn(
-      //       mostRecentPrices[1].PMS,
-      //       mostRecentPrices[0].PMS,
-      //     ),
-      //     closedDate: mostRecentPrices[0].Period,
-      //   },
-      //   // ICEData: {
-      //   //   overallPricePercentChange:
-      //   //     ICEPercentageChange > 0
-      //   //       ? `+${ICEPercentageChange.toFixed(2)}` ?? '0.00'
-      //   //       : `${ICEPercentageChange.toFixed(2)}` ?? '0.00',
-      //   //   currentPrice: mostRecentPrices[1].ICE ?? '0.00',
-      //   //   recentPricePercentChange:
-      //   //     recentPriceChgFxn(
-      //   //       mostRecentPrices[1].ICE,
-      //   //       mostRecentPrices[0].ICE,
-      //   //     ) ?? '0.00',
-      //   // },
-      // };
     } catch (error) {
       error.location = `PetroDataServices.${this.petroDataAnalysisPercentages.name} method`;
       AppResponse.error(error);
@@ -2317,7 +2119,7 @@ export class PetroDataService {
         return { name, url };
       }
 
-      /************************ Export XLSX files ****************************/
+      /************************ Export PDF files ****************************/
       if (flag === FileExtensionType.PDF) {
         const csvWriter = createObjectCsvWriter({
           path: 'petro-data.csv',
@@ -2372,6 +2174,7 @@ export class PetroDataService {
         // );
 
         return { name, url };
+        return;
       }
     } catch (error) {
       error.location = `PetroDataServices.${this.rawDataActions.name} method`;
@@ -2433,14 +2236,6 @@ export class PetroDataService {
         : flag === FileExtensionType.XLSX
           ? 'xlsx'
           : 'pdf';
-    // if (flags === FileExtensionType.CSV) {
-    //   const { originalname } = file;
-    //   const splitImg = originalname.split('.');
-    //   // Last element in the array
-    //   fileType = splitImg[splitImg.length - 1];
-    // } else {
-    //   fileType = 'csv';
-    // }
 
     const params = {
       Bucket: this.configService.get<string>('SPACES_BUCKET_NAME'),
@@ -2488,7 +2283,7 @@ export class PetroDataService {
 
   private generatePdfContent(pdfDoc: any, records: any[]): void {
     // Customize the PDF layout and content based on your requirements
-    pdfDoc.fontSize(5); // Adjust the font size as needed
+    pdfDoc.fontSize(7);
 
     // Constants for column widths and table headers
     const columnWidths = [55, 15, 20, 25, 150, 30, 25, 25, 25, 65];
@@ -2506,7 +2301,7 @@ export class PetroDataService {
     ];
 
     // Set the initial position for the table
-    let tableX = 50;
+    let tableX = 30;
     let tableY = 50;
 
     // Add the table header
@@ -2524,6 +2319,8 @@ export class PetroDataService {
     // Populate the table with data
     records.forEach((record) => {
       tableX = 50; // Reset X position for each row
+
+      let maxRowHeight = 0; // Track the maximum height of the current row
 
       tableHeader.forEach((header, index) => {
         let cellContent = String(record[header]);
@@ -2548,24 +2345,29 @@ export class PetroDataService {
 
         // Draw each line of the cell content
         textLines.forEach((line, lineIndex) => {
-          pdfDoc.text(line, tableX, tableY + lineIndex * 5, {
+          const lineHeight =
+            pdfDoc.heightOfString(line, {
+              width: columnWidths[index],
+            }) + 5;
+
+          pdfDoc.text(line, tableX, tableY, {
             width: columnWidths[index],
-            align: 'left',
+            align: 'left', // Adjust alignment as needed
           });
+
+          // Update the maximum height for the row
+          maxRowHeight = Math.max(maxRowHeight, lineHeight);
+
+          // Move to the next row within the same column
+          tableY += lineHeight;
         });
 
-        tableX += columnWidths[index]; // Do not add padding between columns here to minimize space
+        tableX += columnWidths[index]; // Move to the next column
+        tableY -= maxRowHeight; // Reset Y position to the start of the row
       });
 
-      // Move to the next row
-      tableY += Math.max(
-        ...tableHeader.map(
-          (header) =>
-            pdfDoc.heightOfString(String(record[header]), {
-              width: columnWidths[tableHeader.indexOf(header)],
-            }) + 5,
-        ),
-      );
+      // Move to the next row based on the maximum height of the current row
+      tableY += maxRowHeight;
     });
   }
 }

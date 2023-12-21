@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   Query,
   Req,
@@ -23,6 +24,7 @@ import { JwtAuthGuard } from 'src/guards/jwt/jwt.guard';
 import { RoleGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/guards/decorators/roles.decorator';
 import { Role } from 'src/common/interfaces/roles.interface';
+import { UserProfileSettingsDto } from './dto/settings.dto';
 
 const { success } = AppResponse;
 
