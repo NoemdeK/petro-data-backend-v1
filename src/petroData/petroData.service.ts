@@ -2236,14 +2236,6 @@ export class PetroDataService {
         : flag === FileExtensionType.XLSX
           ? 'xlsx'
           : 'pdf';
-    // if (flags === FileExtensionType.CSV) {
-    //   const { originalname } = file;
-    //   const splitImg = originalname.split('.');
-    //   // Last element in the array
-    //   fileType = splitImg[splitImg.length - 1];
-    // } else {
-    //   fileType = 'csv';
-    // }
 
     const params = {
       Bucket: this.configService.get<string>('SPACES_BUCKET_NAME'),

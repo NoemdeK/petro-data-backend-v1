@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   Query,
   Req,
@@ -14,6 +15,10 @@ import { AppResponse } from 'src/common/app.response';
 import { CreateUserDto, LoginDto } from './dto/create-user.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from 'src/guards/jwt/jwt.guard';
+import { RoleGuard } from 'src/guards/roles.guard';
+import { Roles } from 'src/guards/decorators/roles.decorator';
+import { Role } from 'src/common/interfaces/roles.interface';
+import { UserProfileSettingsDto } from 'src/petroData/dto/settings.dto';
 
 const { success } = AppResponse;
 @Controller('auth')
@@ -78,5 +83,22 @@ export class AuthController {
     return res
       .status(200)
       .json(success('Successfully retrieved user profile', 200, data));
+  }
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
+  @Patch('/me/settings')
+  async userProfileSettings(
+    @Req() req: any,
+    @Res() res: Response,
+    @Body() userProfileSettingsDto: UserProfileSettingsDto,
+  ): Promise<Response> {
+    userProfileSettingsDto.userId = req.user.userId;
+    const data = await this.authService.userProfileSettings(
+      userProfileSettingsDto,
+    );
+    return res
+      .status(200)
+      .json(success('Successfully updated user profile settings', 200, data));
   }
 }
