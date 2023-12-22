@@ -11,11 +11,9 @@ import {
   PasswordResetSchema,
 } from 'src/schema/passwordReset.schema';
 import { EmailModule } from 'src/email/email.module';
-import { FormidableGuard } from 'src/guards/formidable.guard';
 import { PetroDataUtility } from 'src/petroData/petroData.utility';
 import { PetroDataRepository } from 'src/petroData/petroData.repository';
 import { PetroData, PetroDataSchema } from 'src/schema/petroData.schema';
-import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   controllers: [AuthController],
