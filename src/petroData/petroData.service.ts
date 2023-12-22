@@ -307,7 +307,7 @@ export class PetroDataService {
         }
 
         if (period === PeriodicInterval.YESTERDAY) {
-          const yesterdayDate = moment().subtract(1, 'months').toDate();
+          const yesterdayDate = moment().subtract(1, 'days').toDate();
 
           const analysisData = await this.petroDataUtility.getAnalysis(
             regions,
@@ -381,6 +381,11 @@ export class PetroDataService {
         if (period === PeriodicInterval.MAX) {
           const analysis = await Promise.all(
             Array.from(regions, async (index: any) => {
+              if (index === Regions.NATIONAL) {
+                return await this.petroDataRepository.getNationalMaxPetroData(
+                  ProductType.AGO,
+                );
+              }
               return await this.petroDataRepository.getMaxPetroData(
                 index,
                 ProductType.AGO,
@@ -503,7 +508,7 @@ export class PetroDataService {
         }
 
         if (period === PeriodicInterval.YESTERDAY) {
-          const yesterdayDate = moment().subtract(1, 'months').toDate();
+          const yesterdayDate = moment().subtract(1, 'days').toDate();
 
           const analysisData = await this.petroDataUtility.getAnalysis(
             regions,
@@ -577,6 +582,11 @@ export class PetroDataService {
         if (period === PeriodicInterval.MAX) {
           const analysis = await Promise.all(
             Array.from(regions, async (index: any) => {
+              if (index === Regions.NATIONAL) {
+                return await this.petroDataRepository.getNationalMaxPetroData(
+                  ProductType.PMS,
+                );
+              }
               return await this.petroDataRepository.getMaxPetroData(
                 index,
                 ProductType.PMS,
@@ -699,7 +709,7 @@ export class PetroDataService {
         }
 
         if (period === PeriodicInterval.YESTERDAY) {
-          const yesterdayDate = moment().subtract(1, 'months').toDate();
+          const yesterdayDate = moment().subtract(1, 'days').toDate();
 
           const analysisData = await this.petroDataUtility.getAnalysis(
             regions,
@@ -772,6 +782,11 @@ export class PetroDataService {
         if (period === PeriodicInterval.MAX) {
           const analysis = await Promise.all(
             Array.from(regions, async (index: any) => {
+              if (index === Regions.NATIONAL) {
+                return await this.petroDataRepository.getNationalMaxPetroData(
+                  ProductType.DPK,
+                );
+              }
               return await this.petroDataRepository.getMaxPetroData(
                 index,
                 ProductType.DPK,
@@ -894,7 +909,7 @@ export class PetroDataService {
         }
 
         if (period === PeriodicInterval.YESTERDAY) {
-          const yesterdayDate = moment().subtract(1, 'months').toDate();
+          const yesterdayDate = moment().subtract(1, 'days').toDate();
 
           const analysisData = await this.petroDataUtility.getAnalysis(
             regions,
@@ -968,6 +983,11 @@ export class PetroDataService {
         if (period === PeriodicInterval.MAX) {
           const analysis = await Promise.all(
             Array.from(regions, async (index: any) => {
+              if (index === Regions.NATIONAL) {
+                return await this.petroDataRepository.getNationalMaxPetroData(
+                  ProductType.LPG,
+                );
+              }
               return await this.petroDataRepository.getMaxPetroData(
                 index,
                 ProductType.LPG,
@@ -1090,7 +1110,7 @@ export class PetroDataService {
         }
 
         if (period === PeriodicInterval.YESTERDAY) {
-          const yesterdayDate = moment().subtract(1, 'months').toDate();
+          const yesterdayDate = moment().subtract(1, 'days').toDate();
 
           const analysisData = await this.petroDataUtility.getAnalysis(
             regions,
@@ -1163,6 +1183,11 @@ export class PetroDataService {
         if (period === PeriodicInterval.MAX) {
           const analysis = await Promise.all(
             Array.from(regions, async (index: any) => {
+              if (index === Regions.NATIONAL) {
+                return await this.petroDataRepository.getNationalMaxPetroData(
+                  ProductType.ICE,
+                );
+              }
               return await this.petroDataRepository.getMaxPetroData(
                 index,
                 ProductType.ICE,
