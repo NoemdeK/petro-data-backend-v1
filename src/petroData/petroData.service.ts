@@ -2147,23 +2147,15 @@ export class PetroDataService {
         const csvData = fs.readFileSync('petro-data.csv', 'utf8');
         const records = await this.parseCsv(csvData);
 
-        const outputDirectory = path.join(__dirname, 'dist');
-        const pdfOutputPath = path.join(outputDirectory, 'petro-data.pdf');
-
-        // Create the output directory if it doesn't exist
-        if (!fs.existsSync(outputDirectory)) {
-          fs.mkdirSync(outputDirectory, { recursive: true });
-        }
-
         const pdfDoc = new PDFDocument();
-
-        pdfDoc.pipe(fs.createWriteStream(pdfOutputPath));
+        const outputPath = 'petro-data.pdf';
+        pdfDoc.pipe(fs.createWriteStream(outputPath));
 
         this.generatePdfContent(pdfDoc, records);
 
         pdfDoc.end();
 
-        const pdfBuffer = fs.readFileSync(pdfOutputPath);
+        const pdfBuffer = fs.readFileSync(outputPath);
 
         const getImageUrl = await this.petroDataUtility.uploadS3(
           getDataWithinRange,
@@ -2173,17 +2165,17 @@ export class PetroDataService {
 
         const { name, url } = getImageUrl.data;
 
-        //  todo ****************
-        /* Delete the files */
-        const filesToDelete = ['petro-data.csv', 'petro-data.pdf'];
+        // //  todo ****************
+        // /* Delete the files */
+        // const filesToDelete = ['petro-data.csv', 'petro-data.pdf'];
 
-        await Promise.all(
-          filesToDelete.map((file: any) => {
-            fs.unlink(file, (error) => {
-              this.logger.error(`Error deleting file: ${error}`);
-            });
-          }),
-        );
+        // await Promise.all(
+        //   filesToDelete.map((file: any) => {
+        //     fs.unlink(file, (error) => {
+        //       this.logger.error(`Error deleting file: ${error}`);
+        //     });
+        //   }),
+        // );
 
         return { name, url };
       }
