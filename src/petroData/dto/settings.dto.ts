@@ -1,6 +1,8 @@
 import { CreateUserDto } from 'src/auth/dto/create-user.dto';
 
-export class UserProfileSettingsDto extends CreateUserDto {
+export class UserProfileSettingsDto {
+  firstName: string;
+  lastName: string;
   userId: string;
-  avatar: string;
+  avatar: any;
 }

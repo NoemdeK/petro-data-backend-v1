@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -11,6 +11,11 @@ import {
   PasswordResetSchema,
 } from 'src/schema/passwordReset.schema';
 import { EmailModule } from 'src/email/email.module';
+import { FormidableGuard } from 'src/guards/formidable.guard';
+import { PetroDataUtility } from 'src/petroData/petroData.utility';
+import { PetroDataRepository } from 'src/petroData/petroData.repository';
+import { PetroData, PetroDataSchema } from 'src/schema/petroData.schema';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   controllers: [AuthController],
@@ -26,9 +31,15 @@ import { EmailModule } from 'src/email/email.module';
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: PasswordReset.name, schema: PasswordResetSchema },
+      { name: PetroData.name, schema: PetroDataSchema },
     ]),
     EmailModule,
   ],
-  providers: [AuthService, AuthRepository],
+  providers: [
+    AuthService,
+    AuthRepository,
+    PetroDataUtility,
+    PetroDataRepository,
+  ],
 })
 export class AuthModule {}

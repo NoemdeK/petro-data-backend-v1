@@ -1,11 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import * as moment from 'moment';
-import { ProductType, Regions } from './enum/utils/enum.util';
+import {
+  FileExtensionType,
+  ProductType,
+  Regions,
+} from './enum/utils/enum.util';
 import { PetroDataRepository } from './petroData.repository';
+import { v4 as uuidv4 } from 'uuid';
+import { S3 } from 'aws-sdk';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PetroDataUtility {
-  constructor(private readonly petroDataRepository: PetroDataRepository) {}
+  constructor(
+    private readonly petroDataRepository: PetroDataRepository,
+    private readonly configService: ConfigService,
+  ) {}
 
   /**
    * @Responsibility: fxn to calculate periodic dataset for products within date specified
@@ -418,4 +428,57 @@ export class PetroDataUtility {
       recent: +recentPeriodicPriceChgPercent.toFixed(2),
     };
   };
+
+  /* Private fxn to store files in digital ocean spaces */
+  async uploadS3(file: any, flag: string, buffer: any) {
+    let savedImages: any = {};
+    const errors = [];
+    const fileName = `${uuidv4().replace(/-/g, '').toLocaleUpperCase()}`;
+
+    let fileType: string;
+    if (flag === FileExtensionType.OTHERS) {
+      const { originalname } = file;
+      const splitImg = originalname.split('.');
+      // Last element in the array
+      fileType = splitImg[splitImg.length - 1];
+    } else {
+      if (flag === FileExtensionType.CSV) {
+        fileType = 'csv';
+      }
+      if (flag === FileExtensionType.XLSX) {
+        fileType = 'xlsx';
+      }
+      if (flag === FileExtensionType.PDF) {
+        fileType = 'pdf';
+      }
+    }
+
+    const params = {
+      Bucket: this.configService.get<string>('SPACES_BUCKET_NAME'),
+      Key: `${this.configService.get<string>(
+        'PETRO_DATA_FILE_DIR',
+      )}/${fileName}.${fileType}`,
+      Body: buffer,
+      ACL: 'public-read',
+    };
+    const data = await this.getS3().upload(params).promise();
+    if (data) {
+      savedImages = { name: fileName, type: fileType, url: data.Location };
+    } else {
+      errors.push(file);
+    }
+
+    return {
+      data: savedImages,
+      errors: errors.length ? errors : null,
+    };
+  }
+
+  private getS3() {
+    return new S3({
+      accessKeyId: this.configService.get<string>('SPACES_ACCESS_KEY'),
+      secretAccessKey: this.configService.get<string>('SPACES_SECRET_KEY'),
+      endpoint: this.configService.get('SPACES_ENDPOINT'),
+    });
+  }
 }
