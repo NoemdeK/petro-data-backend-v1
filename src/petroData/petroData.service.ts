@@ -25,11 +25,11 @@ import { catchError, fromEventPattern, lastValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 import { AxiosResponse, AxiosError } from 'axios';
 import { HttpService } from '@nestjs/axios';
-import { v4 as uuidv4 } from 'uuid';
-import { S3 } from 'aws-sdk';
+
 import { parse } from 'csv-parse';
 import * as PDFDocument from 'pdfkit';
 import { PetroDataUtility } from './petroData.utility';
+import * as path from 'path';
 
 @Injectable()
 export class PetroDataService {
@@ -1824,6 +1824,7 @@ export class PetroDataService {
               : recentAGOPricePercentChange < 0
                 ? `${recentAGOPricePercentChange.toFixed(2)}`
                 : '0.00',
+          closedDate: SERecentPriceData[0].Period,
         },
         PMSData: {
           overallPricePercentChange:
@@ -1839,6 +1840,7 @@ export class PetroDataService {
               : recentPMSPricePercentChange < 0
                 ? `${recentPMSPricePercentChange.toFixed(2)}`
                 : '0.00',
+          closedDate: SERecentPriceData[0].Period,
         },
 
         DPKData: {
@@ -1855,6 +1857,7 @@ export class PetroDataService {
               : recentDPKPricePercentChange < 0
                 ? `${recentDPKPricePercentChange.toFixed(2)}`
                 : '0.00',
+          closedDate: SERecentPriceData[0].Period,
         },
 
         LPGData: {
@@ -1871,23 +1874,25 @@ export class PetroDataService {
               : recentLPGPricePercentChange < 0
                 ? `${recentLPGPricePercentChange.toFixed(2)}`
                 : '0.00',
+          closedDate: SERecentPriceData[0].Period,
         },
 
-        // ICEData: {
-        //   overallPricePercentChange:
-        //     overallPercentageChgICE > 0
-        //       ? `+${overallPercentageChgICE}`
-        //       : overallPercentageChgICE < 0
-        //         ? `${overallPercentageChgICE}`
-        //         : '0.00',
-        //   currentPrice: ICECurrentPrice ? ICECurrentPrice.toFixed(2) : '0.00',
-        //   recentPricePercentChange:
-        //     recentICEPricePercentChange > 0
-        //       ? `+${recentICEPricePercentChange.toFixed(2)}`
-        //       : recentICEPricePercentChange > 0
-        //         ? `${recentICEPricePercentChange.toFixed(2)}`
-        //         : '0.00',
-        // },
+        ICEData: {
+          overallPricePercentChange:
+            overallPercentageChgICE > 0
+              ? `+${overallPercentageChgICE}`
+              : overallPercentageChgICE < 0
+                ? `${overallPercentageChgICE}`
+                : '0.00',
+          currentPrice: ICECurrentPrice ? ICECurrentPrice.toFixed(2) : '0.00',
+          recentPricePercentChange:
+            recentICEPricePercentChange > 0
+              ? `+${recentICEPricePercentChange.toFixed(2)}`
+              : recentICEPricePercentChange > 0
+                ? `${recentICEPricePercentChange.toFixed(2)}`
+                : '0.00',
+          closedDate: SERecentPriceData[0].Period,
+        },
       };
     } catch (error) {
       error.location = `PetroDataServices.${this.petroDataAnalysisPercentages.name} method`;
@@ -2080,7 +2085,7 @@ export class PetroDataService {
 
         const csvBuffer = require('fs').createReadStream('petro-data.csv');
 
-        const getImageUrl = await this.uploadS3(
+        const getImageUrl = await this.petroDataUtility.uploadS3(
           getDataWithinRange,
           'csv',
           csvBuffer,
@@ -2108,7 +2113,7 @@ export class PetroDataService {
           type: 'buffer',
         });
 
-        const getImageUrl = await this.uploadS3(
+        const getImageUrl = await this.petroDataUtility.uploadS3(
           getDataWithinRange,
           'xlsx',
           xlsxBuffer,
@@ -2142,8 +2147,15 @@ export class PetroDataService {
         const csvData = fs.readFileSync('petro-data.csv', 'utf8');
         const records = await this.parseCsv(csvData);
 
+        const outputDirectory = path.join(__dirname, 'dist');
+        const pdfOutputPath = path.join(outputDirectory, 'petro-data.pdf');
+
+        // Create the output directory if it doesn't exist
+        if (!fs.existsSync(outputDirectory)) {
+          fs.mkdirSync(outputDirectory, { recursive: true });
+        }
+
         const pdfDoc = new PDFDocument();
-        const pdfOutputPath = 'petro-data.pdf';
 
         pdfDoc.pipe(fs.createWriteStream(pdfOutputPath));
 
@@ -2153,7 +2165,7 @@ export class PetroDataService {
 
         const pdfBuffer = fs.readFileSync(pdfOutputPath);
 
-        const getImageUrl = await this.uploadS3(
+        const getImageUrl = await this.petroDataUtility.uploadS3(
           getDataWithinRange,
           'pdf',
           pdfBuffer,
@@ -2161,20 +2173,19 @@ export class PetroDataService {
 
         const { name, url } = getImageUrl.data;
 
-        // todo ****************
+        //  todo ****************
         /* Delete the files */
-        // const filesToDelete = ['petro-data.csv', 'petro-data.pdf'];
+        const filesToDelete = ['petro-data.csv', 'petro-data.pdf'];
 
-        // await Promise.all(
-        //   filesToDelete.map((file: any) => {
-        //     fs.unlink(file, (error) => {
-        //       this.logger.error(`Error deleting file: ${error}`);
-        //     });
-        //   }),
-        // );
+        await Promise.all(
+          filesToDelete.map((file: any) => {
+            fs.unlink(file, (error) => {
+              this.logger.error(`Error deleting file: ${error}`);
+            });
+          }),
+        );
 
         return { name, url };
-        return;
       }
     } catch (error) {
       error.location = `PetroDataServices.${this.rawDataActions.name} method`;
@@ -2212,7 +2223,11 @@ export class PetroDataService {
 
       const csvBuffer = require('fs').createReadStream('petro-data.csv');
 
-      const getImageUrl = await this.uploadS3(allData, 'csv', csvBuffer);
+      const getImageUrl = await this.petroDataUtility.uploadS3(
+        allData,
+        'csv',
+        csvBuffer,
+      );
       const { name, url } = getImageUrl.data;
 
       fs.unlinkSync('petro-data.csv');
@@ -2222,48 +2237,6 @@ export class PetroDataService {
       error.location = `PetroDataServices.${this.rawDataActions.name} method`;
       AppResponse.error(error);
     }
-  }
-
-  /* Private fxn to store files in digital ocean spaces */
-  private async uploadS3(file: any, flag: string, buffer: any) {
-    let savedImages: any = {};
-    const errors = [];
-    const fileName = `${uuidv4().replace(/-/g, '').toLocaleUpperCase()}`;
-
-    let fileType: string =
-      flag === FileExtensionType.CSV
-        ? 'csv'
-        : flag === FileExtensionType.XLSX
-          ? 'xlsx'
-          : 'pdf';
-
-    const params = {
-      Bucket: this.configService.get<string>('SPACES_BUCKET_NAME'),
-      Key: `${this.configService.get<string>(
-        'PETRO_DATA_FILE_DIR',
-      )}/${fileName}.${fileType}`,
-      Body: buffer,
-      ACL: 'public-read',
-    };
-    const data = await this.getS3().upload(params).promise();
-    if (data) {
-      savedImages = { name: fileName, type: fileType, url: data.Location };
-    } else {
-      errors.push(file);
-    }
-
-    return {
-      data: savedImages,
-      errors: errors.length ? errors : null,
-    };
-  }
-
-  private getS3() {
-    return new S3({
-      accessKeyId: this.configService.get<string>('SPACES_ACCESS_KEY'),
-      secretAccessKey: this.configService.get<string>('SPACES_SECRET_KEY'),
-      endpoint: this.configService.get('SPACES_ENDPOINT'),
-    });
   }
 
   /* Private fxn to parse csv data */

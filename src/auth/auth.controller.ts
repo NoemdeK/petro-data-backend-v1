@@ -7,10 +7,12 @@ import {
   Query,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Response } from 'express';
+import { RequestHandler, Response, Request } from 'express';
 import { AppResponse } from 'src/common/app.response';
 import { CreateUserDto, LoginDto } from './dto/create-user.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -19,6 +21,7 @@ import { RoleGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/guards/decorators/roles.decorator';
 import { Role } from 'src/common/interfaces/roles.interface';
 import { UserProfileSettingsDto } from 'src/petroData/dto/settings.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 const { success } = AppResponse;
 @Controller('auth')
@@ -88,15 +91,27 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
   @Patch('/me/settings')
+  @UseInterceptors(FileInterceptor('file'))
   async userProfileSettings(
-    @Req() req: any,
+    @UploadedFile()
+    @Req()
+    req: any,
     @Res() res: Response,
+    @UploadedFile()
+    file: Express.Multer.File,
     @Body() userProfileSettingsDto: UserProfileSettingsDto,
+    @Query('id') id: string,
   ): Promise<Response> {
-    userProfileSettingsDto.userId = req.user.userId;
-    const data = await this.authService.userProfileSettings(
-      userProfileSettingsDto,
-    );
+    function payload() {
+      return {
+        firstName: userProfileSettingsDto.firstName,
+        lastName: userProfileSettingsDto.lastName,
+        avatar: file,
+        userId: id,
+      };
+    }
+
+    const data = await this.authService.userProfileSettings(payload());
     return res
       .status(200)
       .json(success('Successfully updated user profile settings', 200, data));

@@ -14,6 +14,8 @@ import { EmailService } from 'src/email/email.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { passwordResetTemplate } from 'src/email/templates/password-reset-template';
 import { UserProfileSettingsDto } from 'src/petroData/dto/settings.dto';
+import { PetroDataUtility } from 'src/petroData/petroData.utility';
+import { FileExtensionType } from 'src/petroData/enum/utils/enum.util';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +24,7 @@ export class AuthService {
     private jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
+    private readonly petroDataUtility: PetroDataUtility,
   ) {}
 
   /**
@@ -272,17 +275,24 @@ export class AuthService {
         });
       }
 
+      const getImageUrl = await this.petroDataUtility.uploadS3(
+        avatar,
+        FileExtensionType.OTHERS,
+        Buffer.from(avatar.buffer),
+      );
+
       function updateData() {
         return {
           firstName,
           lastName,
-          avatar,
+          avatar: getImageUrl?.data?.url,
         };
       }
 
       await this.authRepository.updateUser({ _id: user?._id }, updateData());
       return;
     } catch (error) {
+      console.log(error);
       error.location = `AuthServices.${this.userProfile.name} method`;
       AppResponse.error(error);
     }
