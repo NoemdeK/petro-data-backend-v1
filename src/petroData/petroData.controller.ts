@@ -71,7 +71,7 @@ export class PetroDataController {
       await this.petroDataService.petroDataAnalysis(petroDataAnalysisDto);
     return res
       .status(200)
-      .json(success('Successfully analyzed petro data', 200, data));
+      .json(success('Successfully analyzed regional petro data', 200, data));
   }
 
   @UseGuards(JwtAuthGuard, RoleGuard)

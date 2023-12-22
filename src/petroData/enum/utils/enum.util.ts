@@ -31,4 +31,5 @@ export enum Regions {
   NORTH_CENTRAL = 'North Central',
   NORTH_EAST = 'North East',
   NORTH_WEST = 'North West',
+  NATIONAL = 'National',
 }

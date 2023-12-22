@@ -34,6 +34,37 @@ export class PetroDataUtility {
 
     const analysis = await Promise.all(
       Array.from(regions, async (index: any) => {
+        /* For national */
+        if (index === Regions.NATIONAL) {
+          return product === ProductType.AGO
+            ? await this.petroDataRepository.getNationalPetroDataForAGO(
+                formattedDate,
+                today,
+              )
+            : product === ProductType.PMS
+              ? await this.petroDataRepository.getNationalPetroDataForPMS(
+                  formattedDate,
+                  today,
+                )
+              : product === ProductType.DPK
+                ? await this.petroDataRepository.getNationalPetroDataForDPK(
+                    formattedDate,
+                    today,
+                  )
+                : product === ProductType.LPG
+                  ? await this.petroDataRepository.getNationalPetroDataForLPG(
+                      formattedDate,
+                      today,
+                    )
+                  : product === ProductType.LPG
+                    ? await this.petroDataRepository.getNationalPetroDataForICE(
+                        formattedDate,
+                        today,
+                      )
+                    : [];
+        }
+
+        /* For each regions - SE, SW, SS, NE, NW, NC */
         return product === ProductType.AGO
           ? await this.petroDataRepository.getPeriodicPetroDataForAGO(
               formattedDate,
