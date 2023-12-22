@@ -2126,6 +2126,10 @@ export class PetroDataService {
 
       /************************ Export PDF files ****************************/
       if (flag === FileExtensionType.PDF) {
+        /* Clear the pervious content in petro-data.csv before proceeding */
+        const pdfFilePath = 'petro-data.csv';
+        fs.writeFileSync(pdfFilePath, '');
+
         const csvWriter = createObjectCsvWriter({
           path: 'petro-data.csv',
           header: [
@@ -2165,17 +2169,8 @@ export class PetroDataService {
 
         const { name, url } = getImageUrl.data;
 
-        // //  todo ****************
-        // /* Delete the files */
-        // const filesToDelete = ['petro-data.csv', 'petro-data.pdf'];
-
-        // await Promise.all(
-        //   filesToDelete.map((file: any) => {
-        //     fs.unlink(file, (error) => {
-        //       this.logger.error(`Error deleting file: ${error}`);
-        //     });
-        //   }),
-        // );
+        /* Delete petro-data.csv file */
+        fs.unlinkSync('petro-data.csv');
 
         return { name, url };
       }
