@@ -30,7 +30,7 @@ export class AuthService {
   /**
    * @Responsibility: dedicated service for signing up a new user
    *
-   * @param signUpDto
+   * @param createUserDto
    * @returns {Promise<any>}
    */
 
@@ -54,6 +54,37 @@ export class AuthService {
       return;
     } catch (error) {
       error.location = `AuthServices.${this.signup.name} method`;
+      AppResponse.error(error);
+    }
+  }
+
+  /**
+   * @Responsibility: dedicated service for signing up a data entry user
+   *
+   * @param createUserDto
+   * @returns {Promise<any>}
+   */
+
+  async dataEntrySignup(createUserDto: CreateUserDto): Promise<any> {
+    try {
+      let { firstName, lastName, email, password } = createUserDto;
+
+      /* Hash password before storing it */
+      password = password ? hashSync(password, genSaltSync()) : null;
+
+      function userData(): CreateUserDto {
+        return {
+          firstName,
+          lastName,
+          email,
+          password,
+          role: Role.RWX_DATA_ENTRY_USER,
+        };
+      }
+      await this.authRepository.createUser(userData());
+      return;
+    } catch (error) {
+      error.location = `AuthServices.${this.dataEntrySignup.name} method`;
       AppResponse.error(error);
     }
   }

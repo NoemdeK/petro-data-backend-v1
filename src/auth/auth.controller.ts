@@ -41,6 +41,19 @@ export class AuthController {
       .json(success('Successfully created user', 201, data));
   }
 
+  @Post('/signup/data-entry')
+  async dataEntrySignup(
+    @Req() req: any,
+    @Res() res: Response,
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<Response> {
+    const data = await this.authService.dataEntrySignup(createUserDto);
+
+    return res
+      .status(201)
+      .json(success('Successfully created data entry user', 201, data));
+  }
+
   @Post('/login')
   async login(
     @Res() res: Response,

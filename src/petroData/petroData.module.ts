@@ -8,6 +8,10 @@ import { PetroDataRepository } from './petroData.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { HttpModule } from '@nestjs/axios';
 import { PetroDataUtility } from './petroData.utility';
+import {
+  PetroDataPhoto,
+  PetroDataPhotoSchema,
+} from 'src/schema/petroDataPhoto.schema';
 
 @Module({
   imports: [
@@ -15,6 +19,7 @@ import { PetroDataUtility } from './petroData.utility';
     ConfigModule,
     MongooseModule.forFeature([
       { name: PetroData.name, schema: PetroDataSchema },
+      { name: PetroDataPhoto.name, schema: PetroDataPhotoSchema },
     ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
