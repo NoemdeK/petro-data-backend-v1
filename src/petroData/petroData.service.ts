@@ -1017,7 +1017,7 @@ export class PetroDataService {
         }
       }
 
-      /************************** ICE Product Type ***************************************/
+      /************************** ICE Product Type ****************************************/
       if (product === ProductType.ICE) {
         if (period === PeriodicInterval.ONE_WEEK) {
           const oneWeekDate = moment().subtract(7, 'days').toDate();

@@ -79,7 +79,7 @@ export class PetroDataController {
     );
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
+  // @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
   @Post('/analysis')
   async petroDataAnalysis(
@@ -96,7 +96,7 @@ export class PetroDataController {
       .json(success('Successfully analyzed regional petro data', 200, data));
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
+  // @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
   @Get('/analysis/price-percentage-change')
   async petroDataAnalysisPercentages(
@@ -115,7 +115,7 @@ export class PetroDataController {
       );
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
+  // @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
   @Get('/analysis/projections')
   async petroDataAnalysisProjections(
@@ -137,7 +137,7 @@ export class PetroDataController {
       .json(success('Successfully retrieved analysis projections', 200, data));
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
+  // @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
   @Get('/raw')
   async retrieveRawPetroData(
@@ -153,7 +153,7 @@ export class PetroDataController {
       );
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
+  // @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
   @Post('/raw/actions')
   async rawDataActions(
