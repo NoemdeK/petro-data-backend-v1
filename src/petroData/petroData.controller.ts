@@ -8,13 +8,17 @@ import {
   Req,
   Res,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AppResponse } from 'src/common/app.response';
 import { PetroDataService } from './petroData.service';
 import { Response } from 'express';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+} from '@nestjs/platform-express';
 import {
   PetroDataAnalysisDto,
   PetroDataAnalysisProjectionDto,
@@ -32,29 +36,47 @@ const { success } = AppResponse;
 export class PetroDataController {
   constructor(private readonly petroDataService: PetroDataService) {}
 
-  // @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.RWX_USER)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_DATA_ENTRY_USER)
   @Post('/upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadXlsxCsvFilesIntoDb(
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'file', maxCount: 1 },
+      { name: 'photo', maxCount: 1 },
+    ]),
+  )
+  async uploadFilesIntoDb(
     @Req() req: any,
     @Res() res: Response,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles()
+    files: {
+      file: Express.Multer.File[];
+      photo: Express.Multer.File[];
+    },
   ): Promise<Response> {
-    const configFileBuffer: Buffer = req.file.buffer;
-    const data = await this.petroDataService.uploadXlsxCsvFilesIntoDb(
-      file,
-      configFileBuffer,
+    const configFileBuffer: Buffer = req.files.file[0].buffer;
+    const configPhotoBuffer: Buffer = req.files.photo[0].buffer;
+    const userId = req.user.userId;
+
+    function payload() {
+      return {
+        file: files.file[0],
+        photo: files.photo[0],
+        configFileBuffer,
+        configPhotoBuffer,
+        userId,
+      };
+    }
+
+    const data = await this.petroDataService.uploadFilesIntoDb(payload());
+
+    return res.status(201).json(
+      success(
+        'Successfully stored xlsx/csv files into the database',
+        201,
+        /*  data, */
+      ),
     );
-    return res
-      .status(201)
-      .json(
-        success(
-          'Successfully stored xlsx/csv files into the database',
-          201,
-          data,
-        ),
-      );
   }
 
   // @UseGuards(JwtAuthGuard, RoleGuard)

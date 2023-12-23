@@ -5,7 +5,6 @@ import * as fs from 'fs';
 import { createObjectCsvWriter } from 'csv-writer';
 import { Readable, Transform, pipeline } from 'stream';
 import { PetroDataRepository } from './petroData.repository';
-import { promisify } from 'util';
 import * as csvParser from 'csv-parser';
 import { Logger } from '@nestjs/common';
 import {
@@ -51,10 +50,13 @@ export class PetroDataService {
    * @returns {Promise<any>}
    */
 
-  async uploadXlsxCsvFilesIntoDb(
-    file: any,
-    configFileBuffer: any,
-  ): Promise<any> {
+  async uploadFilesIntoDb({
+    file,
+    photo,
+    configFileBuffer,
+    configPhotoBuffer,
+    userId,
+  }): Promise<any> {
     try {
       if (!file) {
         AppResponse.error({
@@ -64,17 +66,6 @@ export class PetroDataService {
       }
 
       const fileExtType = file.originalname.split('.')[1];
-
-      const allowedExtensions: string[] = [
-        FileExtensionType.CSV,
-        FileExtensionType.XLSX,
-      ];
-      if (!allowedExtensions.includes(fileExtType)) {
-        AppResponse.error({
-          message: 'File extension not allowed',
-          status: HttpStatus.EXPECTATION_FAILED,
-        });
-      }
 
       function readFileStream() {
         const readableStream = new Readable();
@@ -118,6 +109,7 @@ export class PetroDataService {
                     LPG: data.LPG ?? null,
                     ICE: data.ICE ?? null,
                     Region: data.Region,
+                    userId,
                   };
                 }
 
@@ -163,9 +155,10 @@ export class PetroDataService {
           // Process and store data
           jsonData.forEach(async (data) => {
             try {
-              if (data.Period) {
-                data.Period = moment(data.Period, 'DD-MMM-YY').toISOString();
+              if (data?.Period) {
+                data.Period = moment(data?.Period, 'DD-MMM-YY').toISOString();
               }
+              data.userId = userId;
               await this.petroDataRepository.createPetroData(data);
             } catch (error) {
               this.logger.log('Error processing data:', error.message);
@@ -174,8 +167,21 @@ export class PetroDataService {
           this.logger.log('Data processing complete');
         });
       }
+
+      /********************* Upload the picture **********************/
+      const getPhotoUrl = await this.petroDataUtility.uploadS3(
+        photo,
+        'others',
+        configPhotoBuffer,
+      );
+
+      await this.petroDataRepository.createPhotoData({
+        userId,
+        photoUrl: getPhotoUrl.data.url,
+      });
+      return;
     } catch (error) {
-      error.location = `PetroDataServices.${this.uploadXlsxCsvFilesIntoDb.name} method`;
+      error.location = `PetroDataServices.${this.uploadFilesIntoDb.name} method`;
       AppResponse.error(error);
     }
   }
