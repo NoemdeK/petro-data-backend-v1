@@ -56,7 +56,7 @@ export class PetroDataUtility {
                       formattedDate,
                       today,
                     )
-                  : product === ProductType.LPG
+                  : product === ProductType.ICE
                     ? await this.petroDataRepository.getNationalPetroDataForICE(
                         formattedDate,
                         today,
@@ -89,7 +89,7 @@ export class PetroDataUtility {
                     today,
                     index,
                   )
-                : product === ProductType.LPG
+                : product === ProductType.ICE
                   ? await this.petroDataRepository.getPeriodicPetroDataForICE(
                       formattedDate,
                       today,
