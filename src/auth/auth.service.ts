@@ -138,7 +138,10 @@ export class AuthService {
         };
       }
 
-      return { auth: this.jwtService.sign(jwtPayloadForAuth()) };
+      return {
+        auth: this.jwtService.sign(jwtPayloadForAuth()),
+        role: theUser?.role,
+      };
     } catch (error) {
       error.location = `AuthServices.${this.login.name} method`;
       AppResponse.error(error);
