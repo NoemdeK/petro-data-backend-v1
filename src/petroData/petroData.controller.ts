@@ -70,13 +70,15 @@ export class PetroDataController {
 
     const data = await this.petroDataService.uploadFilesIntoDb(payload());
 
-    return res.status(201).json(
-      success(
-        'Successfully stored xlsx/csv files into the database',
-        201,
-        /*  data, */
-      ),
-    );
+    return res
+      .status(201)
+      .json(
+        success(
+          'Successfully stored xlsx/csv files into the database',
+          201,
+          data,
+        ),
+      );
   }
 
   // @UseGuards(JwtAuthGuard, RoleGuard)

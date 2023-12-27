@@ -35,6 +35,9 @@ export class PetroData {
   @Prop({ type: Number, required: true })
   LPG: number;
 
+  @Prop({ type: Number, required: true })
+  ICE: number;
+
   @Prop({ type: String, required: true })
   Region: string;
 
