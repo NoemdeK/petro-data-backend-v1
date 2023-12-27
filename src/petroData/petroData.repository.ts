@@ -32,6 +32,7 @@ export class PetroDataRepository {
     try {
       return await this.petroDataModel.create(data);
     } catch (error) {
+      console.log(error);
       throw new Error(error?.messsage);
     }
   }

@@ -99,16 +99,16 @@ export class PetroDataService {
                 function csvUploadData() {
                   return {
                     State: data['State '] ?? data['State'],
-                    Day: data.Day ?? null,
+                    Day: data?.Day ?? null,
                     Year: data['Year '] ?? data['Year'],
                     Month: data['Month '] ?? data['Month'],
                     Period: moment(formattedPeriodDate).format('YYYY-MM-DD'),
-                    AGO: data.AGO ?? null,
-                    PMS: data.PMS ?? null,
-                    DPK: data.DPK ?? null,
-                    LPG: data.LPG ?? null,
-                    ICE: data.ICE ?? null,
-                    Region: data.Region,
+                    AGO: data?.AGO ?? null,
+                    PMS: data?.PMS ?? null,
+                    DPK: data?.DPK ?? null,
+                    LPG: data?.LPG ?? null,
+                    ICE: data['ICE Brent Crude Oil'] ?? null,
+                    Region: data?.Region,
                     userId,
                   };
                 }
