@@ -1919,7 +1919,7 @@ export class PetroDataService {
           recentPricePercentChange:
             recentICEPricePercentChange > 0
               ? `+${recentICEPricePercentChange.toFixed(2)}`
-              : recentICEPricePercentChange > 0
+              : recentICEPricePercentChange < 0
                 ? `${recentICEPricePercentChange.toFixed(2)}`
                 : '0.00',
           closedDate: SERecentPriceData[0].Period,
