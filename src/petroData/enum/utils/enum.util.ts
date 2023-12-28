@@ -2,7 +2,7 @@ export enum FileExtensionType {
   CSV = 'csv',
   XLSX = 'xlsx',
   PDF = 'pdf',
-  OTHERS = 'others',
+  IMAGES = 'images',
 }
 
 export enum ProductType {

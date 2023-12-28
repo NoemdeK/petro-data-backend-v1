@@ -320,7 +320,7 @@ export class AuthService {
 
       const getImageUrl = await this.petroDataUtility.uploadS3(
         avatar,
-        FileExtensionType.OTHERS,
+        FileExtensionType.IMAGES,
         Buffer.from(avatar.buffer),
       );
 

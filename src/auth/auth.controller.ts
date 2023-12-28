@@ -107,21 +107,19 @@ export class AuthController {
   @Patch('/me/settings')
   @UseInterceptors(FileInterceptor('file'))
   async userProfileSettings(
-    @UploadedFile()
     @Req()
     req: any,
     @Res() res: Response,
     @UploadedFile()
     file: Express.Multer.File,
     @Body() userProfileSettingsDto: UserProfileSettingsDto,
-    @Query('id') id: string,
   ): Promise<Response> {
     function payload() {
       return {
         firstName: userProfileSettingsDto.firstName,
         lastName: userProfileSettingsDto.lastName,
         avatar: file,
-        userId: id,
+        userId: req.user.userId,
       };
     }
 

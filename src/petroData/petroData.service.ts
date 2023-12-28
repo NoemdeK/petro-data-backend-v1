@@ -172,7 +172,7 @@ export class PetroDataService {
       /********************* Upload the picture **********************/
       const getPhotoUrl = await this.petroDataUtility.uploadS3(
         photo,
-        'others',
+        'images',
         configPhotoBuffer,
       );
 
