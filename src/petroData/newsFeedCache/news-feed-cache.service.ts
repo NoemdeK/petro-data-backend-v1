@@ -8,7 +8,10 @@ export class NewsFeedCachingService {
 
   /* Method to return the cache data for checks and comparisons before making a request */
   get(key: string, validityPeriod: number = 0): any | undefined {
+    console.log('get_key ******* : ', key);
+
     const cachedData = this.newsFeedCache[key];
+    console.log(cachedData);
 
     if (
       cachedData &&
@@ -23,6 +26,7 @@ export class NewsFeedCachingService {
   /* Method to set the cache key and value after making a request */
   set(key: string, value: any): void {
     this.newsFeedCache[key] = { data: value, timestamp: Date.now() };
+    console.log(this.newsFeedCache[key]);
   }
 
   /* Job that runs every 6 hours to clear the news feed cache */
@@ -45,8 +49,8 @@ export class NewsFeedCachingService {
   //     this.newsFeedCache = {};
   //   }
 
-  //   /* method to get the entire cache for inspection */
-  //   getCache(): Record<string, { data: any; timestamp: number }> {
-  //     return this.newsFeedCache;
-  //   }
+  /* method to get the entire cache for inspection */
+  // getCache(): Record<string, { data: any; timestamp: number }> {
+  //   return this.newsFeedCache;
+  // }
 }

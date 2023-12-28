@@ -28,7 +28,7 @@ import { HttpService } from '@nestjs/axios';
 import { parse } from 'csv-parse';
 import * as PDFDocument from 'pdfkit';
 import { PetroDataUtility } from './petroData.utility';
-import * as path from 'path';
+import { NewsFeedCachingService } from './newsFeedCache/news-feed-cache.service';
 
 @Injectable()
 export class PetroDataService {
@@ -37,6 +37,7 @@ export class PetroDataService {
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
     private readonly petroDataUtility: PetroDataUtility,
+    private readonly newsFeedCachingService: NewsFeedCachingService,
   ) {}
 
   private readonly logger = new Logger(PetroDataService.name);
@@ -1978,25 +1979,62 @@ export class PetroDataService {
       let queryString;
 
       const axiosCallFxn = async (queryString: string) => {
-        const { data } = await lastValueFrom(
-          this.httpService
-            .get(
-              `${this.configService.get<string>(
-                'G_NEWS_URL',
-              )}?q=${queryString}&lang=en&country=us&page=${page}&max=5&sortby=publishedAt&apikey=${this.configService.get<string>(
-                'G_NEWS_SECRET_KEY',
-              )}`,
-            )
-            .pipe(
-              catchError((error: AxiosError) => {
-                return AppResponse.error({
-                  message: error?.message,
-                  status: HttpStatus.BAD_REQUEST,
-                });
-              }),
-            ),
+        /* Inject news feed caching implementation at this point for checker */
+        const cacheKey =
+          flag === ProductType.PMS
+            ? `${this.configService.get<string>(
+                'G_NEWS_API_CACHE_KEY',
+              )}_pms_page_${page}`
+            : flag === ProductType.ICE
+              ? `${this.configService.get<string>(
+                  'G_NEWS_API_CACHE_KEY',
+                )}_ice_page_${page}`
+              : flag === ProductType.LPG
+                ? `${this.configService.get<string>(
+                    'G_NEWS_API_CACHE_KEY',
+                  )}_lpg_page_${page}`
+                : flag === ProductType.AGO
+                  ? `${this.configService.get<string>(
+                      'G_NEWS_API_CACHE_KEY',
+                    )}_ago_page_${page}`
+                  : `${this.configService.get<string>(
+                      'G_NEWS_API_CACHE_KEY',
+                    )}_dpk_page_${page}`;
+
+        const cacheValidityPeriod = 6 * 60 * 60 * 1000; // 6 hours;
+        const cachedData = this.newsFeedCachingService.get(
+          cacheKey,
+          cacheValidityPeriod,
         );
-        return data;
+
+        if (cachedData) {
+          return cachedData;
+        } else {
+          const { data } = await lastValueFrom(
+            this.httpService
+              .get(
+                `${this.configService.get<string>(
+                  'G_NEWS_URL',
+                )}?q=${queryString}&lang=en&country=us&page=${page}&max=5&sortby=publishedAt&apikey=${this.configService.get<string>(
+                  'G_NEWS_SECRET_KEY',
+                )}`,
+              )
+              .pipe(
+                catchError((error: AxiosError) => {
+                  return AppResponse.error({
+                    message: error?.message,
+                    status: HttpStatus.BAD_REQUEST,
+                  });
+                }),
+              ),
+          );
+
+          // Cache the response for future requests
+          // This way, the client does not have to always make a request to the g-news server
+          this.newsFeedCachingService.set(cacheKey, data);
+
+          return data;
+        }
       };
 
       if (flag === ProductType.PMS) {
@@ -2016,7 +2054,6 @@ export class PetroDataService {
       }
 
       if (flag === ProductType.DPK) {
-        queryString = 'kerosene';
         return axiosCallFxn('kerosene');
       }
     } catch (error) {

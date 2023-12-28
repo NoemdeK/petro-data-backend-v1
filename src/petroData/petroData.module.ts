@@ -12,6 +12,7 @@ import {
   PetroDataPhoto,
   PetroDataPhotoSchema,
 } from 'src/schema/petroDataPhoto.schema';
+import { NewsFeedCachingService } from './newsFeedCache/news-feed-cache.service';
 
 @Module({
   imports: [
@@ -30,6 +31,11 @@ import {
     }),
   ],
   controllers: [PetroDataController],
-  providers: [PetroDataService, PetroDataRepository, PetroDataUtility],
+  providers: [
+    PetroDataService,
+    PetroDataRepository,
+    PetroDataUtility,
+    NewsFeedCachingService,
+  ],
 })
 export class PetroDataModule {}
