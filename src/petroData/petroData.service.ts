@@ -29,6 +29,7 @@ import { parse } from 'csv-parse';
 import * as PDFDocument from 'pdfkit';
 import { PetroDataUtility } from './petroData.utility';
 import { NewsFeedCachingService } from './newsFeedCache/news-feed-cache.service';
+import { CreatePetroDataDto } from './dto/create-petro-data.dto';
 
 @Injectable()
 export class PetroDataService {
@@ -41,6 +42,65 @@ export class PetroDataService {
   ) {}
 
   private readonly logger = new Logger(PetroDataService.name);
+
+  /**
+   * @Responsibility: dedicated service for creating petro data
+   *
+   * @param createPetroDataDto
+   *
+   * @returns {Promise<any>}
+   */
+
+  async createPetroData(createPetroDataDto: CreatePetroDataDto): Promise<any> {
+    try {
+      const { state, period, products, region, userId, photoUrl } =
+        createPetroDataDto;
+      const productAvg: Record<string, number> = {};
+
+      const data = Object.keys(products);
+
+      const theLength: number = data.length;
+      for (let i = 0; i < theLength; i++) {
+        const eachProduct = products[data[i]];
+        const keys = ['nnpc', 'total', 'private'];
+
+        const sum = keys.reduce((acc, key) => acc + eachProduct[key], 0);
+        const average = +sum / +keys.length;
+
+        productAvg[data[i]] = +average.toFixed(2);
+      }
+
+      const formattedPeriodDate = moment(period, 'D-MMM-YY').format(
+        'YYYY-MM-DD',
+      );
+
+      function createData() {
+        return {
+          State: state,
+          Period: formattedPeriodDate,
+          PMS: productAvg?.PMS,
+          AGO: productAvg?.AGO,
+          LPG: productAvg?.LPG,
+          DPK: productAvg?.DPK,
+          ICE: productAvg?.ICE,
+          Region: region,
+          userId,
+        };
+      }
+
+      await Promise.all([
+        this.petroDataRepository.createPetroData(createData()),
+        this.petroDataRepository.createPhotoData({
+          userId,
+          photoUrl,
+        }),
+      ]);
+      return;
+    } catch (error) {
+      error.location = `PetroDataServices.${this.createPetroData.name} method`;
+      AppResponse.error(error);
+    }
+  }
 
   /**
    * @Responsibility: dedicated service for uploading csv/xlsx files into the database

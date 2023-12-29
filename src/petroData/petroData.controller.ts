@@ -29,12 +29,29 @@ import { RoleGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/guards/decorators/roles.decorator';
 import { Role } from 'src/common/interfaces/roles.interface';
 import { UserProfileSettingsDto } from './dto/settings.dto';
+import { CreatePetroDataDto } from './dto/create-petro-data.dto';
 
 const { success } = AppResponse;
 
 @Controller('petro-data')
 export class PetroDataController {
   constructor(private readonly petroDataService: PetroDataService) {}
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_DATA_ENTRY_USER)
+  @Post('/create')
+  async createPetroData(
+    @Req() req: any,
+    @Res() res: Response,
+    @Body() createPetroDataDto: CreatePetroDataDto,
+  ): Promise<Response> {
+    createPetroDataDto.userId = req.user.userId;
+    const data =
+      await this.petroDataService.createPetroData(createPetroDataDto);
+    return res
+      .status(200)
+      .json(success('Successfully created petro data', 201, data));
+  }
 
   // @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.RWX_DATA_ENTRY_USER)

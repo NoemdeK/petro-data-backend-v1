@@ -11,14 +11,14 @@ export class PetroData {
   @Prop({ type: String, required: true })
   State: string;
 
-  @Prop({ type: String, required: true })
-  Day: string;
+  // @Prop({ type: String, required: true })
+  // Day: string;
 
-  @Prop({ type: Number, required: true })
-  Year: number;
+  // @Prop({ type: Number, required: true })
+  // Year: number;
 
-  @Prop({ type: String, required: true })
-  Month: string;
+  // @Prop({ type: String, required: true })
+  // Month: string;
 
   @Prop({ type: String, required: true })
   Period: string;
