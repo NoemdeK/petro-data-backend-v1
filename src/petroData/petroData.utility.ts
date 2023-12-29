@@ -467,7 +467,7 @@ export class PetroDataUtility {
     const fileName = `${uuidv4().replace(/-/g, '').toLocaleUpperCase()}`;
 
     let fileType: string;
-    if (flag === FileExtensionType.OTHERS) {
+    if (flag === FileExtensionType.IMAGES) {
       const { originalname } = file;
       const splitImg = originalname.split('.');
       // Last element in the array

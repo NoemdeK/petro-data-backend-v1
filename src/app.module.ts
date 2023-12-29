@@ -7,6 +7,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './execption/http-exception';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
+import { FileUploadModule } from './fileUpload/file-upload.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     AuthModule,
     PetroDataModule,
+    FileUploadModule,
   ],
   controllers: [AppController],
   providers: [
