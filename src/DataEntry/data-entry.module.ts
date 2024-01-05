@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { DataEntryController } from './date-entry.controller';
+import { DataEntryController } from './data-entry.controller';
 import { DataEntryService } from './data-entry.service';
 import { AuthRepository } from '../auth/auth.repository';
 import { JwtModule } from '@nestjs/jwt';
@@ -10,9 +10,9 @@ import {
   PasswordReset,
   PasswordResetSchema,
 } from 'src/schema/passwordReset.schema';
-import { DataEntry, DataEntrySchema } from '../schema/dataEntry.schema';
 import { DataEntryRepository } from './data-entry.repository';
 import { DataEntryUtility } from './data-entry.utility';
+import { DataEntry, DataEntrySchema } from 'src/schema/dataEntry.schema';
 
 @Module({
   imports: [

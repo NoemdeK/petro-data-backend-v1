@@ -8,7 +8,7 @@ import { HttpExceptionFilter } from './execption/http-exception';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { FileUploadModule } from './fileUpload/file-upload.module';
-import { DataEntryModule } from './DataEntry/date-entry.module';
+import { DataEntryModule } from './DataEntry/data-entry.module';
 
 @Module({
   imports: [
