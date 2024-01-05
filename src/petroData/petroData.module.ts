@@ -8,10 +8,6 @@ import { PetroDataRepository } from './petroData.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { HttpModule } from '@nestjs/axios';
 import { PetroDataUtility } from './petroData.utility';
-import {
-  PetroDataPhoto,
-  PetroDataPhotoSchema,
-} from 'src/schema/petroDataPhoto.schema';
 import { NewsFeedCachingService } from './newsFeedCache/news-feed-cache.service';
 
 @Module({
@@ -20,7 +16,6 @@ import { NewsFeedCachingService } from './newsFeedCache/news-feed-cache.service'
     ConfigModule,
     MongooseModule.forFeature([
       { name: PetroData.name, schema: PetroDataSchema },
-      { name: PetroDataPhoto.name, schema: PetroDataPhotoSchema },
     ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],

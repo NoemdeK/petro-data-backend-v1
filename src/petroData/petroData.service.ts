@@ -90,10 +90,6 @@ export class PetroDataService {
 
       await Promise.all([
         this.petroDataRepository.createPetroData(createData()),
-        this.petroDataRepository.createPhotoData({
-          userId,
-          photoUrl,
-        }),
       ]);
       return;
     } catch (error) {
@@ -229,17 +225,6 @@ export class PetroDataService {
         });
       }
 
-      /********************* Upload the picture **********************/
-      const getPhotoUrl = await this.petroDataUtility.uploadS3(
-        photo,
-        'images',
-        configPhotoBuffer,
-      );
-
-      await this.petroDataRepository.createPhotoData({
-        userId,
-        photoUrl: getPhotoUrl.data.url,
-      });
       return;
     } catch (error) {
       error.location = `PetroDataServices.${this.uploadFilesIntoDb.name} method`;

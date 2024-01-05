@@ -20,8 +20,8 @@ export class DataEntry {
   @Prop({ type: Number, required: true })
   price: number;
 
-  @Prop({ type: String, required: true })
-  priceDate: string;
+  @Prop({ type: Date, required: true })
+  priceDate: Date;
 
   @Prop({ type: String, required: true })
   supportingDocument: string;
@@ -45,10 +45,13 @@ export class DataEntry {
   rejectedBy: string;
 
   @Prop({ type: String, required: false })
-  dateApproved: string;
+  rejectionReason: string;
 
-  @Prop({ type: String, required: false })
-  dateRejected: string;
+  @Prop({ type: Date, required: false })
+  dateApproved: Date;
+
+  @Prop({ type: Date, required: false })
+  dateRejected: Date;
 
   @Prop({ default: () => moment().utc().toDate(), type: Date })
   createdAt: Moment;

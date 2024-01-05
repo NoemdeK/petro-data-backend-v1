@@ -14,10 +14,6 @@ import { EmailModule } from 'src/email/email.module';
 import { PetroDataUtility } from 'src/petroData/petroData.utility';
 import { PetroDataRepository } from 'src/petroData/petroData.repository';
 import { PetroData, PetroDataSchema } from 'src/schema/petro-data.schema';
-import {
-  PetroDataPhoto,
-  PetroDataPhotoSchema,
-} from 'src/schema/petroDataPhoto.schema';
 
 @Module({
   controllers: [AuthController],
@@ -34,7 +30,6 @@ import {
       { name: User.name, schema: UserSchema },
       { name: PasswordReset.name, schema: PasswordResetSchema },
       { name: PetroData.name, schema: PetroDataSchema },
-      { name: PetroDataPhoto.name, schema: PetroDataPhotoSchema },
     ]),
     EmailModule,
   ],

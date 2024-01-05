@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   Query,
   Req,
@@ -17,6 +18,7 @@ import { Roles } from 'src/guards/decorators/roles.decorator';
 import { Role } from 'src/common/interfaces/roles.interface';
 import { UploadDataEntryDto } from './dto/upload-date-entry.dto';
 import { RetrieveDataEntry } from './dto/retrieve-data-entry.dto';
+import { DataEntryActionsDto } from './dto/data-entry-actions.dto';
 
 const { success } = AppResponse;
 @Controller('data-entry')
@@ -40,7 +42,8 @@ export class DataEntryController {
   }
 
   @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(/* Role.RWX_ADMIN */ Role.RWX_DATA_ENTRY_USER)
+  // todo ---- remove 'Role.RWX_DATA_ENTRY_USER' later
+  @Roles(Role.RWX_ADMIN, Role.RWX_DATA_ENTRY_USER)
   @Get('/retrieve')
   async retrieveDataEntry(
     @Req() req: any,
@@ -64,5 +67,29 @@ export class DataEntryController {
     return res
       .status(200)
       .json(success('Successfully retrieved data entry', 200, data));
+  }
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Patch('/actions')
+  // todo ---- remove 'Role.RWX_DATA_ENTRY_USER' later
+  @Roles(Role.RWX_ADMIN, Role.RWX_DATA_ENTRY_USER)
+  async dataEntryActions(
+    @Req() req: any,
+    @Res() res: Response,
+    @Query('entryId') entryId: string,
+    @Query('flag') flag: string,
+  ): Promise<Response> {
+    function payload(): DataEntryActionsDto {
+      return {
+        entryId,
+        flag,
+        dataEntryApproverId: req.user.userId,
+        rejectionReason: req.body.rejectionReason,
+      };
+    }
+    const data = await this.dataEntryService.dataEntryActions(payload());
+    return res
+      .status(200)
+      .json(success('Successfully performed action on data entry', 200, data));
   }
 }
