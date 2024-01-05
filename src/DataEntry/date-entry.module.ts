@@ -13,6 +13,7 @@ import {
 } from 'src/schema/passwordReset.schema';
 import { DataEntry, DataEntrySchema } from 'src/schema/dataEntry.schema';
 import { DataEntryRepository } from './data-entry.repository';
+import { DataEntryUtility } from './data-entry.utility';
 
 @Module({
   imports: [
@@ -30,6 +31,11 @@ import { DataEntryRepository } from './data-entry.repository';
     ]),
   ],
   controllers: [DataEntryController],
-  providers: [DataEntryService, AuthRepository, DataEntryRepository],
+  providers: [
+    DataEntryService,
+    AuthRepository,
+    DataEntryRepository,
+    DataEntryUtility,
+  ],
 })
 export class DataEntryModule {}

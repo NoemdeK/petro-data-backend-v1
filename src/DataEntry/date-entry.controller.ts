@@ -1,4 +1,13 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { AppResponse } from 'src/common/app.response';
 import { DataEntryService } from './data-entry.service';
@@ -7,6 +16,7 @@ import { RoleGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/guards/decorators/roles.decorator';
 import { Role } from 'src/common/interfaces/roles.interface';
 import { UploadDataEntryDto } from './dto/upload-date-entry.dto';
+import { RetrieveDataEntry } from './dto/retrieve-data-entry.dto';
 
 const { success } = AppResponse;
 @Controller('data-entry')
@@ -30,18 +40,29 @@ export class DataEntryController {
   }
 
   @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.RWX_ADMIN)
+  @Roles(/* Role.RWX_ADMIN */ Role.RWX_DATA_ENTRY_USER)
   @Get('/retrieve')
   async retrieveDataEntry(
     @Req() req: any,
     @Res() res: Response,
-    @Body() uploadDataEntryDto: UploadDataEntryDto,
+    @Query('flag') flag: string,
+    @Query('batch') batch: string,
+    @Query('search') search?: string,
+    @Query('filter') filter?: string,
   ): Promise<Response> {
-    uploadDataEntryDto.userId = req.user.userId;
-    const data =
-      await this.dataEntryService.retrieveDataEntry(uploadDataEntryDto);
+    function payload(): RetrieveDataEntry {
+      return {
+        flag,
+        batch,
+        userId: req.user.userId,
+        search,
+        filter,
+      };
+    }
+
+    const data = await this.dataEntryService.retrieveDataEntry(payload());
     return res
       .status(200)
-      .json(success('Successfully retrieved data entry', 201, data));
+      .json(success('Successfully retrieved data entry', 200, data));
   }
 }

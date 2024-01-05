@@ -30,7 +30,25 @@ export class DataEntry {
   status: string;
 
   @Prop({ type: String, required: true })
-  userId: string;
+  region: string;
+
+  @Prop({ type: String, required: true })
+  dataEntryUserId: string;
+
+  @Prop({ type: String, required: false })
+  dataEntryApproverId: string;
+
+  @Prop({ type: String, required: false })
+  approvedBy: string;
+
+  @Prop({ type: String, required: false })
+  rejectedBy: string;
+
+  @Prop({ type: String, required: false })
+  dateApproved: string;
+
+  @Prop({ type: String, required: false })
+  dateRejected: string;
 
   @Prop({ default: () => moment().utc().toDate(), type: Date })
   createdAt: Moment;
