@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PetroDataController } from './petroData.controller';
 import { PetroDataService } from './petroData.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { PetroData, PetroDataSchema } from 'src/schema/petroData.schema';
+import { PetroData, PetroDataSchema } from 'src/schema/petro-data.schema';
 import { PetroDataRepository } from './petroData.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { HttpModule } from '@nestjs/axios';

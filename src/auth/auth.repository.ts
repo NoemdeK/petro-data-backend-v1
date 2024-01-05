@@ -6,7 +6,7 @@ import { PropDataInput } from 'src/common/utils/util.interface';
 import {
   PasswordReset,
   PasswordResetDocument,
-} from 'src/schema/passwordReset.schema';
+} from 'src/schema/password-reset.schema';
 
 @Injectable()
 export class AuthRepository {

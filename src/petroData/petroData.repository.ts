@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PetroData, PetroDataDocument } from 'src/schema/petroData.schema';
+import { PetroData, PetroDataDocument } from 'src/schema/petro-data.schema';
 import { Model } from 'mongoose';
 import { CreateXlsxDto } from './dto/create-xlsx.dto';
 import { ProductType } from './enum/utils/enum.util';

@@ -9,7 +9,7 @@ import { User, UserSchema } from '../schema/user.schema';
 import {
   PasswordReset,
   PasswordResetSchema,
-} from 'src/schema/passwordReset.schema';
+} from 'src/schema/password-reset.schema';
 import { DataEntryRepository } from './data-entry.repository';
 import { DataEntryUtility } from './data-entry.utility';
 import { DataEntry, DataEntrySchema } from '../schema/data-entry.schema';
