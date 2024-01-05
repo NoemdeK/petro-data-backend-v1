@@ -1,17 +1,16 @@
 import { Module } from '@nestjs/common';
 import { DataEntryController } from './date-entry.controller';
 import { DataEntryService } from './data-entry.service';
-import { AuthService } from 'src/auth/auth.service';
-import { AuthRepository } from 'src/auth/auth.repository';
+import { AuthRepository } from '../auth/auth.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from 'src/schema/user.schema';
+import { User, UserSchema } from '../schema/user.schema';
 import {
   PasswordReset,
   PasswordResetSchema,
 } from 'src/schema/passwordReset.schema';
-import { DataEntry, DataEntrySchema } from 'src/schema/dataEntry.schema';
+import { DataEntry, DataEntrySchema } from '../schema/dataEntry.schema';
 import { DataEntryRepository } from './data-entry.repository';
 import { DataEntryUtility } from './data-entry.utility';
 
