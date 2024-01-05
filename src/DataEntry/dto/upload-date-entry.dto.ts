@@ -10,5 +10,6 @@ export class DataEntryDto {
   price: string;
   priceDate: string;
   supportingDocument: string;
-  region?: string;
+  region: string;
+  pdeId: string;
 }

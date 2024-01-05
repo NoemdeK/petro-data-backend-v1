@@ -130,7 +130,6 @@ export class DataEntryService {
               : index?.dateRejected
                 ? index?.dateRejected
                 : null,
-            pdeId: index?.pdeId,
             status: index?.status,
             fillingStation: index?.fillingStation,
             state: index?.state,
