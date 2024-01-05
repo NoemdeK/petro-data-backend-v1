@@ -108,7 +108,7 @@ export class DataEntryService {
           ]);
 
           return {
-            _id: index?._id,
+            entryId: index?._id,
             submittedBy: dateEntryUserInfo
               ? `${dateEntryUserInfo?.firstName?.trim()} ${dateEntryUserInfo?.lastName?.trim()}`
               : null,

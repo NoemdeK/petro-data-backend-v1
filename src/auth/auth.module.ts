@@ -9,11 +9,11 @@ import { User, UserSchema } from 'src/schema/user.schema';
 import {
   PasswordReset,
   PasswordResetSchema,
-} from 'src/schema/passwordReset.schema';
+} from 'src/schema/password-reset.schema';
 import { EmailModule } from 'src/email/email.module';
 import { PetroDataUtility } from 'src/petroData/petroData.utility';
 import { PetroDataRepository } from 'src/petroData/petroData.repository';
-import { PetroData, PetroDataSchema } from 'src/schema/petroData.schema';
+import { PetroData, PetroDataSchema } from 'src/schema/petro-data.schema';
 import {
   PetroDataPhoto,
   PetroDataPhotoSchema,
