@@ -37,66 +37,50 @@ const { success } = AppResponse;
 export class PetroDataController {
   constructor(private readonly petroDataService: PetroDataService) {}
 
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.RWX_DATA_ENTRY_USER)
-  @Post('/create')
-  async createPetroData(
-    @Req() req: any,
-    @Res() res: Response,
-    @Body() createPetroDataDto: CreatePetroDataDto,
-  ): Promise<Response> {
-    createPetroDataDto.userId = req.user.userId;
-    const data =
-      await this.petroDataService.createPetroData(createPetroDataDto);
-    return res
-      .status(200)
-      .json(success('Successfully created petro data', 201, data));
-  }
+  // // @UseGuards(JwtAuthGuard, RoleGuard)
+  // @Roles(Role.RWX_DATA_ENTRY_USER)
+  // @Post('/upload')
+  // @UseInterceptors(
+  //   FileFieldsInterceptor([
+  //     { name: 'file', maxCount: 1 },
+  //     { name: 'photo', maxCount: 1 },
+  //   ]),
+  // )
+  // async uploadFilesIntoDb(
+  //   @Req() req: any,
+  //   @Res() res: Response,
+  //   @UploadedFiles()
+  //   files: {
+  //     file: Express.Multer.File[];
+  //     photo: Express.Multer.File[];
+  //   },
+  // ): Promise<Response> {
+  //   const configFileBuffer: Buffer = req.files.file[0].buffer;
+  //   const configPhotoBuffer: Buffer = req.files.photo[0].buffer;
+  //   const userId = req.user.userId;
 
-  // @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.RWX_DATA_ENTRY_USER)
-  @Post('/upload')
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'file', maxCount: 1 },
-      { name: 'photo', maxCount: 1 },
-    ]),
-  )
-  async uploadFilesIntoDb(
-    @Req() req: any,
-    @Res() res: Response,
-    @UploadedFiles()
-    files: {
-      file: Express.Multer.File[];
-      photo: Express.Multer.File[];
-    },
-  ): Promise<Response> {
-    const configFileBuffer: Buffer = req.files.file[0].buffer;
-    const configPhotoBuffer: Buffer = req.files.photo[0].buffer;
-    const userId = req.user.userId;
+  //   function payload() {
+  //     return {
+  //       file: files.file[0],
+  //       photo: files.photo[0],
+  //       configFileBuffer,
+  //       configPhotoBuffer,
+  //       userId,
+  //     };
+  //   }
 
-    function payload() {
-      return {
-        file: files.file[0],
-        photo: files.photo[0],
-        configFileBuffer,
-        configPhotoBuffer,
-        userId,
-      };
-    }
+  //   const data = await this.petroDataService.uploadFilesIntoDb(payload());
 
-    const data = await this.petroDataService.uploadFilesIntoDb(payload());
-
-    return res
-      .status(201)
-      .json(
-        success(
-          'Successfully stored xlsx/csv files into the database',
-          201,
-          data,
-        ),
-      );
-  }
+  //   return res
+  //     .status(201)
+  //     .json(
+  //       success(
+  //         'Successfully stored xlsx/csv files into the database',
+  //         201,
+  //         data,
+  //       ),
+  //     );
+  // }
 
   // @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.RWX_USER, Role.RW_USER, Role.R_USER)
