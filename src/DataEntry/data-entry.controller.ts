@@ -42,7 +42,6 @@ export class DataEntryController {
   }
 
   @UseGuards(JwtAuthGuard, RoleGuard)
-  // todo ---- remove 'Role.RWX_DATA_ENTRY_USER' later
   @Roles(Role.RWX_ADMIN)
   @Get('/retrieve')
   async retrieveDataEntry(
@@ -71,7 +70,6 @@ export class DataEntryController {
 
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Patch('/actions')
-  // todo ---- remove 'Role.RWX_DATA_ENTRY_USER' later
   @Roles(Role.RWX_ADMIN)
   async dataEntryActions(
     @Req() req: any,
