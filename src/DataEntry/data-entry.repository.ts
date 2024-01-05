@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { RetrieveDataEntry } from './dto/retrieve-data-entry.dto';
 import { DataEntryStatus } from './enum/utils/enum.util';
 import { DataEntryUtility } from './data-entry.utility';
-import { DataEntry, DataEntryDocument } from 'src/schema/dataEntry.schema';
+import { DataEntry, DataEntryDocument } from '../schema/dataEntry.schema';
 
 @Injectable()
 export class DataEntryRepository {
