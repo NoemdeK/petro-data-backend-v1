@@ -1,13 +1,13 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Moment } from 'moment';
 import { Document } from 'mongoose';
-import { Role } from 'src/common/interfaces/roles.interface';
 import * as moment from 'moment';
+import { DataEntryStatus } from 'src/DataEntry/enum/utils/enum.util';
 
-export type PetroDataDocument = PetroData & Document;
+export type DataEntryDocument = DataEntry & Document;
 
 @Schema()
-export class PetroData {
+export class DataEntry {
   @Prop({ type: String, required: true })
   fillingStation: string;
 
@@ -26,6 +26,9 @@ export class PetroData {
   @Prop({ type: String, required: true })
   supportingDocument: string;
 
+  @Prop({ type: String, required: true, default: DataEntryStatus.PENDING })
+  status: string;
+
   @Prop({ type: String, required: true })
   userId: string;
 
@@ -33,4 +36,4 @@ export class PetroData {
   createdAt: Moment;
 }
 
-export const PetroDataSchema = SchemaFactory.createForClass(PetroData);
+export const DataEntrySchema = SchemaFactory.createForClass(DataEntry);

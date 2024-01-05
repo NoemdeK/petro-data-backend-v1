@@ -11,6 +11,8 @@ import {
   PasswordReset,
   PasswordResetSchema,
 } from 'src/schema/passwordReset.schema';
+import { DataEntry, DataEntrySchema } from 'src/schema/dataEntry.schema';
+import { DataEntryRepository } from './data-entry.repository';
 
 @Module({
   imports: [
@@ -22,11 +24,12 @@ import {
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([
+      { name: DataEntry.name, schema: DataEntrySchema },
       { name: User.name, schema: UserSchema },
       { name: PasswordReset.name, schema: PasswordResetSchema },
     ]),
   ],
   controllers: [DataEntryController],
-  providers: [DataEntryService, AuthRepository],
+  providers: [DataEntryService, AuthRepository, DataEntryRepository],
 })
 export class DataEntryModule {}

@@ -9,14 +9,14 @@ import { Role } from 'src/common/interfaces/roles.interface';
 import { UploadDataEntryDto } from './dto/upload-date-entry.dto';
 
 const { success } = AppResponse;
-@Controller('auth')
+@Controller('data-entry')
 export class DataEntryController {
   constructor(private readonly dataEntryService: DataEntryService) {}
 
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(Role.RWX_DATA_ENTRY_USER, Role.RWX_ADMIN)
-  @Post('/create')
-  async createPetroData(
+  @Post('/upload')
+  async uploadDataEntry(
     @Req() req: any,
     @Res() res: Response,
     @Body() uploadDataEntryDto: UploadDataEntryDto,
@@ -26,6 +26,22 @@ export class DataEntryController {
       await this.dataEntryService.uploadDataEntry(uploadDataEntryDto);
     return res
       .status(201)
-      .json(success('Successfully created petro data', 201, data));
+      .json(success('Successfully uploaded data entry', 201, data));
+  }
+
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(Role.RWX_ADMIN)
+  @Get('/retrieve')
+  async retrieveDataEntry(
+    @Req() req: any,
+    @Res() res: Response,
+    @Body() uploadDataEntryDto: UploadDataEntryDto,
+  ): Promise<Response> {
+    uploadDataEntryDto.userId = req.user.userId;
+    const data =
+      await this.dataEntryService.retrieveDataEntry(uploadDataEntryDto);
+    return res
+      .status(200)
+      .json(success('Successfully retrieved data entry', 201, data));
   }
 }
