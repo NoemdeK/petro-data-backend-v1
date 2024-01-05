@@ -15,7 +15,7 @@ export class DataEntryRepository {
   ) {}
 
   /**
-   * @Responsibility: Repo for creating a data entry
+   * @Responsibility: Repo for data entry creation
    *
    * @param data
    * @returns {Promise<DataEntryDocument>}
