@@ -13,6 +13,8 @@ import {
 import { DataEntryRepository } from './data-entry.repository';
 import { DataEntryUtility } from './data-entry.utility';
 import { DataEntry, DataEntrySchema } from '../schema/data-entry.schema';
+import { PetroDataRepository } from 'src/petroData/petroData.repository';
+import { PetroData, PetroDataSchema } from 'src/schema/petro-data.schema';
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { DataEntry, DataEntrySchema } from '../schema/data-entry.schema';
       { name: DataEntry.name, schema: DataEntrySchema },
       { name: User.name, schema: UserSchema },
       { name: PasswordReset.name, schema: PasswordResetSchema },
+      { name: PetroData.name, schema: PetroDataSchema },
     ]),
   ],
   controllers: [DataEntryController],
@@ -35,6 +38,7 @@ import { DataEntry, DataEntrySchema } from '../schema/data-entry.schema';
     AuthRepository,
     DataEntryRepository,
     DataEntryUtility,
+    PetroDataRepository,
   ],
 })
 export class DataEntryModule {}

@@ -3,3 +3,8 @@ export enum DataEntryStatus {
   APPROVED = 'approved',
   REJECTED = 'rejected',
 }
+
+export enum DataEntryActions {
+  APPROVE = 'approve',
+  REJECT = 'reject',
+}

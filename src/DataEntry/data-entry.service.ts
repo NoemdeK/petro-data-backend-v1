@@ -5,15 +5,20 @@ import { AuthRepository } from 'src/auth/auth.repository';
 import { Role } from 'src/common/interfaces/roles.interface';
 import { DataEntryRepository } from './data-entry.repository';
 import { RetrieveDataEntry } from './dto/retrieve-data-entry.dto';
-import { DataEntryStatus } from './enum/utils/enum.util';
+import { DataEntryActions, DataEntryStatus } from './enum/utils/enum.util';
 import { DataEntryUtility } from './data-entry.utility';
 import { nigeriaStates } from 'src/data/states-region';
+import { DataEntryActionsDto } from './dto/data-entry-actions.dto';
+import * as moment from 'moment';
+import { PetroDataRepository } from 'src/petroData/petroData.repository';
+import { errorMonitor } from 'stream';
 
 @Injectable()
 export class DataEntryService {
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly dataEntryRepository: DataEntryRepository,
+    private readonly petroDataRepository: PetroDataRepository,
     private readonly dataEntryUtility: DataEntryUtility,
   ) {}
 
@@ -51,10 +56,6 @@ export class DataEntryService {
 
       await Promise.all(
         Array.from(dataEntry, async (index) => {
-          /* Format the price date before storing it in the database */
-          index.priceDate = this.dataEntryUtility.customDateFormat(
-            new Date(index?.priceDate),
-          );
           /* The region is automatically added based on the state provided by the client */
           index.region = nigeriaStates[index?.state];
           const modIndex = { ...index, dataEntryUserId: userId };
@@ -78,7 +79,7 @@ export class DataEntryService {
 
   async retrieveDataEntry(retrieveDataEntry: RetrieveDataEntry): Promise<any> {
     try {
-      const { flag, batch, search, filter, userId } = retrieveDataEntry;
+      const { flag, batch, search, filter } = retrieveDataEntry;
 
       if (
         flag !== DataEntryStatus.PENDING &&
@@ -126,9 +127,9 @@ export class DataEntryService {
               : index?.status === DataEntryStatus.REJECTED
                 ? 'dateRejected'
                 : 'dateApproved']: index?.dateApproved
-              ? index?.dateApproved
+              ? this.dataEntryUtility.customDateFormat(index?.dateApproved)
               : index?.dateRejected
-                ? index?.dateRejected
+                ? this.dataEntryUtility.customDateFormat(index?.dateRejected)
                 : null,
             status: index?.status,
             fillingStation: index?.fillingStation,
@@ -145,6 +146,85 @@ export class DataEntryService {
       return { result, count };
     } catch (error) {
       error.location = `DataEntryServices.${this.retrieveDataEntry.name} method`;
+      AppResponse.error(error);
+    }
+  }
+
+  /**
+   * @Responsibility: dedicated service for performing data entry actions
+   *
+   * @param dataEntryActionsDto
+   * @returns {Promise<any>}
+   */
+
+  async dataEntryActions(
+    dataEntryActionsDto: DataEntryActionsDto,
+  ): Promise<any> {
+    try {
+      const { flag, entryId, dataEntryApproverId, rejectionReason } =
+        dataEntryActionsDto;
+
+      console.log(dataEntryActionsDto);
+
+      if (
+        flag !== DataEntryActions.APPROVE &&
+        flag !== DataEntryActions.REJECT
+      ) {
+        AppResponse.error({
+          message: 'Invalid flag',
+          status: HttpStatus.BAD_REQUEST,
+        });
+      }
+
+      const getDataEntry = await this.dataEntryRepository.getSingleDataEntry({
+        _id: entryId,
+      });
+      if (!getDataEntry) {
+        AppResponse.error({
+          message: 'Data entry not found',
+          status: HttpStatus.BAD_REQUEST,
+        });
+      }
+
+      /* Data Entry Approval action */
+      if (flag === DataEntryActions.APPROVE) {
+        /* Update the data entry status to approved */
+        await this.dataEntryRepository.updateDataEntry(
+          { _id: getDataEntry._id },
+          {
+            status: DataEntryStatus.APPROVED,
+            dataEntryApproverId,
+            dateApproved: moment().utc().toDate(),
+          },
+        );
+
+        // function data() {
+        //   return {
+        //     Period: this.dataEntryUtility.customDateFormat(
+        //       getDataEntry?.priceDate,
+        //     ),
+        //   };
+        // }
+        // await this.petroDataRepository.createPetroData();
+        return;
+      }
+
+      /* Data Entry Rejection action */
+      if (flag === DataEntryActions.REJECT) {
+        /* Update the data entry status to approved */
+        await this.dataEntryRepository.updateDataEntry(
+          { _id: getDataEntry._id },
+          {
+            status: DataEntryStatus.REJECTED,
+            dataEntryApproverId,
+            dateRejected: moment().utc().toDate(),
+            rejectionReason: rejectionReason.trim(),
+          },
+        );
+        return;
+      }
+    } catch (error) {
+      error.location = `DataEntryServices.${this.dataEntryActions.name} method`;
       AppResponse.error(error);
     }
   }

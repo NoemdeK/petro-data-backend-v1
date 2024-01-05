@@ -6,18 +6,12 @@ import { CreateXlsxDto } from './dto/create-xlsx.dto';
 import { ProductType } from './enum/utils/enum.util';
 import { PropDataInput } from 'src/common/utils/util.interface';
 import * as moment from 'moment';
-import {
-  PetroDataPhoto,
-  PetroDataPhotoDocument,
-} from 'src/schema/petroDataPhoto.schema';
 
 @Injectable()
 export class PetroDataRepository {
   constructor(
     @InjectModel(PetroData.name)
     private petroDataModel: Model<PetroDataDocument>,
-    @InjectModel(PetroDataPhoto.name)
-    private petroDataPhotoModel: Model<PetroDataPhotoDocument>,
   ) {}
 
   /**
@@ -31,23 +25,6 @@ export class PetroDataRepository {
   async createPetroData(data: any): Promise<PetroDataDocument> {
     try {
       return await this.petroDataModel.create(data);
-    } catch (error) {
-      console.log(error);
-      throw new Error(error?.messsage);
-    }
-  }
-
-  /**
-   * @Responsibility: Repo for creating petro data
-   *
-   * @param data
-   *
-   * @returns {any}
-   */
-
-  async createPhotoData(data: any): Promise<PetroDataPhotoDocument> {
-    try {
-      return await this.petroDataPhotoModel.create(data);
     } catch (error) {
       throw new Error(error?.messsage);
     }

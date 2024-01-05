@@ -5,6 +5,7 @@ import { RetrieveDataEntry } from './dto/retrieve-data-entry.dto';
 import { DataEntryStatus } from './enum/utils/enum.util';
 import { DataEntryUtility } from './data-entry.utility';
 import { DataEntry, DataEntryDocument } from '../schema/data-entry.schema';
+import { PropDataInput } from 'src/common/utils/util.interface';
 
 @Injectable()
 export class DataEntryRepository {
@@ -24,6 +25,38 @@ export class DataEntryRepository {
   async createDataEntry(data: any): Promise<DataEntryDocument> {
     try {
       return await this.dataEntryModel.create(data);
+    } catch (error) {
+      throw new Error(error?.messsage);
+    }
+  }
+
+  /**
+   * @Responsibility: Repo for fetching single data entry doc
+   *
+   * @param data
+   * @returns {Promise<DataEntryDocument>}
+   */
+
+  async getSingleDataEntry(where: PropDataInput): Promise<DataEntryDocument> {
+    try {
+      return await this.dataEntryModel.findOne(where).lean();
+    } catch (error) {
+      throw new Error(error?.messsage);
+    }
+  }
+
+  /**
+   * @Responsibility: Repo for updating data entry
+   *
+   * @param data
+   * @returns {Promise<DataEntryDocument>}
+   */
+
+  async updateDataEntry(where: any, data: any): Promise<DataEntryDocument> {
+    try {
+      return await this.dataEntryModel
+        .findOneAndUpdate(where, data, { new: true })
+        .lean();
     } catch (error) {
       throw new Error(error?.messsage);
     }
