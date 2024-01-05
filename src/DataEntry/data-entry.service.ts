@@ -221,6 +221,7 @@ export class DataEntryService {
             rejectionReason: rejectionReason.trim(),
           },
         );
+        return;
       }
     } catch (error) {
       error.location = `DataEntryServices.${this.dataEntryActions.name} method`;
