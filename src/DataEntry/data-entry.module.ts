@@ -12,7 +12,7 @@ import {
 } from 'src/schema/passwordReset.schema';
 import { DataEntryRepository } from './data-entry.repository';
 import { DataEntryUtility } from './data-entry.utility';
-import { DataEntry, DataEntrySchema } from 'src/schema/dataEntry.schema';
+import { DataEntry, DataEntrySchema } from '../schema/dataEntry.schema';
 
 @Module({
   imports: [
