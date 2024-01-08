@@ -106,9 +106,9 @@ export class PetroDataUtility {
     );
 
     /* Get National data */
-    const nationalData = analysisData.filter(
-      (a: any) => a?.Region == Regions.NATIONAL,
-    );
+    // const nationalData = analysisData.filter(
+    //   (a: any) => a?.Region == Regions.NATIONAL,
+    // );
 
     /********************** Overall Price Change Calculation **********************/
     let SEResult: number;
@@ -345,44 +345,44 @@ export class PetroDataUtility {
       NCResult = 0;
     }
 
-    let nationalResult: number;
-    if (nationalData.length > 1) {
-      for (let i = 1; i < nationalData.length; i++) {
-        // Old price for each product
-        const oldPrice =
-          productType === ProductType.AGO
-            ? nationalData[i - 1].AGO ?? 0
-            : productType === ProductType.PMS
-              ? nationalData[i - 1].PMS ?? 0
-              : productType === ProductType.DPK
-                ? nationalData[i - 1].DPK ?? 0
-                : productType === ProductType.LPG
-                  ? nationalData[i - 1].LPG ?? 0
-                  : productType === ProductType.ICE
-                    ? nationalData[i - 1].ICE ?? 0
-                    : 0;
+    // let nationalResult: number;
+    // if (nationalData.length > 1) {
+    //   for (let i = 1; i < nationalData.length; i++) {
+    //     // Old price for each product
+    //     const oldPrice =
+    //       productType === ProductType.AGO
+    //         ? nationalData[i - 1].AGO ?? 0
+    //         : productType === ProductType.PMS
+    //           ? nationalData[i - 1].PMS ?? 0
+    //           : productType === ProductType.DPK
+    //             ? nationalData[i - 1].DPK ?? 0
+    //             : productType === ProductType.LPG
+    //               ? nationalData[i - 1].LPG ?? 0
+    //               : productType === ProductType.ICE
+    //                 ? nationalData[i - 1].ICE ?? 0
+    //                 : 0;
 
-        // new price for each product
-        const newPrice =
-          productType === ProductType.AGO
-            ? nationalData[i].AGO ?? 0
-            : productType === ProductType.PMS
-              ? nationalData[i].PMS ?? 0
-              : productType === ProductType.DPK
-                ? nationalData[i].DPK ?? 0
-                : productType === ProductType.LPG
-                  ? nationalData[i].LPG ?? 0
-                  : productType === ProductType.ICE
-                    ? nationalData[i].ICE ?? 0
-                    : 0;
+    //     // new price for each product
+    //     const newPrice =
+    //       productType === ProductType.AGO
+    //         ? nationalData[i].AGO ?? 0
+    //         : productType === ProductType.PMS
+    //           ? nationalData[i].PMS ?? 0
+    //           : productType === ProductType.DPK
+    //             ? nationalData[i].DPK ?? 0
+    //             : productType === ProductType.LPG
+    //               ? nationalData[i].LPG ?? 0
+    //               : productType === ProductType.ICE
+    //                 ? nationalData[i].ICE ?? 0
+    //                 : 0;
 
-        if (newPrice) {
-          nationalResult = ((oldPrice - newPrice) / oldPrice) * 100;
-        }
-      }
-    } else {
-      nationalResult = 0;
-    }
+    //     if (newPrice) {
+    //       nationalResult = ((oldPrice - newPrice) / oldPrice) * 100;
+    //     }
+    //   }
+    // } else {
+    //   nationalResult = 0;
+    // }
 
     /* Result for overall periodic percentage price change */
     const overallPeriodicPriceChgPercent =
@@ -392,8 +392,7 @@ export class PetroDataUtility {
       +SSResult +
       +NEResult +
       +NWResult +
-      +NCResult +
-      +nationalResult / 6;
+      +NCResult / /* +nationalResult */ 6;
 
     /********************** Recent Price Change Calculation **********************/
     /* Today's price - Yesterday's price / 6 */
@@ -409,8 +408,8 @@ export class PetroDataUtility {
       SSData.length > 1 &&
       NEData.length > 1 &&
       NWData.length > 1 &&
-      NCData.length > 1 &&
-      nationalData.length > 1
+      NCData.length > 1
+      // nationalData.length > 1
     ) {
       recentPeriodicPriceChg =
         productType === ProductType.AGO
@@ -425,10 +424,9 @@ export class PetroDataUtility {
               ((NWData.slice(-2)[0]?.AGO ?? 0) -
                 (NWData.slice(-2)[1]?.AGO ?? 0)) +
               ((NCData.slice(-2)[0]?.AGO ?? 0) -
-                (NCData.slice(-2)[1]?.AGO ?? 0)) +
-              ((nationalData.slice(-2)[0]?.AGO ?? 0) -
-                (nationalData.slice(-2)[1]?.AGO ?? 0))) /
-            6
+                (NCData.slice(-2)[1]?.AGO ?? 0))) /
+            /* ((nationalData.slice(-2)[0]?.AGO ?? 0) -
+                (nationalData.slice(-2)[1]?.AGO ?? 0)) */ 6
           : productType === ProductType.PMS
             ? ((SEData.slice(-2)[0]?.PMS ?? 0) -
                 (SEData.slice(-2)[1]?.PMS ?? 0) +
@@ -441,10 +439,9 @@ export class PetroDataUtility {
                 ((NWData.slice(-2)[0]?.PMS ?? 0) -
                   (NWData.slice(-2)[1]?.PMS ?? 0)) +
                 ((NCData.slice(-2)[0]?.PMS ?? 0) -
-                  (NCData.slice(-2)[1]?.PMS ?? 0)) +
-                ((nationalData.slice(-2)[0]?.PMS ?? 0) -
-                  (nationalData.slice(-2)[1]?.PMS ?? 0))) /
-              6
+                  (NCData.slice(-2)[1]?.PMS ?? 0))) /
+              /* ((nationalData.slice(-2)[0]?.PMS ?? 0) -
+                  (nationalData.slice(-2)[1]?.PMS ?? 0)) */ 6
             : productType === ProductType.DPK
               ? ((SEData.slice(-2)[0]?.DPK ?? 0) -
                   (SEData.slice(-2)[1]?.DPK ?? 0) +
@@ -457,10 +454,9 @@ export class PetroDataUtility {
                   ((NWData.slice(-2)[0]?.DPK ?? 0) -
                     (NWData.slice(-2)[1]?.DPK ?? 0)) +
                   ((NCData.slice(-2)[0]?.DPK ?? 0) -
-                    (NCData.slice(-2)[1]?.DPK ?? 0)) +
-                  ((nationalData.slice(-2)[0]?.DPK ?? 0) -
-                    (nationalData.slice(-2)[1]?.DPK ?? 0))) /
-                6
+                    (NCData.slice(-2)[1]?.DPK ?? 0))) /
+                /* ((nationalData.slice(-2)[0]?.DPK ?? 0) -
+                    (nationalData.slice(-2)[1]?.DPK ?? 0)) */ 6
               : productType === ProductType.LPG
                 ? ((SEData.slice(-2)[0]?.LPG ?? 0) -
                     (SEData.slice(-2)[1]?.LPG ?? 0) +
@@ -473,10 +469,9 @@ export class PetroDataUtility {
                     ((NWData.slice(-2)[0]?.LPG ?? 0) -
                       (NWData.slice(-2)[1]?.LPG ?? 0)) +
                     ((NCData.slice(-2)[0]?.LPG ?? 0) -
-                      (NCData.slice(-2)[1]?.LPG ?? 0)) +
-                    ((nationalData.slice(-2)[0]?.LPG ?? 0) -
-                      (nationalData.slice(-2)[1]?.LPG ?? 0))) /
-                  6
+                      (NCData.slice(-2)[1]?.LPG ?? 0))) /
+                  /* ((nationalData.slice(-2)[0]?.LPG ?? 0) -
+                      (nationalData.slice(-2)[1]?.LPG ?? 0)) */ 6
                 : ((SEData.slice(-2)[0]?.ICE ?? 0) -
                     (SEData.slice(-2)[1]?.ICE ?? 0) +
                     ((SWData.slice(-2)[0]?.ICE ?? 0) -
@@ -488,10 +483,9 @@ export class PetroDataUtility {
                     ((NWData.slice(-2)[0]?.ICE ?? 0) -
                       (NWData.slice(-2)[1]?.ICE ?? 0)) +
                     ((NCData.slice(-2)[0]?.ICE ?? 0) -
-                      (NCData.slice(-2)[1]?.ICE ?? 0)) +
-                    ((nationalData.slice(-2)[0]?.ICE ?? 0) -
-                      (nationalData.slice(-2)[1]?.ICE ?? 0))) /
-                  6;
+                      (NCData.slice(-2)[1]?.ICE ?? 0))) /
+                  /* ((nationalData.slice(-2)[0]?.ICE ?? 0) -
+                      (nationalData.slice(-2)[1]?.ICE ?? 0)) */ 6;
     } else {
       recentPeriodicPriceChg = 0;
     }
