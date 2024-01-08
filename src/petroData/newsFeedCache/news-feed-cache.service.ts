@@ -8,8 +8,6 @@ export class NewsFeedCachingService {
 
   /* Method to return the cache data for checks and comparisons before making a request */
   get(key: string, validityPeriod: number = 0): any | undefined {
-    console.log('get_key ******* : ', key);
-
     const cachedData = this.newsFeedCache[key];
     console.log(cachedData);
 

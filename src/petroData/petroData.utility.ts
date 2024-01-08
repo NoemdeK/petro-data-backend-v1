@@ -34,37 +34,7 @@ export class PetroDataUtility {
 
     const analysis = await Promise.all(
       Array.from(regions, async (index: any) => {
-        /* For national */
-        if (index === Regions.NATIONAL) {
-          return product === ProductType.AGO
-            ? await this.petroDataRepository.getNationalPetroDataForAGO(
-                formattedDate,
-                today,
-              )
-            : product === ProductType.PMS
-              ? await this.petroDataRepository.getNationalPetroDataForPMS(
-                  formattedDate,
-                  today,
-                )
-              : product === ProductType.DPK
-                ? await this.petroDataRepository.getNationalPetroDataForDPK(
-                    formattedDate,
-                    today,
-                  )
-                : product === ProductType.LPG
-                  ? await this.petroDataRepository.getNationalPetroDataForLPG(
-                      formattedDate,
-                      today,
-                    )
-                  : product === ProductType.ICE
-                    ? await this.petroDataRepository.getNationalPetroDataForICE(
-                        formattedDate,
-                        today,
-                      )
-                    : [];
-        }
-
-        /* For each regions - SE, SW, SS, NE, NW, NC */
+        /* For each regions - SE, SW, SS, NE, NW, NC, National */
         return product === ProductType.AGO
           ? await this.petroDataRepository.getPeriodicPetroDataForAGO(
               formattedDate,
@@ -135,9 +105,14 @@ export class PetroDataUtility {
       (a: any) => a?.Region == Regions.NORTH_CENTRAL,
     );
 
+    /* Get National data */
+    const nationalData = analysisData.filter(
+      (a: any) => a?.Region == Regions.NATIONAL,
+    );
+
     /********************** Overall Price Change Calculation **********************/
     let SEResult: number;
-    if (SEData.length) {
+    if (SEData.length > 1) {
       for (let i = 1; i < SEData.length; i++) {
         // Old price for each product
         const oldPrice =
@@ -176,7 +151,7 @@ export class PetroDataUtility {
     }
 
     let SWResult: number;
-    if (SWData.length) {
+    if (SWData.length > 1) {
       for (let i = 1; i < SWData.length; i++) {
         // Old price for each product
         const oldPrice =
@@ -215,7 +190,7 @@ export class PetroDataUtility {
     }
 
     let SSResult: number;
-    if (SSData.length) {
+    if (SSData.length > 1) {
       for (let i = 1; i < SSData.length; i++) {
         // Old price for each product
         const oldPrice =
@@ -254,7 +229,7 @@ export class PetroDataUtility {
     }
 
     let NEResult: number;
-    if (NEData.length) {
+    if (NEData.length > 1) {
       for (let i = 1; i < NEData.length; i++) {
         // Old price for each product
         const oldPrice =
@@ -293,7 +268,7 @@ export class PetroDataUtility {
     }
 
     let NWResult: number;
-    if (NWData.length) {
+    if (NWData.length > 1) {
       for (let i = 1; i < NWData.length; i++) {
         // Old price for each product
         const oldPrice =
@@ -332,7 +307,7 @@ export class PetroDataUtility {
     }
 
     let NCResult: number;
-    if (NCData.length) {
+    if (NCData.length > 1) {
       for (let i = 1; i < NCData.length; i++) {
         // Old price for each product
         const oldPrice =
@@ -370,93 +345,160 @@ export class PetroDataUtility {
       NCResult = 0;
     }
 
+    let nationalResult: number;
+    if (nationalData.length > 1) {
+      for (let i = 1; i < nationalData.length; i++) {
+        // Old price for each product
+        const oldPrice =
+          productType === ProductType.AGO
+            ? nationalData[i - 1].AGO ?? 0
+            : productType === ProductType.PMS
+              ? nationalData[i - 1].PMS ?? 0
+              : productType === ProductType.DPK
+                ? nationalData[i - 1].DPK ?? 0
+                : productType === ProductType.LPG
+                  ? nationalData[i - 1].LPG ?? 0
+                  : productType === ProductType.ICE
+                    ? nationalData[i - 1].ICE ?? 0
+                    : 0;
+
+        // new price for each product
+        const newPrice =
+          productType === ProductType.AGO
+            ? nationalData[i].AGO ?? 0
+            : productType === ProductType.PMS
+              ? nationalData[i].PMS ?? 0
+              : productType === ProductType.DPK
+                ? nationalData[i].DPK ?? 0
+                : productType === ProductType.LPG
+                  ? nationalData[i].LPG ?? 0
+                  : productType === ProductType.ICE
+                    ? nationalData[i].ICE ?? 0
+                    : 0;
+
+        if (newPrice) {
+          nationalResult = ((oldPrice - newPrice) / oldPrice) * 100;
+        }
+      }
+    } else {
+      nationalResult = 0;
+    }
+
     /* Result for overall periodic percentage price change */
     const overallPeriodicPriceChgPercent =
-      (+SEResult +
-        +SWResult +
-        +SWResult +
-        +SSResult +
-        +NEResult +
-        +NWResult +
-        +NCResult) /
-      6;
+      +SEResult +
+      +SWResult +
+      +SWResult +
+      +SSResult +
+      +NEResult +
+      +NWResult +
+      +NCResult +
+      +nationalResult / 6;
 
     /********************** Recent Price Change Calculation **********************/
     /* Today's price - Yesterday's price / 6 */
-    const recentPeriodicPriceChgPercent =
-      productType === ProductType.AGO
-        ? ((SEData.slice(-2)[0]?.AGO ?? 0) -
-            (SEData.slice(-2)[1]?.AGO ?? 0) +
-            ((SWData.slice(-2)[0]?.AGO ?? 0) -
-              (SWData.slice(-2)[1]?.AGO ?? 0)) +
-            ((SSData.slice(-2)[0]?.AGO ?? 0) -
-              (SSData.slice(-2)[1]?.AGO ?? 0)) +
-            ((NEData.slice(-2)[0]?.AGO ?? 0) -
-              (NEData.slice(-2)[1]?.AGO ?? 0)) +
-            ((NWData.slice(-2)[0]?.AGO ?? 0) -
-              (NWData.slice(-2)[1]?.AGO ?? 0)) +
-            ((NCData.slice(-2)[0]?.AGO ?? 0) -
-              (NCData.slice(-2)[1]?.AGO ?? 0))) /
-          6
-        : productType === ProductType.PMS
-          ? ((SEData.slice(-2)[0]?.PMS ?? 0) -
-              (SEData.slice(-2)[1]?.PMS ?? 0) +
-              ((SWData.slice(-2)[0]?.PMS ?? 0) -
-                (SWData.slice(-2)[1]?.PMS ?? 0)) +
-              ((SSData.slice(-2)[0]?.PMS ?? 0) -
-                (SSData.slice(-2)[1]?.PMS ?? 0)) +
-              ((NEData.slice(-2)[0]?.PMS ?? 0) -
-                (NEData.slice(-2)[1]?.PMS ?? 0)) +
-              ((NWData.slice(-2)[0]?.PMS ?? 0) -
-                (NWData.slice(-2)[1]?.PMS ?? 0)) +
-              ((NCData.slice(-2)[0]?.PMS ?? 0) -
-                (NCData.slice(-2)[1]?.PMS ?? 0))) /
+
+    let recentPeriodicPriceChg;
+
+    /* If the data peovided for the regions is not more than two, then there is no recent change in the data */
+    /* Hence, the recent change in price is 0 */
+    /* This is because for us to calculate the recent periodic price, we must have yesterday's and today's prices */
+    if (
+      SEData.length > 1 &&
+      SWData.length > 1 &&
+      SSData.length > 1 &&
+      NEData.length > 1 &&
+      NWData.length > 1 &&
+      NCData.length > 1 &&
+      nationalData.length > 1
+    ) {
+      recentPeriodicPriceChg =
+        productType === ProductType.AGO
+          ? ((SEData.slice(-2)[0]?.AGO ?? 0) -
+              (SEData.slice(-2)[1]?.AGO ?? 0) +
+              ((SWData.slice(-2)[0]?.AGO ?? 0) -
+                (SWData.slice(-2)[1]?.AGO ?? 0)) +
+              ((SSData.slice(-2)[0]?.AGO ?? 0) -
+                (SSData.slice(-2)[1]?.AGO ?? 0)) +
+              ((NEData.slice(-2)[0]?.AGO ?? 0) -
+                (NEData.slice(-2)[1]?.AGO ?? 0)) +
+              ((NWData.slice(-2)[0]?.AGO ?? 0) -
+                (NWData.slice(-2)[1]?.AGO ?? 0)) +
+              ((NCData.slice(-2)[0]?.AGO ?? 0) -
+                (NCData.slice(-2)[1]?.AGO ?? 0)) +
+              ((nationalData.slice(-2)[0]?.AGO ?? 0) -
+                (nationalData.slice(-2)[1]?.AGO ?? 0))) /
             6
-          : productType === ProductType.DPK
-            ? ((SEData.slice(-2)[0]?.DPK ?? 0) -
-                (SEData.slice(-2)[1]?.DPK ?? 0) +
-                ((SWData.slice(-2)[0]?.DPK ?? 0) -
-                  (SWData.slice(-2)[1]?.DPK ?? 0)) +
-                ((SSData.slice(-2)[0]?.DPK ?? 0) -
-                  (SSData.slice(-2)[1]?.DPK ?? 0)) +
-                ((NEData.slice(-2)[0]?.DPK ?? 0) -
-                  (NEData.slice(-2)[1]?.DPK ?? 0)) +
-                ((NWData.slice(-2)[0]?.DPK ?? 0) -
-                  (NWData.slice(-2)[1]?.DPK ?? 0)) +
-                ((NCData.slice(-2)[0]?.DPK ?? 0) -
-                  (NCData.slice(-2)[1]?.DPK ?? 0))) /
+          : productType === ProductType.PMS
+            ? ((SEData.slice(-2)[0]?.PMS ?? 0) -
+                (SEData.slice(-2)[1]?.PMS ?? 0) +
+                ((SWData.slice(-2)[0]?.PMS ?? 0) -
+                  (SWData.slice(-2)[1]?.PMS ?? 0)) +
+                ((SSData.slice(-2)[0]?.PMS ?? 0) -
+                  (SSData.slice(-2)[1]?.PMS ?? 0)) +
+                ((NEData.slice(-2)[0]?.PMS ?? 0) -
+                  (NEData.slice(-2)[1]?.PMS ?? 0)) +
+                ((NWData.slice(-2)[0]?.PMS ?? 0) -
+                  (NWData.slice(-2)[1]?.PMS ?? 0)) +
+                ((NCData.slice(-2)[0]?.PMS ?? 0) -
+                  (NCData.slice(-2)[1]?.PMS ?? 0)) +
+                ((nationalData.slice(-2)[0]?.PMS ?? 0) -
+                  (nationalData.slice(-2)[1]?.PMS ?? 0))) /
               6
-            : productType === ProductType.LPG
-              ? ((SEData.slice(-2)[0]?.LPG ?? 0) -
-                  (SEData.slice(-2)[1]?.LPG ?? 0) +
-                  ((SWData.slice(-2)[0]?.LPG ?? 0) -
-                    (SWData.slice(-2)[1]?.LPG ?? 0)) +
-                  ((SSData.slice(-2)[0]?.LPG ?? 0) -
-                    (SSData.slice(-2)[1]?.LPG ?? 0)) +
-                  ((NEData.slice(-2)[0]?.LPG ?? 0) -
-                    (NEData.slice(-2)[1]?.LPG ?? 0)) +
-                  ((NWData.slice(-2)[0]?.LPG ?? 0) -
-                    (NWData.slice(-2)[1]?.LPG ?? 0)) +
-                  ((NCData.slice(-2)[0]?.LPG ?? 0) -
-                    (NCData.slice(-2)[1]?.LPG ?? 0))) /
+            : productType === ProductType.DPK
+              ? ((SEData.slice(-2)[0]?.DPK ?? 0) -
+                  (SEData.slice(-2)[1]?.DPK ?? 0) +
+                  ((SWData.slice(-2)[0]?.DPK ?? 0) -
+                    (SWData.slice(-2)[1]?.DPK ?? 0)) +
+                  ((SSData.slice(-2)[0]?.DPK ?? 0) -
+                    (SSData.slice(-2)[1]?.DPK ?? 0)) +
+                  ((NEData.slice(-2)[0]?.DPK ?? 0) -
+                    (NEData.slice(-2)[1]?.DPK ?? 0)) +
+                  ((NWData.slice(-2)[0]?.DPK ?? 0) -
+                    (NWData.slice(-2)[1]?.DPK ?? 0)) +
+                  ((NCData.slice(-2)[0]?.DPK ?? 0) -
+                    (NCData.slice(-2)[1]?.DPK ?? 0)) +
+                  ((nationalData.slice(-2)[0]?.DPK ?? 0) -
+                    (nationalData.slice(-2)[1]?.DPK ?? 0))) /
                 6
-              : ((SEData.slice(-2)[0]?.ICE ?? 0) -
-                  (SEData.slice(-2)[1]?.ICE ?? 0) +
-                  ((SWData.slice(-2)[0]?.ICE ?? 0) -
-                    (SWData.slice(-2)[1]?.ICE ?? 0)) +
-                  ((SSData.slice(-2)[0]?.ICE ?? 0) -
-                    (SSData.slice(-2)[1]?.ICE ?? 0)) +
-                  ((NEData.slice(-2)[0]?.ICE ?? 0) -
-                    (NEData.slice(-2)[1]?.ICE ?? 0)) +
-                  ((NWData.slice(-2)[0]?.ICE ?? 0) -
-                    (NWData.slice(-2)[1]?.ICE ?? 0)) +
-                  ((NCData.slice(-2)[0]?.ICE ?? 0) -
-                    (NCData.slice(-2)[1]?.ICE ?? 0))) /
-                6;
+              : productType === ProductType.LPG
+                ? ((SEData.slice(-2)[0]?.LPG ?? 0) -
+                    (SEData.slice(-2)[1]?.LPG ?? 0) +
+                    ((SWData.slice(-2)[0]?.LPG ?? 0) -
+                      (SWData.slice(-2)[1]?.LPG ?? 0)) +
+                    ((SSData.slice(-2)[0]?.LPG ?? 0) -
+                      (SSData.slice(-2)[1]?.LPG ?? 0)) +
+                    ((NEData.slice(-2)[0]?.LPG ?? 0) -
+                      (NEData.slice(-2)[1]?.LPG ?? 0)) +
+                    ((NWData.slice(-2)[0]?.LPG ?? 0) -
+                      (NWData.slice(-2)[1]?.LPG ?? 0)) +
+                    ((NCData.slice(-2)[0]?.LPG ?? 0) -
+                      (NCData.slice(-2)[1]?.LPG ?? 0)) +
+                    ((nationalData.slice(-2)[0]?.LPG ?? 0) -
+                      (nationalData.slice(-2)[1]?.LPG ?? 0))) /
+                  6
+                : ((SEData.slice(-2)[0]?.ICE ?? 0) -
+                    (SEData.slice(-2)[1]?.ICE ?? 0) +
+                    ((SWData.slice(-2)[0]?.ICE ?? 0) -
+                      (SWData.slice(-2)[1]?.ICE ?? 0)) +
+                    ((SSData.slice(-2)[0]?.ICE ?? 0) -
+                      (SSData.slice(-2)[1]?.ICE ?? 0)) +
+                    ((NEData.slice(-2)[0]?.ICE ?? 0) -
+                      (NEData.slice(-2)[1]?.ICE ?? 0)) +
+                    ((NWData.slice(-2)[0]?.ICE ?? 0) -
+                      (NWData.slice(-2)[1]?.ICE ?? 0)) +
+                    ((NCData.slice(-2)[0]?.ICE ?? 0) -
+                      (NCData.slice(-2)[1]?.ICE ?? 0)) +
+                    ((nationalData.slice(-2)[0]?.ICE ?? 0) -
+                      (nationalData.slice(-2)[1]?.ICE ?? 0))) /
+                  6;
+    } else {
+      recentPeriodicPriceChg = 0;
+    }
 
     return {
       overall: +overallPeriodicPriceChgPercent.toFixed(2),
-      recent: +recentPeriodicPriceChgPercent.toFixed(2),
+      recent: +recentPeriodicPriceChg.toFixed(2),
     };
   };
 

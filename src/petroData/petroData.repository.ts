@@ -106,33 +106,6 @@ export class PetroDataRepository {
   }
 
   /**
-   * @Responsibility: Repo for retrieving national petro data for AGO
-   *
-   * @param data
-   *
-   * @returns {any}
-   */
-
-  async getNationalPetroDataForAGO(
-    formattedDate?: string,
-    today?: string,
-  ): Promise<PetroDataDocument[]> {
-    try {
-      return await this.petroDataModel
-        .find({
-          Period: {
-            $gte: formattedDate,
-            $lt: today,
-          },
-        })
-        .select('_id Period AGO Region')
-        .lean();
-    } catch (error) {
-      throw new Error(error?.messsage);
-    }
-  }
-
-  /**
    * @Responsibility: Repo for retrieving periodic petro data for PMS
    *
    * @param data
@@ -153,33 +126,6 @@ export class PetroDataRepository {
             $lt: today,
           },
           Region: regionIndex,
-        })
-        .select('_id Period PMS Region')
-        .lean();
-    } catch (error) {
-      throw new Error(error?.messsage);
-    }
-  }
-
-  /**
-   * @Responsibility: Repo for retrieving national petro data for PMS
-   *
-   * @param data
-   *
-   * @returns {any}
-   */
-
-  async getNationalPetroDataForPMS(
-    formattedDate?: string,
-    today?: string,
-  ): Promise<PetroDataDocument[]> {
-    try {
-      return await this.petroDataModel
-        .find({
-          Period: {
-            $gte: formattedDate,
-            $lt: today,
-          },
         })
         .select('_id Period PMS Region')
         .lean();
@@ -218,33 +164,6 @@ export class PetroDataRepository {
   }
 
   /**
-   * @Responsibility: Repo for retrieving national petro data for DPK
-   *
-   * @param data
-   *
-   * @returns {any}
-   */
-
-  async getNationalPetroDataForDPK(
-    formattedDate?: string,
-    today?: string,
-  ): Promise<PetroDataDocument[]> {
-    try {
-      return await this.petroDataModel
-        .find({
-          Period: {
-            $gte: formattedDate,
-            $lt: today,
-          },
-        })
-        .select('_id Period DPK Region')
-        .lean();
-    } catch (error) {
-      throw new Error(error?.messsage);
-    }
-  }
-
-  /**
    * @Responsibility: Repo for retrieving periodic petro data for LPG
    *
    * @param data
@@ -274,33 +193,6 @@ export class PetroDataRepository {
   }
 
   /**
-   * @Responsibility: Repo for retrieving national petro data for LPG
-   *
-   * @param data
-   *
-   * @returns {any}
-   */
-
-  async getNationalPetroDataForLPG(
-    formattedDate?: string,
-    today?: string,
-  ): Promise<PetroDataDocument[]> {
-    try {
-      return await this.petroDataModel
-        .find({
-          Period: {
-            $gte: formattedDate,
-            $lt: today,
-          },
-        })
-        .select('_id Period LPG Region')
-        .lean();
-    } catch (error) {
-      throw new Error(error?.messsage);
-    }
-  }
-
-  /**
    * @Responsibility: Repo for retrieving periodic petro data for ICE
    *
    * @param data
@@ -321,33 +213,6 @@ export class PetroDataRepository {
             $lt: today,
           },
           Region: regionIndex,
-        })
-        .select('_id Period ICE Region')
-        .lean();
-    } catch (error) {
-      throw new Error(error?.messsage);
-    }
-  }
-
-  /**
-   * @Responsibility: Repo for retrieving national petro data for ICE
-   *
-   * @param data
-   *
-   * @returns {any}
-   */
-
-  async getNationalPetroDataForICE(
-    formattedDate?: string,
-    today?: string,
-  ): Promise<PetroDataDocument[]> {
-    try {
-      return await this.petroDataModel
-        .find({
-          Period: {
-            $gte: formattedDate,
-            $lt: today,
-          },
         })
         .select('_id Period ICE Region')
         .lean();
