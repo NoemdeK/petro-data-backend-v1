@@ -18,12 +18,13 @@ export class JobService {
   // @Cron(CronExpression.EVERY_DAY_AT_NOON)
   async aggregateDataEntryValues() {
     try {
-      const startOfDay = moment().startOf('day');
-      const endOfDay = moment().endOf('day');
+      /* Since data entry will be uploaded a day ahead */
+      const startOfYesterday = moment().subtract(1, 'days').startOf('day');
+      const endOfYesterday = moment().subtract(1, 'days').endOf('day');
 
       /* Get all the approved data entries submiited for the day */
       const theDataEnt = await this.dataEntryRepository.getMutipleDataEntry({
-        priceDate: { $gte: startOfDay, $lt: endOfDay },
+        priceDate: { $gte: startOfYesterday, $lt: endOfYesterday },
         status: DataEntryStatus.APPROVED,
       });
 
