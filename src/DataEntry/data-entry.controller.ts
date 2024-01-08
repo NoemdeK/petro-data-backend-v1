@@ -42,7 +42,7 @@ export class DataEntryController {
   }
 
   @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.RWX_ADMIN)
+  @Roles(Role.RWX_ADMIN, Role.RWX_DATA_ENTRY_USER)
   @Get('/retrieve')
   async retrieveDataEntry(
     @Req() req: any,
@@ -70,7 +70,7 @@ export class DataEntryController {
 
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Patch('/actions')
-  @Roles(Role.RWX_ADMIN)
+  @Roles(Role.RWX_ADMIN, Role.RWX_DATA_ENTRY_USER)
   async dataEntryActions(
     @Req() req: any,
     @Res() res: Response,

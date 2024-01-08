@@ -46,6 +46,23 @@ export class DataEntryRepository {
   }
 
   /**
+   * @Responsibility: Repo for fetching multiple data entry doc
+   *
+   * @param data
+   * @returns {Promise<DataEntryDocument>}
+   */
+
+  async getMutipleDataEntry(
+    where: PropDataInput,
+  ): Promise<DataEntryDocument[]> {
+    try {
+      return await this.dataEntryModel.find(where).lean();
+    } catch (error) {
+      throw new Error(error?.messsage);
+    }
+  }
+
+  /**
    * @Responsibility: Repo for updating data entry
    *
    * @param data
@@ -69,12 +86,12 @@ export class DataEntryRepository {
    * @returns {Promise<DataEntryDocument>}
    */
 
-  async retrieveDataEntry({
+  async retrieveDataEntry<T>({
     batch,
     search,
     filter,
     flag,
-  }: Partial<RetrieveDataEntry>): Promise<any> {
+  }: Partial<RetrieveDataEntry>): Promise<{ data: T[]; count: number }> {
     try {
       let data,
         query =

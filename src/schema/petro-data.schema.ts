@@ -8,7 +8,7 @@ export type PetroDataDocument = PetroData & Document;
 
 @Schema()
 export class PetroData {
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false, default: null })
   State: string;
 
   @Prop({ type: String, required: true })
@@ -32,7 +32,7 @@ export class PetroData {
   @Prop({ type: String, required: true })
   Region: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false, default: null })
   userId: string;
 
   @Prop({ default: () => moment().utc().toDate(), type: Date })

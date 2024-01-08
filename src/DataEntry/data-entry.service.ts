@@ -92,12 +92,13 @@ export class DataEntryService {
         });
       }
 
-      const { data, count } = await this.dataEntryRepository.retrieveDataEntry({
-        batch,
-        search,
-        filter,
-        flag,
-      });
+      const { data, count } =
+        await this.dataEntryRepository.retrieveDataEntry<object>({
+          batch,
+          search,
+          filter,
+          flag,
+        });
 
       const result = await Promise.all(
         Array.from(data, async (index: any) => {
@@ -133,10 +134,12 @@ export class DataEntryService {
                 : null,
             status: index?.status,
             fillingStation: index?.fillingStation,
+            supportingDocument: index?.supportingDocument,
             state: index?.state,
             region: index?.region,
             product: index?.product,
             price: index?.price,
+
             dateSubmitted: this.dataEntryUtility.customDateFormat(
               new Date(index?.createdAt),
             ),
@@ -163,8 +166,6 @@ export class DataEntryService {
     try {
       const { flag, entryId, dataEntryApproverId, rejectionReason } =
         dataEntryActionsDto;
-
-      console.log(dataEntryActionsDto);
 
       if (
         flag !== DataEntryActions.APPROVE &&

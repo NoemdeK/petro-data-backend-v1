@@ -43,194 +43,194 @@ export class PetroDataService {
 
   private readonly logger = new Logger(PetroDataService.name);
 
-  /**
-   * @Responsibility: dedicated service for creating petro data
-   *
-   * @param createPetroDataDto
-   *
-   * @returns {Promise<any>}
-   */
+  // /**
+  //  * @Responsibility: dedicated service for creating petro data
+  //  *
+  //  * @param createPetroDataDto
+  //  *
+  //  * @returns {Promise<any>}
+  //  */
 
-  async createPetroData(createPetroDataDto: CreatePetroDataDto): Promise<any> {
-    try {
-      const { state, period, products, region, userId, photoUrl } =
-        createPetroDataDto;
-      const productAvg: Record<string, number> = {};
+  // async createPetroData(createPetroDataDto: CreatePetroDataDto): Promise<any> {
+  //   try {
+  //     const { state, period, products, region, userId, photoUrl } =
+  //       createPetroDataDto;
+  //     const productAvg: Record<string, number> = {};
 
-      const data = Object.keys(products);
+  //     const data = Object.keys(products);
 
-      const theLength: number = data.length;
-      for (let i = 0; i < theLength; i++) {
-        const eachProduct = products[data[i]];
-        const keys = ['nnpc', 'total', 'private'];
+  //     const theLength: number = data.length;
+  //     for (let i = 0; i < theLength; i++) {
+  //       const eachProduct = products[data[i]];
+  //       const keys = ['nnpc', 'total', 'private'];
 
-        const sum = keys.reduce((acc, key) => acc + eachProduct[key], 0);
-        const average = +sum / +keys.length;
+  //       const sum = keys.reduce((acc, key) => acc + eachProduct[key], 0);
+  //       const average = +sum / +keys.length;
 
-        productAvg[data[i]] = +average.toFixed(2);
-      }
+  //       productAvg[data[i]] = +average.toFixed(2);
+  //     }
 
-      const formattedPeriodDate = moment(period, 'D-MMM-YY').format(
-        'YYYY-MM-DD',
-      );
+  //     const formattedPeriodDate = moment(period, 'D-MMM-YY').format(
+  //       'YYYY-MM-DD',
+  //     );
 
-      function createData() {
-        return {
-          State: state,
-          Period: formattedPeriodDate,
-          PMS: productAvg?.PMS,
-          AGO: productAvg?.AGO,
-          LPG: productAvg?.LPG,
-          DPK: productAvg?.DPK,
-          ICE: productAvg?.ICE,
-          Region: region,
-          userId,
-        };
-      }
+  //     function createData() {
+  //       return {
+  //         State: state,
+  //         Period: formattedPeriodDate,
+  //         PMS: productAvg?.PMS,
+  //         AGO: productAvg?.AGO,
+  //         LPG: productAvg?.LPG,
+  //         DPK: productAvg?.DPK,
+  //         ICE: productAvg?.ICE,
+  //         Region: region,
+  //         userId,
+  //       };
+  //     }
 
-      await Promise.all([
-        this.petroDataRepository.createPetroData(createData()),
-      ]);
-      return;
-    } catch (error) {
-      error.location = `PetroDataServices.${this.createPetroData.name} method`;
-      AppResponse.error(error);
-    }
-  }
+  //     await Promise.all([
+  //       this.petroDataRepository.createPetroData(createData()),
+  //     ]);
+  //     return;
+  //   } catch (error) {
+  //     error.location = `PetroDataServices.${this.createPetroData.name} method`;
+  //     AppResponse.error(error);
+  //   }
+  // }
 
-  /**
-   * @Responsibility: dedicated service for uploading csv/xlsx files into the database
-   *
-   * @param file
-   * @param configFileBuffer
-   *
-   * @returns {Promise<any>}
-   */
+  // /**
+  //  * @Responsibility: dedicated service for uploading csv/xlsx files into the database
+  //  *
+  //  * @param file
+  //  * @param configFileBuffer
+  //  *
+  //  * @returns {Promise<any>}
+  //  */
 
-  async uploadFilesIntoDb({
-    file,
-    photo,
-    configFileBuffer,
-    configPhotoBuffer,
-    userId,
-  }): Promise<any> {
-    try {
-      if (!file) {
-        AppResponse.error({
-          message: 'Please input file',
-          status: HttpStatus.BAD_REQUEST,
-        });
-      }
+  // async uploadFilesIntoDb({
+  //   file,
+  //   photo,
+  //   configFileBuffer,
+  //   configPhotoBuffer,
+  //   userId,
+  // }): Promise<any> {
+  //   try {
+  //     if (!file) {
+  //       AppResponse.error({
+  //         message: 'Please input file',
+  //         status: HttpStatus.BAD_REQUEST,
+  //       });
+  //     }
 
-      const fileExtType = file.originalname.split('.')[1];
+  //     const fileExtType = file.originalname.split('.')[1];
 
-      function readFileStream() {
-        const readableStream = new Readable();
-        readableStream.push(configFileBuffer);
-        readableStream.push(null);
+  //     function readFileStream() {
+  //       const readableStream = new Readable();
+  //       readableStream.push(configFileBuffer);
+  //       readableStream.push(null);
 
-        return readableStream;
-      }
+  //       return readableStream;
+  //     }
 
-      /************************** CSV File Extension  ********************************/
-      if (fileExtType === FileExtensionType.CSV) {
-        let readableStream = readFileStream();
+  //     /************************** CSV File Extension  ********************************/
+  //     if (fileExtType === FileExtensionType.CSV) {
+  //       let readableStream = readFileStream();
 
-        const jsonData = [];
+  //       const jsonData = [];
 
-        // CSV parsing stream
-        readableStream
-          .pipe(csvParser())
-          .on('data', (data) => {
-            jsonData.push(data);
-          })
-          .on('end', () => {
-            // Process and store data
-            jsonData.forEach(async (data) => {
-              try {
-                const formattedPeriodDate = moment(
-                  data.Period,
-                  'D-MMM-YY',
-                ).format('YYYY-MM-DD');
+  //       // CSV parsing stream
+  //       readableStream
+  //         .pipe(csvParser())
+  //         .on('data', (data) => {
+  //           jsonData.push(data);
+  //         })
+  //         .on('end', () => {
+  //           // Process and store data
+  //           jsonData.forEach(async (data) => {
+  //             try {
+  //               const formattedPeriodDate = moment(
+  //                 data.Period,
+  //                 'D-MMM-YY',
+  //               ).format('YYYY-MM-DD');
 
-                function csvUploadData() {
-                  return {
-                    State: data['State '] ?? data['State'],
-                    Day: data?.Day ?? null,
-                    Year: data['Year '] ?? data['Year'],
-                    Month: data['Month '] ?? data['Month'],
-                    Period: moment(formattedPeriodDate).format('YYYY-MM-DD'),
-                    AGO: data?.AGO ?? null,
-                    PMS: data?.PMS ?? null,
-                    DPK: data?.DPK ?? null,
-                    LPG: data?.LPG ?? null,
-                    ICE: data['ICE Brent Crude Oil'] ?? null,
-                    Region: data?.Region,
-                    userId,
-                  };
-                }
+  //               function csvUploadData() {
+  //                 return {
+  //                   State: data['State '] ?? data['State'],
+  //                   Day: data?.Day ?? null,
+  //                   Year: data['Year '] ?? data['Year'],
+  //                   Month: data['Month '] ?? data['Month'],
+  //                   Period: moment(formattedPeriodDate).format('YYYY-MM-DD'),
+  //                   AGO: data?.AGO ?? null,
+  //                   PMS: data?.PMS ?? null,
+  //                   DPK: data?.DPK ?? null,
+  //                   LPG: data?.LPG ?? null,
+  //                   ICE: data['ICE Brent Crude Oil'] ?? null,
+  //                   Region: data?.Region,
+  //                   userId,
+  //                 };
+  //               }
 
-                await this.petroDataRepository.createPetroData(csvUploadData());
-              } catch (error) {
-                this.logger.log('Error processing data:', error);
-              }
-            });
+  //               await this.petroDataRepository.createPetroData(csvUploadData());
+  //             } catch (error) {
+  //               this.logger.log('Error processing data:', error);
+  //             }
+  //           });
 
-            this.logger.log('Data processing complete');
-          });
-      }
+  //           this.logger.log('Data processing complete');
+  //         });
+  //     }
 
-      /************************** XLSX File Extension  ********************************/
-      if (fileExtType === FileExtensionType.XLSX) {
-        // Read XLSX file using streams
-        let readableStream = readFileStream();
+  //     /************************** XLSX File Extension  ********************************/
+  //     if (fileExtType === FileExtensionType.XLSX) {
+  //       // Read XLSX file using streams
+  //       let readableStream = readFileStream();
 
-        const xlsx_workbook = new exceljs.Workbook();
+  //       const xlsx_workbook = new exceljs.Workbook();
 
-        readableStream.on('end', async () => {
-          // Process and store data
-          const jsonData = [];
+  //       readableStream.on('end', async () => {
+  //         // Process and store data
+  //         const jsonData = [];
 
-          xlsx_workbook.eachSheet((worksheet, sheetId) => {
-            const sheetData = [];
-            worksheet.eachRow((row, rowNumber) => {
-              if (rowNumber !== 1) {
-                // Skip header row
-                const rowData = {};
-                row.eachCell((cell, colNumber) => {
-                  // Assuming header names are unique, use them as keys
-                  const header = String(
-                    worksheet.getRow(1).getCell(colNumber).value,
-                  );
-                  rowData[header] = String(cell.value); // Explicitly cast to string
-                });
-                sheetData.push(rowData);
-              }
-            });
-            jsonData.push(...sheetData);
-          });
-          // Process and store data
-          jsonData.forEach(async (data) => {
-            try {
-              if (data?.Period) {
-                data.Period = moment(data?.Period, 'DD-MMM-YY').toISOString();
-              }
-              data.userId = userId;
-              await this.petroDataRepository.createPetroData(data);
-            } catch (error) {
-              this.logger.log('Error processing data:', error.message);
-            }
-          });
-          this.logger.log('Data processing complete');
-        });
-      }
+  //         xlsx_workbook.eachSheet((worksheet, sheetId) => {
+  //           const sheetData = [];
+  //           worksheet.eachRow((row, rowNumber) => {
+  //             if (rowNumber !== 1) {
+  //               // Skip header row
+  //               const rowData = {};
+  //               row.eachCell((cell, colNumber) => {
+  //                 // Assuming header names are unique, use them as keys
+  //                 const header = String(
+  //                   worksheet.getRow(1).getCell(colNumber).value,
+  //                 );
+  //                 rowData[header] = String(cell.value); // Explicitly cast to string
+  //               });
+  //               sheetData.push(rowData);
+  //             }
+  //           });
+  //           jsonData.push(...sheetData);
+  //         });
+  //         // Process and store data
+  //         jsonData.forEach(async (data) => {
+  //           try {
+  //             if (data?.Period) {
+  //               data.Period = moment(data?.Period, 'DD-MMM-YY').toISOString();
+  //             }
+  //             data.userId = userId;
+  //             await this.petroDataRepository.createPetroData(data);
+  //           } catch (error) {
+  //             this.logger.log('Error processing data:', error.message);
+  //           }
+  //         });
+  //         this.logger.log('Data processing complete');
+  //       });
+  //     }
 
-      return;
-    } catch (error) {
-      error.location = `PetroDataServices.${this.uploadFilesIntoDb.name} method`;
-      AppResponse.error(error);
-    }
-  }
+  //     return;
+  //   } catch (error) {
+  //     error.location = `PetroDataServices.${this.uploadFilesIntoDb.name} method`;
+  //     AppResponse.error(error);
+  //   }
+  // }
 
   /**
    * @Responsibility: dedicated service for retrieving petro data analysis
@@ -1535,49 +1535,49 @@ export class PetroDataService {
       };
 
       const AGOCurrentPrice =
-        (+AGODataByRegion.SE +
-          +AGODataByRegion.SW +
-          +AGODataByRegion.SS +
-          +AGODataByRegion.NE +
-          +AGODataByRegion.NW +
-          +AGODataByRegion.NC) /
-        6;
+        (+AGODataByRegion.SE ??
+          0 + +AGODataByRegion.SW ??
+          0 + +AGODataByRegion.SS ??
+          0 + +AGODataByRegion.NE ??
+          0 + +AGODataByRegion.NW ??
+          0 + +AGODataByRegion.NC ??
+          0) / 6;
 
       const PMSCurrentPrice =
-        (+PMSDataByRegion.SE +
-          +PMSDataByRegion.SW +
-          +PMSDataByRegion.SS +
-          +PMSDataByRegion.NE +
-          +PMSDataByRegion.NW +
-          +PMSDataByRegion.NC) /
-        6;
+        (+PMSDataByRegion.SE ??
+          0 + +PMSDataByRegion.SW ??
+          0 + +PMSDataByRegion.SS ??
+          0 + +PMSDataByRegion.NE ??
+          0 + +PMSDataByRegion.NW ??
+          0 + +PMSDataByRegion.NC ??
+          0) / 6;
 
       const DPKCurrentPrice =
-        (+DPKDataByRegion.SE +
-          +DPKDataByRegion.SW +
-          +DPKDataByRegion.SS +
-          +DPKDataByRegion.NE +
-          +DPKDataByRegion.NW +
-          +DPKDataByRegion.NC) /
-        6;
+        (+DPKDataByRegion.SE ??
+          0 + +DPKDataByRegion.SW ??
+          0 + +DPKDataByRegion.SS ??
+          0 + +DPKDataByRegion.NE ??
+          0 + +DPKDataByRegion.NW ??
+          0 + +DPKDataByRegion.NC ??
+          0) / 6;
 
       const LPGCurrentPrice =
-        (+LPGDataByRegion.SE +
-          +LPGDataByRegion.SW +
-          +LPGDataByRegion.SS +
-          +LPGDataByRegion.NE +
-          +LPGDataByRegion.NW +
-          +LPGDataByRegion.NC) /
-        6;
+        (+LPGDataByRegion.SE ??
+          0 + +LPGDataByRegion.SW ??
+          0 + +LPGDataByRegion.SS ??
+          0 + +LPGDataByRegion.NE ??
+          0 + +LPGDataByRegion.NW ??
+          0 + +LPGDataByRegion.NC ??
+          0) / 6;
 
       const ICECurrentPrice =
-        (+ICEDataByRegion.SE +
-          +ICEDataByRegion.SW +
-          +ICEDataByRegion.SS +
-          +ICEDataByRegion.NE +
-          +ICEDataByRegion.NW +
-          +ICEDataByRegion.NC) /
-        6;
+        (+ICEDataByRegion.SE ??
+          0 + +ICEDataByRegion.SW ??
+          0 + +ICEDataByRegion.SS ??
+          0 + +ICEDataByRegion.NE ??
+          0 + +ICEDataByRegion.NW ??
+          0 + +ICEDataByRegion.NC ??
+          0) / 6;
 
       /* Calculate the difference in last two prices for all products in every region */
 
@@ -1623,50 +1623,71 @@ export class PetroDataService {
         2,
       );
 
-      const recentAGOPriceChg =
-        (SERecentPriceData[0].AGO ?? 0) -
-        (SERecentPriceData[1].AGO ?? 0) +
-        ((SWRecentPriceData[0].AGO ?? 0) - (SWRecentPriceData[1].AGO ?? 0)) +
-        ((SSRecentPriceData[0].AGO ?? 0) - (SSRecentPriceData[1].AGO ?? 0)) +
-        ((NERecentPriceData[0].AGO ?? 0) - (NERecentPriceData[1].AGO ?? 0)) +
-        ((NWRecentPriceData[0].AGO ?? 0) - (NWRecentPriceData[1].AGO ?? 0)) +
-        ((NCRecentPriceData[0].AGO ?? 0) - (NCRecentPriceData[1].AGO ?? 0));
+      let recentAGOPriceChg,
+        recentPMSPriceChg,
+        recentDPKPriceChg,
+        recentLPGPriceChg,
+        recentICEPriceChg;
 
-      const recentPMSPriceChg =
-        (SERecentPriceData[0].PMS ?? 0) -
-        (SERecentPriceData[1].PMS ?? 0) +
-        ((SWRecentPriceData[0].PMS ?? 0) - (SWRecentPriceData[1].PMS ?? 0)) +
-        ((SSRecentPriceData[0].PMS ?? 0) - (SSRecentPriceData[1].PMS ?? 0)) +
-        ((NERecentPriceData[0].PMS ?? 0) - (NERecentPriceData[1].PMS ?? 0)) +
-        ((NWRecentPriceData[0].PMS ?? 0) - (NWRecentPriceData[1].PMS ?? 0)) +
-        ((NCRecentPriceData[0].PMS ?? 0) - (NCRecentPriceData[1].PMS ?? 0));
+      if (
+        SERecentPriceData.length > 1 &&
+        SWRecentPriceData.length > 1 &&
+        SSRecentPriceData.length > 1 &&
+        NERecentPriceData.length > 1 &&
+        NWRecentPriceData.length > 1 &&
+        NCRecentPriceData.length > 1
+      ) {
+        recentAGOPriceChg =
+          (SERecentPriceData[0].AGO ?? 0) -
+          (SERecentPriceData[1].AGO ?? 0) +
+          ((SWRecentPriceData[0].AGO ?? 0) - (SWRecentPriceData[1].AGO ?? 0)) +
+          ((SSRecentPriceData[0].AGO ?? 0) - (SSRecentPriceData[1].AGO ?? 0)) +
+          ((NERecentPriceData[0].AGO ?? 0) - (NERecentPriceData[1].AGO ?? 0)) +
+          ((NWRecentPriceData[0].AGO ?? 0) - (NWRecentPriceData[1].AGO ?? 0)) +
+          ((NCRecentPriceData[0].AGO ?? 0) - (NCRecentPriceData[1].AGO ?? 0));
 
-      const recentDPKPriceChg =
-        (SERecentPriceData[0].DPK ?? 0) -
-        (SERecentPriceData[1].DPK ?? 0) +
-        ((SWRecentPriceData[0].DPK ?? 0) - (SWRecentPriceData[1].DPK ?? 0)) +
-        ((SSRecentPriceData[0].DPK ?? 0) - (SSRecentPriceData[1].DPK ?? 0)) +
-        ((NERecentPriceData[0].DPK ?? 0) - (NERecentPriceData[1].DPK ?? 0)) +
-        ((NWRecentPriceData[0].DPK ?? 0) - (NWRecentPriceData[1].DPK ?? 0)) +
-        ((NCRecentPriceData[0].DPK ?? 0) - (NCRecentPriceData[1].DPK ?? 0));
+        recentPMSPriceChg =
+          (SERecentPriceData[0].PMS ?? 0) -
+          (SERecentPriceData[1].PMS ?? 0) +
+          ((SWRecentPriceData[0].PMS ?? 0) - (SWRecentPriceData[1].PMS ?? 0)) +
+          ((SSRecentPriceData[0].PMS ?? 0) - (SSRecentPriceData[1].PMS ?? 0)) +
+          ((NERecentPriceData[0].PMS ?? 0) - (NERecentPriceData[1].PMS ?? 0)) +
+          ((NWRecentPriceData[0].PMS ?? 0) - (NWRecentPriceData[1].PMS ?? 0)) +
+          ((NCRecentPriceData[0].PMS ?? 0) - (NCRecentPriceData[1].PMS ?? 0));
 
-      const recentLPGPriceChg =
-        (SERecentPriceData[0].LPG ?? 0) -
-        (SERecentPriceData[1].LPG ?? 0) +
-        ((SWRecentPriceData[0].LPG ?? 0) - (SWRecentPriceData[1].LPG ?? 0)) +
-        ((SSRecentPriceData[0].LPG ?? 0) - (SSRecentPriceData[1].LPG ?? 0)) +
-        ((NERecentPriceData[0].LPG ?? 0) - (NERecentPriceData[1].LPG ?? 0)) +
-        ((NWRecentPriceData[0].LPG ?? 0) - (NWRecentPriceData[1].LPG ?? 0)) +
-        ((NCRecentPriceData[0].LPG ?? 0) - (NCRecentPriceData[1].LPG ?? 0));
+        recentDPKPriceChg =
+          (SERecentPriceData[0].DPK ?? 0) -
+          (SERecentPriceData[1].DPK ?? 0) +
+          ((SWRecentPriceData[0].DPK ?? 0) - (SWRecentPriceData[1].DPK ?? 0)) +
+          ((SSRecentPriceData[0].DPK ?? 0) - (SSRecentPriceData[1].DPK ?? 0)) +
+          ((NERecentPriceData[0].DPK ?? 0) - (NERecentPriceData[1].DPK ?? 0)) +
+          ((NWRecentPriceData[0].DPK ?? 0) - (NWRecentPriceData[1].DPK ?? 0)) +
+          ((NCRecentPriceData[0].DPK ?? 0) - (NCRecentPriceData[1].DPK ?? 0));
 
-      const recentICEPriceChg =
-        (SERecentPriceData[0].ICE ?? 0) -
-        (SERecentPriceData[1].ICE ?? 0) +
-        ((SWRecentPriceData[0].ICE ?? 0) - (SWRecentPriceData[1].ICE ?? 0)) +
-        ((SSRecentPriceData[0].ICE ?? 0) - (SSRecentPriceData[1].ICE ?? 0)) +
-        ((NERecentPriceData[0].ICE ?? 0) - (NERecentPriceData[1].ICE ?? 0)) +
-        ((NWRecentPriceData[0].ICE ?? 0) - (NWRecentPriceData[1].ICE ?? 0)) +
-        ((NCRecentPriceData[0].ICE ?? 0) - (NCRecentPriceData[1].PMS ?? 0));
+        recentLPGPriceChg =
+          (SERecentPriceData[0].LPG ?? 0) -
+          (SERecentPriceData[1].LPG ?? 0) +
+          ((SWRecentPriceData[0].LPG ?? 0) - (SWRecentPriceData[1].LPG ?? 0)) +
+          ((SSRecentPriceData[0].LPG ?? 0) - (SSRecentPriceData[1].LPG ?? 0)) +
+          ((NERecentPriceData[0].LPG ?? 0) - (NERecentPriceData[1].LPG ?? 0)) +
+          ((NWRecentPriceData[0].LPG ?? 0) - (NWRecentPriceData[1].LPG ?? 0)) +
+          ((NCRecentPriceData[0].LPG ?? 0) - (NCRecentPriceData[1].LPG ?? 0));
+
+        recentICEPriceChg =
+          (SERecentPriceData[0].ICE ?? 0) -
+          (SERecentPriceData[1].ICE ?? 0) +
+          ((SWRecentPriceData[0].ICE ?? 0) - (SWRecentPriceData[1].ICE ?? 0)) +
+          ((SSRecentPriceData[0].ICE ?? 0) - (SSRecentPriceData[1].ICE ?? 0)) +
+          ((NERecentPriceData[0].ICE ?? 0) - (NERecentPriceData[1].ICE ?? 0)) +
+          ((NWRecentPriceData[0].ICE ?? 0) - (NWRecentPriceData[1].ICE ?? 0)) +
+          ((NCRecentPriceData[0].ICE ?? 0) - (NCRecentPriceData[1].PMS ?? 0));
+      } else {
+        recentAGOPriceChg = 0;
+        recentPMSPriceChg = 0;
+        recentDPKPriceChg = 0;
+        recentLPGPriceChg = 0;
+        recentICEPriceChg = 0;
+      }
 
       const recentAGOPricePercentChange = +recentAGOPriceChg / 6;
       const recentPMSPricePercentChange = +recentPMSPriceChg / 6;
@@ -1887,19 +1908,19 @@ export class PetroDataService {
       const overallPercentageChgICE = +overallPercentageChgFxn(ProductType.ICE);
 
       return {
-        AGOData: {
+        ICEData: {
           overallPricePercentChange:
-            overallPercentageChgAGO > 0
-              ? `+${overallPercentageChgAGO}`
-              : overallPercentageChgAGO < 0
-                ? `${overallPercentageChgAGO}`
+            overallPercentageChgICE > 0
+              ? `+${overallPercentageChgICE}`
+              : overallPercentageChgICE < 0
+                ? `${overallPercentageChgICE}`
                 : '0.00',
-          currentPrice: AGOCurrentPrice ? AGOCurrentPrice.toFixed(2) : '0.00',
+          currentPrice: ICECurrentPrice ? ICECurrentPrice.toFixed(2) : '0.00',
           recentPricePercentChange:
-            recentAGOPricePercentChange > 0
-              ? `+${recentAGOPricePercentChange.toFixed(2)}`
-              : recentAGOPricePercentChange < 0
-                ? `${recentAGOPricePercentChange.toFixed(2)}`
+            recentICEPricePercentChange > 0
+              ? `+${recentICEPricePercentChange.toFixed(2)}`
+              : recentICEPricePercentChange < 0
+                ? `${recentICEPricePercentChange.toFixed(2)}`
                 : '0.00',
           closedDate: SERecentPriceData[0].Period,
         },
@@ -1919,7 +1940,22 @@ export class PetroDataService {
                 : '0.00',
           closedDate: SERecentPriceData[0].Period,
         },
-
+        AGOData: {
+          overallPricePercentChange:
+            overallPercentageChgAGO > 0
+              ? `+${overallPercentageChgAGO}`
+              : overallPercentageChgAGO < 0
+                ? `${overallPercentageChgAGO}`
+                : '0.00',
+          currentPrice: AGOCurrentPrice ? AGOCurrentPrice.toFixed(2) : '0.00',
+          recentPricePercentChange:
+            recentAGOPricePercentChange > 0
+              ? `+${recentAGOPricePercentChange.toFixed(2)}`
+              : recentAGOPricePercentChange < 0
+                ? `${recentAGOPricePercentChange.toFixed(2)}`
+                : '0.00',
+          closedDate: SERecentPriceData[0].Period,
+        },
         DPKData: {
           overallPricePercentChange:
             overallPercentageChgDPK > 0
@@ -1953,25 +1989,9 @@ export class PetroDataService {
                 : '0.00',
           closedDate: SERecentPriceData[0].Period,
         },
-
-        ICEData: {
-          overallPricePercentChange:
-            overallPercentageChgICE > 0
-              ? `+${overallPercentageChgICE}`
-              : overallPercentageChgICE < 0
-                ? `${overallPercentageChgICE}`
-                : '0.00',
-          currentPrice: ICECurrentPrice ? ICECurrentPrice.toFixed(2) : '0.00',
-          recentPricePercentChange:
-            recentICEPricePercentChange > 0
-              ? `+${recentICEPricePercentChange.toFixed(2)}`
-              : recentICEPricePercentChange < 0
-                ? `${recentICEPricePercentChange.toFixed(2)}`
-                : '0.00',
-          closedDate: SERecentPriceData[0].Period,
-        },
       };
     } catch (error) {
+      console.log(error);
       error.location = `PetroDataServices.${this.petroDataAnalysisPercentages.name} method`;
       AppResponse.error(error);
     }

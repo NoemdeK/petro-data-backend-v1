@@ -9,9 +9,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { FileUploadModule } from './fileUpload/file-upload.module';
 import { DataEntryModule } from './DataEntry/data-entry.module';
+import { JobModule } from './job/job.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       envFilePath: ['.env'],
       isGlobal: true,
@@ -28,6 +31,7 @@ import { DataEntryModule } from './DataEntry/data-entry.module';
     PetroDataModule,
     FileUploadModule,
     DataEntryModule,
+    JobModule,
   ],
   controllers: [AppController],
   providers: [
