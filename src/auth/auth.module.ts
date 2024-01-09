@@ -14,6 +14,7 @@ import { EmailModule } from 'src/email/email.module';
 import { PetroDataUtility } from 'src/petroData/petroData.utility';
 import { PetroDataRepository } from 'src/petroData/petroData.repository';
 import { PetroData, PetroDataSchema } from 'src/schema/petro-data.schema';
+import { DataEntryUtility } from 'src/DataEntry/data-entry.utility';
 
 @Module({
   controllers: [AuthController],
@@ -38,6 +39,7 @@ import { PetroData, PetroDataSchema } from 'src/schema/petro-data.schema';
     AuthRepository,
     PetroDataUtility,
     PetroDataRepository,
+    DataEntryUtility,
   ],
 })
 export class AuthModule {}

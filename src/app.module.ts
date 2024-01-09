@@ -11,6 +11,7 @@ import { FileUploadModule } from './fileUpload/file-upload.module';
 import { DataEntryModule } from './DataEntry/data-entry.module';
 import { JobModule } from './job/job.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UserModule } from './users/user.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     PetroDataModule,
     FileUploadModule,
     DataEntryModule,
+    UserModule,
     JobModule,
   ],
   controllers: [AppController],

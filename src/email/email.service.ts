@@ -26,6 +26,7 @@ export class EmailService {
         this.logger.log('Email sent successfully');
       })
       .catch((error) => {
+        console.log(error);
         this.logger.error('Error sending email:', error);
       });
   }

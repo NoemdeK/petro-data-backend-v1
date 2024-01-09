@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Role } from 'src/common/interfaces/roles.interface';
 
 @Injectable()
 export class DataEntryUtility {
@@ -23,6 +24,7 @@ export class DataEntryUtility {
    */
 
   customDateFormat(dateObj: Date): string {
+    console.log(dateObj);
     const months = [
       'Jan',
       'Feb',
@@ -38,9 +40,9 @@ export class DataEntryUtility {
       'Dec',
     ];
 
-    const formattedDate = `${dateObj.getFullYear()}-${
-      months[dateObj.getMonth()]
-    }-${('0' + dateObj.getDate()).slice(-2)}`;
+    const formattedDate = `${dateObj?.getFullYear()}-${
+      months[dateObj?.getMonth()]
+    }-${('0' + dateObj?.getDate()).slice(-2)}`;
     return formattedDate;
   }
 
@@ -50,7 +52,7 @@ export class DataEntryUtility {
    * @returns {string}
    */
 
-  generateUniqueDataEntryCode(): string {
+  generateUniqueDataEntryCode(role: string): string {
     /* This uses the Fisher-Yates shuffle to generate random 4 digit values */
     let digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -60,6 +62,8 @@ export class DataEntryUtility {
     }
 
     const randomFourDigits = digits.slice(0, 4).join('');
-    return 'PDA-' + randomFourDigits;
+    return role === Role.RWX_DATA_ENTRY_USER
+      ? `PDFA-${randomFourDigits}`
+      : `PDA-${randomFourDigits}`;
   }
 }
