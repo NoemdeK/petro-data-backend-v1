@@ -27,7 +27,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.RWX_ADMIN, Role.RWX_DATA_ENTRY_USER)
+  @Roles(Role.RWX_ADMIN)
   @Post('/create')
   async createUser(
     @Req() req: any,
@@ -54,7 +54,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.RWX_ADMIN, Role.RWX_DATA_ENTRY_USER)
+  @Roles(Role.RWX_ADMIN)
   @Get('/retrieve')
   async retrieveUsers(
     @Req() req: any,
@@ -79,7 +79,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.RWX_ADMIN, Role.RWX_DATA_ENTRY_USER)
+  @Roles(Role.RWX_ADMIN)
   @Patch('/update')
   async updateUser(
     @Req() req: any,
@@ -96,7 +96,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.RWX_ADMIN, Role.RWX_DATA_ENTRY_USER)
+  @Roles(Role.RWX_ADMIN)
   @Patch('/suspend')
   async suspendUser(
     @Req() req: any,
@@ -110,7 +110,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(Role.RWX_ADMIN, Role.RWX_DATA_ENTRY_USER)
+  @Roles(Role.RWX_ADMIN)
   @Patch('/suspend')
   async deleteUser(
     @Req() req: any,
