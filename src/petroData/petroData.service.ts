@@ -98,14 +98,14 @@ export class PetroDataService {
   //   }
   // }
 
-  // /**
-  //  * @Responsibility: dedicated service for uploading csv/xlsx files into the database
-  //  *
-  //  * @param file
-  //  * @param configFileBuffer
-  //  *
-  //  * @returns {Promise<any>}
-  //  */
+  /**
+   * @Responsibility: dedicated service for uploading csv/xlsx files into the database
+   *
+   * @param file
+   * @param configFileBuffer
+   *
+   * @returns {Promise<any>}
+   */
 
   // async uploadFilesIntoDb({
   //   file,

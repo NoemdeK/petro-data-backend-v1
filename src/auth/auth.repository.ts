@@ -7,6 +7,10 @@ import {
   PasswordReset,
   PasswordResetDocument,
 } from 'src/schema/password-reset.schema';
+import { RetrieveUsersFlag } from 'src/users/enum/utils/enum.util';
+import { Role } from 'src/common/interfaces/roles.interface';
+import { DataEntryUtility } from 'src/DataEntry/data-entry.utility';
+import { RetrieveUsersDto } from 'src/users/dto/retrieve-users.dto';
 
 @Injectable()
 export class AuthRepository {
@@ -14,6 +18,7 @@ export class AuthRepository {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(PasswordReset.name)
     private passwordResetModel: Model<PasswordResetDocument>,
+    private readonly dataEntryUtility: DataEntryUtility,
   ) {}
 
   /**
@@ -57,6 +62,77 @@ export class AuthRepository {
     return await this.userModel.findOneAndUpdate(where, data, {
       new: true,
     });
+  }
+
+  /**
+   * @Responsibility: Repo for deleting a user
+   *
+   * @param where
+   * @returns {Promise<UserDocument>}
+   */
+
+  async deleteUser(where: any): Promise<UserDocument | any> {
+    return await this.userModel.findByIdAndDelete(where);
+  }
+
+  /**
+   * @Responsibility: Repo for retrieving a data entry
+   *
+   * @param data
+   * @returns {Promise<DataEntryDocument>}
+   */
+
+  async retrieveUsers<T>({
+    batch,
+    search,
+    flag,
+  }: Partial<RetrieveUsersDto>): Promise<{ data: T[]; count: number }> {
+    try {
+      let data,
+        query =
+          flag === RetrieveUsersFlag.ANALYSTS
+            ? { role: Role.RWX_DATA_ENTRY_ANALYST }
+            : { role: Role.RWX_DATA_ENTRY_USER };
+
+      // query: any = {
+      //   $or: [
+      //     { role: Role.RWX_DATA_ENTRY_ANALYST },
+      //     { role: Role.RWX_DATA_ENTRY_USER },
+      //   ],
+      // };
+
+      //todo ----->>>
+      /* Searching functionality */
+      // if (search) {
+      //   query = {
+      //     ...query,
+      //     $or: [
+      //       { pdaId: { $regex: new RegExp(search, 'i') } },
+      //       { pdfaId: { $regex: new RegExp(search, 'i') } },
+      //       { firstName: { $regex: new RegExp(search, 'i') } },
+      //       { lastName: { $regex: new RegExp(search, 'i') } },
+      //       { email: { $regex: new RegExp(search, 'i') } },
+      //     ],
+      //   };
+      // }
+
+      data = batch
+        ? await this.userModel
+            .find(query)
+            .lean()
+            .sort({ createdAt: -1 })
+            .skip(this.dataEntryUtility.paginationFunc(+batch, 10))
+            .limit(10)
+        : await this.userModel
+            .find(query)
+            .lean()
+            .sort({ createdAt: -1 })
+            .limit(10);
+      const count = await this.userModel.countDocuments(query);
+      return { data, count };
+    } catch (error) {
+      throw new Error(error?.messsage);
+    }
   }
 
   /**
@@ -112,7 +188,6 @@ export class AuthRepository {
    */
 
   async removeResetPwdToken(where: any): Promise<PasswordResetDocument | any> {
-    console.log(where);
     return await this.passwordResetModel.findByIdAndDelete(where);
   }
 }

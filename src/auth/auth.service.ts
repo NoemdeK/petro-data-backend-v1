@@ -1,5 +1,9 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto, LoginDto } from './dto/create-user.dto';
+import {
+  CreatePasswordDto,
+  CreateUserDto,
+  LoginDto,
+} from './dto/create-user.dto';
 import { AppResponse } from 'src/common/app.response';
 import { hashSync, genSaltSync, compareSync } from 'bcrypt';
 import { Role } from 'src/common/interfaces/roles.interface';
@@ -130,6 +134,11 @@ export class AuthService {
         });
       }
 
+      await this.authRepository.updateUser(
+        { _id: theUser?._id },
+        { lastLoggedIn: moment().utc().toDate() },
+      );
+
       /* Generate jwt token  for auth */
       function jwtPayloadForAuth() {
         return {
@@ -144,6 +153,36 @@ export class AuthService {
       };
     } catch (error) {
       error.location = `AuthServices.${this.login.name} method`;
+      AppResponse.error(error);
+    }
+  }
+
+  /**
+   * @Responsibility: dedicated service for creating password
+   *
+   * @param createPasswordDto
+   * @returns {Promise<any>}
+   */
+
+  async createPassword(createPasswordDto: CreatePasswordDto): Promise<any> {
+    try {
+      let { password, confirmPassword, userId } = createPasswordDto;
+
+      if (password !== confirmPassword) {
+        AppResponse.error({
+          message: 'Passwords do not match',
+          status: HttpStatus.BAD_REQUEST,
+        });
+      }
+
+      /* Hash password before storing it */
+      password = password ? hashSync(password, genSaltSync()) : null;
+
+      await this.authRepository.updateUser({ _id: userId }, { password });
+
+      return;
+    } catch (error) {
+      error.location = `AuthServices.${this.createPassword.name} method`;
       AppResponse.error(error);
     }
   }
@@ -199,6 +238,8 @@ export class AuthService {
       }
       /* Send email to user */
       await this.emailService.emailDispatcher(emailDispatcherPayload());
+
+      return;
     } catch (error) {
       error.location = `AuthServices.${this.forgotPassword.name} method`;
       AppResponse.error(error);
@@ -265,6 +306,8 @@ export class AuthService {
       }
       /* Send email to user */
       await this.emailService.emailDispatcher(emailDispatcherPayload());
+
+      return;
     } catch (error) {
       error.location = `AuthServices.${this.resetPassword.name} method`;
       AppResponse.error(error);

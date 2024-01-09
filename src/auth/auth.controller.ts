@@ -14,7 +14,11 @@ import {
 import { AuthService } from './auth.service';
 import { RequestHandler, Response, Request } from 'express';
 import { AppResponse } from 'src/common/app.response';
-import { CreateUserDto, LoginDto } from './dto/create-user.dto';
+import {
+  CreatePasswordDto,
+  CreateUserDto,
+  LoginDto,
+} from './dto/create-user.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from 'src/guards/jwt/jwt.guard';
 import { RoleGuard } from 'src/guards/roles.guard';
@@ -34,7 +38,6 @@ export class AuthController {
     @Res() res: Response,
     @Body() createUserDto: CreateUserDto,
   ): Promise<Response> {
-    console.log(createUserDto);
     const data = await this.authService.signup(createUserDto);
 
     return res
@@ -53,6 +56,18 @@ export class AuthController {
     return res
       .status(201)
       .json(success('Successfully created data entry user', 201, data));
+  }
+
+  @Patch('/create-password')
+  async createPassword(
+    @Res() res: Response,
+    @Body() createPasswordDto: CreatePasswordDto,
+  ): Promise<Response> {
+    const data = await this.authService.createPassword(createPasswordDto);
+
+    return res
+      .status(200)
+      .json(success('Successfully created new password', 200, data));
   }
 
   @Post('/login')
